@@ -1,0 +1,4040 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="cn" xml:lang="cn">
+<head>
+<!-- 2020-07-22 Wed 08:21 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>统计学习方法</title>
+<meta name="generator" content="Org mode" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2020 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        displayAlign: "center",
+        displayIndent: "0em",
+
+        "HTML-CSS": { scale: 100,
+                        linebreaks: { automatic: "false" },
+                        webFont: "TeX"
+                       },
+        SVG: {scale: 100,
+              linebreaks: { automatic: "false" },
+              font: "TeX"},
+        NativeMML: {scale: 100},
+        TeX: { equationNumbers: {autoNumber: "AMS"},
+               MultLineWidth: "85%",
+               TagSide: "right",
+               TagIndent: ".8em"
+             }
+});
+</script>
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">统计学习方法</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orga2a3fe3">1. 统计方法学习</a>
+<ul>
+<li><a href="#org0de618a">1.1. 统计学习</a></li>
+<li><a href="#orgef06870">1.2. 监督学习</a></li>
+<li><a href="#org3f2b942">1.3. 统计学习三要素</a>
+<ul>
+<li><a href="#orgd055512">1.3.1. 模型</a></li>
+<li><a href="#org0c1c745">1.3.2. 策略</a></li>
+<li><a href="#org0626a35">1.3.3. 算法</a></li>
+</ul>
+</li>
+<li><a href="#org2539881">1.4. 模型评估与模型选择</a>
+<ul>
+<li><a href="#org4292086">1.4.1. 训练误差与测试误差</a></li>
+<li><a href="#org2ec9cee">1.4.2. 过拟合与模型选择</a></li>
+</ul>
+</li>
+<li><a href="#org6d42ab7">1.5. 正则化与交叉验证</a></li>
+<li><a href="#org2a0740c">1.6. 泛化能力</a></li>
+<li><a href="#org545ca66">1.7. 生成模型与判别模型</a></li>
+<li><a href="#orgd20d8ab">1.8. 分类问题</a></li>
+<li><a href="#org8072a71">1.9. 标注问题</a></li>
+<li><a href="#orgf59aee2">1.10. 回归问题</a></li>
+</ul>
+</li>
+<li><a href="#org7a3c09f">2. 感知机</a>
+<ul>
+<li><a href="#orga49b9df">2.1. 感知机模型</a></li>
+<li><a href="#orgb9f7b51">2.2. 感知机学习策略</a></li>
+<li><a href="#org9653649">2.3. 感知机学习算法</a>
+<ul>
+<li><a href="#org25a4ce9">2.3.1. 算法的收敛性</a></li>
+<li><a href="#orga4eb1e3">2.3.2. 感知机学习算法的对偶形式</a></li>
+</ul>
+</li>
+<li><a href="#orga3d496b">2.4. 习题</a>
+<ul>
+<li><a href="#org337cf3d">2.4.1. 2.1 验证感知机为什么不能表示异或</a></li>
+<li><a href="#orgaedbf20">2.4.2. 2.2 模仿例题2.1，构建从训练数据集求解感知机模型的例子</a></li>
+<li><a href="#orgc1d00ae">2.4.3. 2.3 证明：样本集线性可分的充分必要条件是正实例点集所构成的凸壳与负实例点集所构成的凸壳互不相交</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org0c165c3">3. k近邻法</a>
+<ul>
+<li><a href="#org2511238">3.1. k近邻算法</a></li>
+<li><a href="#org7ec3495">3.2. k近邻模型</a>
+<ul>
+<li><a href="#org73b9289">3.2.1. 模型</a></li>
+<li><a href="#org6561423">3.2.2. 距离度量</a></li>
+<li><a href="#org8f86244">3.2.3. k值的选择</a></li>
+<li><a href="#org9371f9b">3.2.4. 分类决策规则</a></li>
+</ul>
+</li>
+<li><a href="#org043bcfb">3.3. k近邻法的实现：kd树</a>
+<ul>
+<li><a href="#org7d674e3">3.3.1. 构造kd树</a></li>
+<li><a href="#org5845ae9">3.3.2. 搜索kd树</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org6feceee">4. 朴素贝叶斯法</a>
+<ul>
+<li><a href="#org340c562">4.1. 朴素贝叶斯法的学习与分类</a>
+<ul>
+<li><a href="#org13b203f">4.1.1. 基本方法</a></li>
+<li><a href="#org6a2696e">4.1.2. 后验概率最大化的含义</a></li>
+</ul>
+</li>
+<li><a href="#org70e2674">4.2. 朴素贝叶斯法的参数估计</a>
+<ul>
+<li><a href="#org2c083fe">4.2.1. 极大似然估计</a></li>
+<li><a href="#org814c29a">4.2.2. 学习与分类算法</a></li>
+</ul>
+</li>
+<li><a href="#orgd6fd971">4.3. 习题</a>
+<ul>
+<li><a href="#org8c2c706">4.3.1. 用极大似然估计推出朴素贝叶斯法中的概率估计公式4.8和4.9</a></li>
+<li><a href="#org9fa9b26">4.3.2. 用贝叶斯估计法推出朴素贝叶斯法中的概率估计公式4.10和4.11</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org33fcb83">5. 决策树</a>
+<ul>
+<li><a href="#org55d6a45">5.1. 决策树模型与学习</a>
+<ul>
+<li><a href="#org4bc5bce">5.1.1. 决策树模型</a></li>
+<li><a href="#org3875819">5.1.2. 决策树与if-then规则</a></li>
+<li><a href="#org07dd3bd">5.1.3. 决策树与条件概率分布</a></li>
+<li><a href="#orgcd6d72c">5.1.4. 决策树学习</a></li>
+</ul>
+</li>
+<li><a href="#org8c61f64">5.2. 特征选择</a>
+<ul>
+<li><a href="#org98469f6">5.2.1. 特征选择问题</a></li>
+<li><a href="#orge623389">5.2.2. 信息增益</a></li>
+<li><a href="#org8f29311">5.2.3. 信息增益比</a></li>
+</ul>
+</li>
+<li><a href="#orga589671">5.3. 决策树的生成</a>
+<ul>
+<li><a href="#org1b4a1f8">5.3.1. ID3算法</a></li>
+<li><a href="#org5725bfb">5.3.2. C4.5的生成算法</a></li>
+</ul>
+</li>
+<li><a href="#org7936a4a">5.4. 决策树的剪枝</a></li>
+<li><a href="#org6f54082">5.5. CART算法</a>
+<ul>
+<li><a href="#orgaaedf73">5.5.1. CART生成</a></li>
+<li><a href="#org08436b8">5.5.2. CART剪枝</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orgcccfcb5">6. 逻辑回归与最大熵模型</a>
+<ul>
+<li><a href="#org3091205">6.1. 逻辑回归模型</a>
+<ul>
+<li><a href="#org5e27595">6.1.1. 逻辑斯谛分布</a></li>
+<li><a href="#org7be4a6d">6.1.2. 二项逻辑斯谛回归模型</a></li>
+<li><a href="#orgf579f05">6.1.3. 参数模型估计</a></li>
+<li><a href="#org6cc519c">6.1.4. 多项逻辑斯谛回归</a></li>
+</ul>
+</li>
+<li><a href="#org12c6e9c">6.2. 最大熵模型</a>
+<ul>
+<li><a href="#org1ab8087">6.2.1. 最大熵原理</a></li>
+<li><a href="#org351db01">6.2.2. 最大熵模型的定义</a></li>
+<li><a href="#org0a7beda">6.2.3. 最大熵模型的学习</a></li>
+<li><a href="#org93657b8">6.2.4. 极大似然估计</a></li>
+</ul>
+</li>
+<li><a href="#orgb655de3">6.3. 模型学习的最优化算法</a>
+<ul>
+<li><a href="#org28f8cd1">6.3.1. 改进的迭代尺度法（IIS）</a></li>
+<li><a href="#orge4d27f7">6.3.2. 拟牛顿法</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orgf1d320c">7. 支持向量机</a>
+<ul>
+<li><a href="#org4dda4e6">7.1. 线性可分支持向量机与硬间隔最大化</a>
+<ul>
+<li><a href="#org241f5ab">7.1.1. 函数间隔和几何间隔</a></li>
+<li><a href="#org9f3661a">7.1.2. 间隔最大化</a></li>
+<li><a href="#orgff2307d">7.1.3. 学习的对偶算法</a></li>
+</ul>
+</li>
+<li><a href="#orge54c3f2">7.2. 线性支持向量机与软间隔最大化</a>
+<ul>
+<li><a href="#org3c69de4">7.2.1. 线性支持向量机</a></li>
+<li><a href="#org8b7ca83">7.2.2. 学习的对偶问题</a></li>
+<li><a href="#org5943570">7.2.3. 支持向量</a></li>
+<li><a href="#org7611d6a">7.2.4. 合页损失函数</a></li>
+</ul>
+</li>
+<li><a href="#org418f8f7">7.3. 非线性支持向量机与核函数</a>
+<ul>
+<li><a href="#org0c327b9">7.3.1. 核技巧</a></li>
+<li><a href="#org3a63be1">7.3.2. 正定核</a></li>
+<li><a href="#orgfc97df0">7.3.3. 常用核函数</a></li>
+<li><a href="#orgbe479b9">7.3.4. 非线性支持向量分类机</a></li>
+</ul>
+</li>
+<li><a href="#orga88cae9">7.4. 序列最小最优化算法</a>
+<ul>
+<li><a href="#orgeba84a3">7.4.1. 两个变量二次规划的求解方法</a></li>
+<li><a href="#org38ef423">7.4.2. 变量的选择方法</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orgcb3096c">8. 提升方法</a>
+<ul>
+<li><a href="#org1c4197c">8.1. 提升方法AdaBoost算法</a>
+<ul>
+<li><a href="#orgf973ae4">8.1.1. 提升方法的基本思路</a></li>
+<li><a href="#org5f736e8">8.1.2. AdaBoost算法</a></li>
+</ul>
+</li>
+<li><a href="#orgb2f1336">8.2. AdaBoost算法的训练误差分析</a></li>
+<li><a href="#org24ac67a">8.3. AdaBoost算法的解释</a>
+<ul>
+<li><a href="#org5eb0d7e">8.3.1. 前向分布算法</a></li>
+<li><a href="#orgc932df7">8.3.2. 前向分布算法与AdaBoost</a></li>
+</ul>
+</li>
+<li><a href="#org8b8bce4">8.4. 提升树</a>
+<ul>
+<li><a href="#orgeab72b5">8.4.1. 提升树模型</a></li>
+<li><a href="#orgc390d37">8.4.2. 梯度提升</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org467414b">9. EM算法及其推广</a>
+<ul>
+<li><a href="#orgf43aac4">9.1. EM算法的引入</a>
+<ul>
+<li><a href="#orgc95df01">9.1.1. EM算法</a></li>
+<li><a href="#orgdf63bed">9.1.2. EM算法的导出</a></li>
+<li><a href="#orgb63f584">9.1.3. EM算法在非监督学习中的应用</a></li>
+</ul>
+</li>
+<li><a href="#org773979f">9.2. EM算法的收敛性</a></li>
+<li><a href="#org7937b40">9.3. EM算法在高斯混合模型学习中的应用</a>
+<ul>
+<li><a href="#orgb91cd4a">9.3.1. 高斯混合模型</a></li>
+<li><a href="#orgb2d28ff">9.3.2. 高斯混合模型参数估计的EM算法</a></li>
+</ul>
+</li>
+<li><a href="#org811f236">9.4. EM算法的推广</a>
+<ul>
+<li><a href="#orgd9c3ab6">9.4.1. F函数的极大-极大算法</a></li>
+<li><a href="#org8980cfd">9.4.2. GEM算法</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org917f0a8">10. 隐马尔可夫模型</a>
+<ul>
+<li><a href="#org7845119">10.1. 隐马尔可夫模型的基本概念</a>
+<ul>
+<li><a href="#org2bbd192">10.1.1. 隐马尔可夫模型的定义</a></li>
+<li><a href="#orga957ec7">10.1.2. 观测序列的生成过程</a></li>
+<li><a href="#org2f7813d">10.1.3. 隐马尔可夫模型的三个基本问题</a></li>
+</ul>
+</li>
+<li><a href="#org47b169b">10.2. 概率计算算法</a>
+<ul>
+<li><a href="#org546ed1c">10.2.1. 直接计算法</a></li>
+<li><a href="#org30acb72">10.2.2. 前向算法</a></li>
+<li><a href="#org74f5c1e">10.2.3. 后向算法</a></li>
+<li><a href="#org382e800">10.2.4. 一些概率与期望值的计算</a></li>
+</ul>
+</li>
+<li><a href="#org71c4462">10.3. 学习算法</a>
+<ul>
+<li><a href="#orgf10fd70">10.3.1. 监督学习算法</a></li>
+<li><a href="#org2be2be9">10.3.2. Baum-Welch算法</a></li>
+<li><a href="#org3a42ec4">10.3.3. Baum-Welch模型参数估计公式</a></li>
+</ul>
+</li>
+<li><a href="#orgd643647">10.4. 预测算法</a>
+<ul>
+<li><a href="#org35cda66">10.4.1. 近似算法</a></li>
+<li><a href="#org01e1ba3">10.4.2. 维特比算法</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org0bbc596">11. 条件随机场</a>
+<ul>
+<li><a href="#org068e086">11.1. 概率无向图模型</a>
+<ul>
+<li><a href="#orgdb15866">11.1.1. 模型定义</a></li>
+<li><a href="#org431ee66">11.1.2. 概率无向图模型的因子分解</a></li>
+</ul>
+</li>
+<li><a href="#org06bc18a">11.2. 条件随机场的定义与形式</a>
+<ul>
+<li><a href="#org0d4e6d2">11.2.1. 条件随机场的定义</a></li>
+<li><a href="#org5abde41">11.2.2. 条件随机场的参数化形式</a></li>
+<li><a href="#org5e85c76">11.2.3. 条件随机场的简化形式</a></li>
+<li><a href="#org755a6af">11.2.4. 条件随机场的矩阵形式</a></li>
+</ul>
+</li>
+<li><a href="#org6a7aa70">11.3. 条件随机场的概率计算问题</a>
+<ul>
+<li><a href="#orgb91f1be">11.3.1. 前向-后向算法</a></li>
+<li><a href="#orgf4728ce">11.3.2. 概率计算</a></li>
+<li><a href="#org1b65f63">11.3.3. 期望值的计算</a></li>
+</ul>
+</li>
+<li><a href="#org43f740f">11.4. 条件随机场的学习算法</a>
+<ul>
+<li><a href="#org16b45f3">11.4.1. 改进的迭代尺度法</a></li>
+<li><a href="#org3026df9">11.4.2. 拟牛顿法</a></li>
+</ul>
+</li>
+<li><a href="#org2064a8b">11.5. 条件随机和的预测算法</a></li>
+</ul>
+</li>
+<li><a href="#org25599da">12. 统计学习方法总结</a>
+<ul>
+<li><a href="#orge13fcf2">12.1. 适用问题</a></li>
+<li><a href="#orgb237e59">12.2. 模型</a></li>
+<li><a href="#org612cfbd">12.3. 学习策略</a></li>
+<li><a href="#org7c154c7">12.4. 学习算法</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-orga2a3fe3" class="outline-2">
+<h2 id="orga2a3fe3"><span class="section-number-2">1</span> 统计方法学习</h2>
+<div class="outline-text-2" id="text-1">
+</div>
+<div id="outline-container-org0de618a" class="outline-3">
+<h3 id="org0de618a"><span class="section-number-3">1.1</span> 统计学习</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+统计学习是计算机系统通过运用数据及统计方法提高系统性能的机器学习。
+特点
+</p>
+<ol class="org-ol">
+<li>以数据为研究对象，是数据是驱动的学科</li>
+<li>目的是对数据进行预测与分析</li>
+<li>以方法为中心，统计学习方法构建模型并应用模型进行预测与分析。</li>
+<li>统计学习是概率论、统计学、信息论、计算理论、最优化理论及计算机科学等多个领域的交叉学科。</li>
+</ol>
+<p>
+统计学习关于数据的基本假设是同类数据具有一定的统计规律型。
+统计学习方法的三要素
+</p>
+<ul class="org-ul">
+<li>模型，学习的模型属于某个假设空间</li>
+<li>策略，从假设空间中，根据某个评价准则，选择最优模型，是对其对已知训练数据和未知数据在给定评价准则下有最优预测。</li>
+<li>算法，最优模型的选取。</li>
+</ul>
+<p>
+实现统计学习方法的步骤
+</p>
+<ol class="org-ol">
+<li>得到一个有限的训练数据集和</li>
+<li>确定包含所有可能模型的假设空间。即学习模型的集合。</li>
+<li>确定模型选择的准则，即学习的策略。</li>
+<li>实现求解最优模型的算法，即学习的算法。</li>
+<li>通过学习方法选择最优模型。</li>
+<li>利用学习的最优模型对新数据进行预测或分析。</li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orgef06870" class="outline-3">
+<h3 id="orgef06870"><span class="section-number-3">1.2</span> 监督学习</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+学习一个模型，使模型能对任意给定的输入，对其相应的输出做一个好的预测。
+模型定义在特征空间上，不是输入空间。输入空间是输入可能的取值，特征空间是特征向量存在的空间。先将输入转化为特征。
+监督学习假设输入与输出的随机变量X和Y遵循某个联合概率分布。
+</p>
+</div>
+</div>
+<div id="outline-container-org3f2b942" class="outline-3">
+<h3 id="org3f2b942"><span class="section-number-3">1.3</span> 统计学习三要素</h3>
+<div class="outline-text-3" id="text-1-3">
+</div>
+<div id="outline-container-orgd055512" class="outline-4">
+<h4 id="orgd055512"><span class="section-number-4">1.3.1</span> 模型</h4>
+</div>
+<div id="outline-container-org0c1c745" class="outline-4">
+<h4 id="org0c1c745"><span class="section-number-4">1.3.2</span> 策略</h4>
+<div class="outline-text-4" id="text-1-3-2">
+</div>
+<ol class="org-ol">
+<li><a id="org0caa4ad"></a>损失函数和风险函数<br />
+<div class="outline-text-5" id="text-1-3-2-1">
+<p>
+损失函数度量模型一次预测的好坏，风险函数度量平均意义下模型预测的好坏。
+损失函数是f(X)和Y的非负值函数
+常用的损失函数
+</p>
+<ol class="org-ol">
+<li>0-1损失函数</li>
+<li>平方损失函数</li>
+<li><p>
+绝对损失函数
+</p>
+\begin{equation}
+L(Y, f(X)) = |f(X) - Y| \tag{1.7}
+\end{equation}</li>
+<li><p>
+对数损失函数或对数似然损失函数
+</p>
+\begin{equation}
+L(Y, P(Y|X)) = -\log P(Y|X) \tag{1.8}
+\end{equation}</li>
+</ol>
+<p>
+损失函数值越小，则模型越好。
+损失函数的期望是
+</p>
+\begin{equation}
+R_{exp}(f) = E_{p}L(Y, f(X)) = \int_{\mathcal{X} \times \mathcal{Y}} L(Y, f(X)) P(x, y)dxdy \tag{1.9}
+\end{equation}
+<p>
+是理论上模型f(X)关于联合分布P(X, Y)的平均意义下的损失，称为风险函数或期望损失。
+学习目标是选择风险最小的模型，但用于联合分布未知，所以无法求解。
+实际上计算模型f(X)关于训练数据的平均损失，称为经验风险或检验损失，即
+</p>
+\begin{equation}
+R_{emp}(f) = \frac 1 N \sum_{i=1}^N L(y_i, f(x_i)) \tag{1.10}
+\end{equation}
+<p>
+根据大数定律，当样本容量趋向无穷时，经验损失趋向于期望损失。可使用经验损失代替期望损失。
+实际中样本数目有限，需对经验风险进行一定的矫正。
+</p>
+</div>
+</li>
+<li><a id="org008befa"></a>经验风险最小化和结构风险最小化<br />
+<div class="outline-text-5" id="text-1-3-2-2">
+<p>
+经验风险最小化（ERM）策略认为经验风险最小的模型就是最优模型。
+当样本足够大时，可以保证很好的效果。
+但当样本比较小时，效果一定很好，会产生过拟合风险
+结构风险最小化（SRM）是为了防止过拟合而提出的策略，等价于正则化。
+</p>
+</div>
+</li>
+</ol>
+</div>
+<div id="outline-container-org0626a35" class="outline-4">
+<h4 id="org0626a35"><span class="section-number-4">1.3.3</span> 算法</h4>
+<div class="outline-text-4" id="text-1-3-3">
+<p>
+统计学习问题归结为最优化问题，对应算法为求解最优化问题的算法。
+如何保证找到全局最优解，并使求解过程高效是重要的问题。
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org2539881" class="outline-3">
+<h3 id="org2539881"><span class="section-number-3">1.4</span> 模型评估与模型选择</h3>
+<div class="outline-text-3" id="text-1-4">
+</div>
+<div id="outline-container-org4292086" class="outline-4">
+<h4 id="org4292086"><span class="section-number-4">1.4.1</span> 训练误差与测试误差</h4>
+</div>
+<div id="outline-container-org2ec9cee" class="outline-4">
+<h4 id="org2ec9cee"><span class="section-number-4">1.4.2</span> 过拟合与模型选择</h4>
+</div>
+</div>
+<div id="outline-container-org6d42ab7" class="outline-3">
+<h3 id="org6d42ab7"><span class="section-number-3">1.5</span> 正则化与交叉验证</h3>
+</div>
+<div id="outline-container-org2a0740c" class="outline-3">
+<h3 id="org2a0740c"><span class="section-number-3">1.6</span> 泛化能力</h3>
+</div>
+<div id="outline-container-org545ca66" class="outline-3">
+<h3 id="org545ca66"><span class="section-number-3">1.7</span> 生成模型与判别模型</h3>
+</div>
+<div id="outline-container-orgd20d8ab" class="outline-3">
+<h3 id="orgd20d8ab"><span class="section-number-3">1.8</span> 分类问题</h3>
+</div>
+<div id="outline-container-org8072a71" class="outline-3">
+<h3 id="org8072a71"><span class="section-number-3">1.9</span> 标注问题</h3>
+</div>
+<div id="outline-container-orgf59aee2" class="outline-3">
+<h3 id="orgf59aee2"><span class="section-number-3">1.10</span> 回归问题</h3>
+</div>
+</div>
+<div id="outline-container-org7a3c09f" class="outline-2">
+<h2 id="org7a3c09f"><span class="section-number-2">2</span> 感知机</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-orga49b9df" class="outline-3">
+<h3 id="orga49b9df"><span class="section-number-3">2.1</span> 感知机模型</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+f(x)=sign(w<sup>T</sup> x+b)
+</p>
+</div>
+</div>
+<div id="outline-container-orgb9f7b51" class="outline-3">
+<h3 id="orgb9f7b51"><span class="section-number-3">2.2</span> 感知机学习策略</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+对数据集中所有数据有y<sub>i</sub>(w<sup>T</sup> x<sub>i</sub> + b) &gt; 0，则数据集线性可分。
+损失函数为误分类点到超平面的距离和总和，设M为误分类点集合，则有
+</p>
+\begin{equation}
+L(w, b) = - \sum_{x_i \in M} y_i (w^T x_i + b) \tag{2.4}
+\end{equation}
+<p>
+感知机学习目标是使上式最小的模型。
+</p>
+</div>
+</div>
+<div id="outline-container-org9653649" class="outline-3">
+<h3 id="org9653649"><span class="section-number-3">2.3</span> 感知机学习算法</h3>
+<div class="outline-text-3" id="text-2-3">
+</div>
+<div id="outline-container-org25a4ce9" class="outline-4">
+<h4 id="org25a4ce9"><span class="section-number-4">2.3.1</span> 算法的收敛性</h4>
+<div class="outline-text-4" id="text-2-3-1">
+<p>
+定理 2.1 Novikoff
+设训练数据集T={(x<sub>1</sub>, y<sub>1</sub>), &ctdot;, (x<sub>N</sub>, y<sub>N</sub>)}是线性可分的，其中 \(x_i \in \mathcal{X} = \mathbb{R}^n,\ y_i \in \mathcal{Y} = {-1,+1},\ i = 1,2,\cdots, N\) ，则
+</p>
+<ol class="org-ol">
+<li><p>
+存在满足条件 \(||\hat{w}_{opt}|| = 1\) 的超平面，\(\hat{w}_{opt} \cdot \hat{x} = 0\) 将训练数据集完全正确分开，且要在&gamma; &gt; 0，对所有i有
+</p>
+\begin{equation}
+y_i (\hat{w}_{opt} \cdot \hat{x}) \ge \gamma \tag{2.8}
+\end{equation}</li>
+<li><p>
+令 \(R=\max_{1 \le i \le N}||\hat{x}_i||\) ，则感知机算法在训练集上的误分类次数k满足不等式
+</p>
+\begin{equation}
+k \le (\frac {R} {\gamma})^2 \tag{2.9}
+\end{equation}</li>
+</ol>
+<p>
+证明:
+</p>
+<ol class="org-ol">
+<li><p>
+若数据集线性可分，则存在超平面 \(\hat{w}_{opt} \cdots \hat{x} = 0\) 将数据集完全分开，对于数据集中的数据，均有
+</p>
+\begin{equation}
+y_i (\hat{w}_{opt} \cdot \hat{x}_i) > 0
+\end{equation}
+<p>
+所以存在
+</p>
+\begin{equation}
+\gamma = \min_{i} {y_i (\hat{w}_{opt} \cdot \hat{x}_i)}
+\end{equation}
+<p>
+使 \(y_i (\hat{w}_{opt} \cdot \hat{x}_i) \ge \gamma\)
+Q.E.D.
+</p></li>
+<li><p>
+感知机算法从 \(\hat{w}_0\) 开始，如果样本分类错误则更新权重， 令 \(\hat{w}_{k-1}\) 使第k个分类错误样本之前的权重，则第k个分类错误样本的条件是
+</p>
+\begin{equation}
+y_i (\hat{w}_{opt} \cdot \hat{x}_i) \le 0
+\end{equation}
+<p>
+此时 \(\hat{w}_{k} = \hat{w}_{k-1} + \eta y_i \hat{x}_i\) 。
+有以下两个不等式
+</p>
+
+\begin{align}
+\hat{w}_k \cdot \hat{w}_{opt} &= \hat{w}_{k-1} \cdot \hat{w}_{opt} + \eta y_i \hat{w}_{opt} \cdot \hat{x}_i \\
+& \ge \hat{w}_{k-1} \cdot \hat{w}_{opt} + \eta \gamma \\
+& \ge \hat{w}_{k-2} \cdot \hat{w}_{opt} + 2\eta \gamma \\
+& \cdots \\
+& \ge k \eta \gamma \tag{2.12} \\
+\vert\vert \hat{w}_k \vert\vert^2 &= ||\hat{w}_{k-1}||^2 + 2\eta y_i \hat{w}_{k-1} \cdot \hat{x}_i + \eta^2 ||\hat{x}_i||^2 \\
+& \le ||\hat{w}_{k-1}||^2 + \eta^2 R^2 \\
+& \le ||\hat{w}_{k-2}||^2 + 2\eta^2 R^2 \\
+& \le \cdots \\
+& \le k \eta^2 R^2
+\end{align}
+<p>
+结合两个不等式有
+</p>
+\begin{align}
+& k \eta \gamma \le \hat{w}_k \cdot \hat{w}_{opt} \le ||\hat{w}_k|| ||\hat{w}_{opt}|| \le \sqrt{k} \eta R \\
+\Rightarrow & k^2 \gamma^2 \le k R^2 \\
+\Rightarrow & k \le (\frac R \gamma)^2
+\end{align}
+<p>
+Q.E.D.
+</p></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orga4eb1e3" class="outline-4">
+<h4 id="orga4eb1e3"><span class="section-number-4">2.3.2</span> 感知机学习算法的对偶形式</h4>
+<div class="outline-text-4" id="text-2-3-2">
+<p>
+对偶形式的基本想法是，将w和b表示为示例x<sub>i</sub>和标记y<sub>i</sub>的线性组合的形式，通过求解系数得到w和b。
+设w和b的初始值为0，对与误分类点(x<sub>i</sub>, y<sub>i</sub>)通过公式更新w和b，修改n次后，w和b的关于(x<sub>i</sub>, y<sub>i</sub>)的增量分别为&alpha;<sub>i</sub> y<sub>i</sub> x<sub>i</sub>和&alpha;<sub>i</sub> y<sub>i</sub>，其中&alpha;<sub>i</sub> = n<sub>i</sub>&eta;，则最后学习的w和b可表示为
+</p>
+\begin{align}
+w = sum_{i=1}^N \alpha_i y_i x_i \tag{2.14} \\
+b = \sum_{i=1}^n \alpha_i y_i \tag{2.15}
+\end{align}
+<p>
+实例点更新次数越多，则它离超平面越近，也越难正确划分。对结果影响越大。
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orga3d496b" class="outline-3">
+<h3 id="orga3d496b"><span class="section-number-3">2.4</span> 习题</h3>
+<div class="outline-text-3" id="text-2-4">
+</div>
+<div id="outline-container-org337cf3d" class="outline-4">
+<h4 id="org337cf3d"><span class="section-number-4">2.4.1</span> 2.1 验证感知机为什么不能表示异或</h4>
+<div class="outline-text-4" id="text-2-4-1">
+<p>
+异或线性不可分
+</p>
+</div>
+</div>
+<div id="outline-container-orgaedbf20" class="outline-4">
+<h4 id="orgaedbf20"><span class="section-number-4">2.4.2</span> 2.2 模仿例题2.1，构建从训练数据集求解感知机模型的例子</h4>
+<div class="outline-text-4" id="text-2-4-2">
+<p>
+略
+</p>
+</div>
+</div>
+<div id="outline-container-orgc1d00ae" class="outline-4">
+<h4 id="orgc1d00ae"><span class="section-number-4">2.4.3</span> 2.3 证明：样本集线性可分的充分必要条件是正实例点集所构成的凸壳与负实例点集所构成的凸壳互不相交</h4>
+<div class="outline-text-4" id="text-2-4-3">
+<p>
+证：
+充分性，若样本线性可分，存在超平面w<sup>T</sup> x = 0，对任意正例有w<sup>T</sup> x &gt; 0，对任意反例有w<sup>T</sup> x &le; 0，对于任意正例凸壳中的样本点x=&sum;<sub>i=1</sub><sup>k</sup> &lambda;<sub>i</sub> x<sub>i</sub>，有&sum;<sub>i=1</sub><sup>k</sup> &lambda;<sub>i</sub> w<sup>T</sup> x<sub>i</sub> &gt; 0，对于任意反例凸壳中的样本点x=&sum;<sub>i=1</sub><sup>k</sup> &lambda;<sub>i</sub> x<sub>i</sub>，有&sum;<sub>i=1</sub><sup>k</sup> &lambda;<sub>i</sub> w<sup>T</sup> x<sub>i</sub> &le; 0，所以两个凸壳被超平面分开，互不相交。
+必要性，
+&#x2026;
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org0c165c3" class="outline-2">
+<h2 id="org0c165c3"><span class="section-number-2">3</span> k近邻法</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-org2511238" class="outline-3">
+<h3 id="org2511238"><span class="section-number-3">3.1</span> k近邻算法</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+算法 3.1 k近邻法
+输入：训练数据集T={(x<sub>1</sub>, y<sub>1</sub>), (x<sub>2</sub>, y<sub>2</sub>), &ctdot;, (x<sub>N</sub>, y<sub>N</sub>)}，其中 \(y_i \in \mathcal{Y} = \{c_1, c_2, \cdots, c_K\}\)
+输出：类别y
+</p>
+<ol class="org-ol">
+<li>根据给定的距离度量，在训练集T中找出与x最邻近的k个点，涵盖这k个点的x的领域记做N<sub>k</sub>(x)</li>
+<li>在N<sub>k</sub>(x)中根据分类决策规则，决定x的类别y</li>
+</ol>
+<p>
+k近邻法没有显式的学习过程。
+</p>
+</div>
+</div>
+<div id="outline-container-org7ec3495" class="outline-3">
+<h3 id="org7ec3495"><span class="section-number-3">3.2</span> k近邻模型</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+k近邻使用的模型有三个基本要素，距离度量、k值和分类决策规则，决定。
+</p>
+</div>
+<div id="outline-container-org73b9289" class="outline-4">
+<h4 id="org73b9289"><span class="section-number-4">3.2.1</span> 模型</h4>
+<div class="outline-text-4" id="text-3-2-1">
+<p>
+模型相当于根据三要素划分特征空间为多个子空间，确定每个子空间里每个点所属的类。
+</p>
+</div>
+</div>
+<div id="outline-container-org6561423" class="outline-4">
+<h4 id="org6561423"><span class="section-number-4">3.2.2</span> 距离度量</h4>
+<div class="outline-text-4" id="text-3-2-2">
+<p>
+距离是衡量特征空间中两个样本相似度的度量，一般使用L<sub>p</sub>距离（Minkowski距离）
+</p>
+\begin{equation}
+L_p(x_i, x_j) = (\sum_{l=1}^n |x_i^l - x_j^l|^p)^{\frac 1 p} \tag{3.2}
+\end{equation}
+<p>
+当p=1时，称为曼哈顿距离
+当p=2时，称为欧式距离
+当p=&infin; 时，是各个坐标距离的最大值。
+</p>
+</div>
+</div>
+<div id="outline-container-org8f86244" class="outline-4">
+<h4 id="org8f86244"><span class="section-number-4">3.2.3</span> k值的选择</h4>
+<div class="outline-text-4" id="text-3-2-3">
+<p>
+k值的选择对算法性能影响较大。
+当k较小时，但结果容易受到噪声的影响，容易过拟合；当k较大时，容易受到无关样本的影响，模型变得简单。
+</p>
+</div>
+</div>
+<div id="outline-container-org9371f9b" class="outline-4">
+<h4 id="org9371f9b"><span class="section-number-4">3.2.4</span> 分类决策规则</h4>
+<div class="outline-text-4" id="text-3-2-4">
+<p>
+一般使用多数表决，是误分类的概率最小，等价于经验风险最小化。
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org043bcfb" class="outline-3">
+<h3 id="org043bcfb"><span class="section-number-3">3.3</span> k近邻法的实现：kd树</h3>
+<div class="outline-text-3" id="text-3-3">
+<p>
+k近邻算法的主要问题在与如何快速进行k近邻搜索。简单的方法是线性扫描，但数据量大时速度很慢。
+一个改进的方法是使用kd树存储训练数据，减少计算距离的次数。
+</p>
+</div>
+<div id="outline-container-org7d674e3" class="outline-4">
+<h4 id="org7d674e3"><span class="section-number-4">3.3.1</span> 构造kd树</h4>
+<div class="outline-text-4" id="text-3-3-1">
+<p>
+kd树是一种对k维空间实例点进行存储以便对其进行快速检索的树形结构。kd树是二叉树，表示对k维空间的一个划分。构造kd树的过程相当于不断地用垂直与坐标的超平面将k维空间切分，构成一系列k维超矩形区域。
+构造方法如下
+算法 3.2 构造平衡kd树
+输入：k为空间数据集T
+输出：kd树
+</p>
+<ol class="org-ol">
+<li>构造根结点，使跟结点对应于k维空间中包含所有实例点的超矩形区域；</li>
+<li>在超巨星区域上选择一个坐标轴和在此坐标轴上的一个切分点，确定一个超平面，这个超平面过选定点并垂直于选定坐标轴，将当前区域切分为左右两个自区域。</li>
+<li>递归第二步，知道子区域没有实例时终止。</li>
+</ol>
+<p>
+递归过程中将实例保存在相应的结点上。
+划分时选择中位数作为切分点，可得到平衡的kd树，但平衡kd树搜索效率不一定最优。
+</p>
+</div>
+</div>
+<div id="outline-container-org5845ae9" class="outline-4">
+<h4 id="org5845ae9"><span class="section-number-4">3.3.2</span> 搜索kd树</h4>
+<div class="outline-text-4" id="text-3-3-2">
+<p>
+以搜索最近邻为例
+算法 3.3 用kd树的最近邻搜索
+输入：kd树，目标点x
+输出：x的最近邻
+</p>
+<ol class="org-ol">
+<li>在kd树中找到包含目标点x的叶结点，从根结点出发，递归向下访问kd树。若目标点x当前维的坐标小于切分点的坐标，则移动到左子结点，否则移动到右子结点，直到子结点为叶结点为止。</li>
+<li>以此叶结点为当前最近结点。</li>
+<li>递归向上回退，在每个结点进行以下操作
+<ol class="org-ol">
+<li>如果该结点保存在实例点比当前最近距离点距离目标点更近，则以该实例点为当前最近点。</li>
+<li>当前最近点一定存在与该结点的一个子结点对应的区域，检查该子结点的父节点的另一子结点对应的区域是否有更近的点。具体来说，检查另一结点对应的区域是否与以目标点为球心、以目标点与当前最近点的距离为半径的超球体相交。</li>
+</ol></li>
+<li>回退到根结点时，搜索结束，最后的当前最近点即为x的最近邻点。</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org6feceee" class="outline-2">
+<h2 id="org6feceee"><span class="section-number-2">4</span> 朴素贝叶斯法</h2>
+<div class="outline-text-2" id="text-4">
+</div>
+<div id="outline-container-org340c562" class="outline-3">
+<h3 id="org340c562"><span class="section-number-3">4.1</span> 朴素贝叶斯法的学习与分类</h3>
+<div class="outline-text-3" id="text-4-1">
+</div>
+<div id="outline-container-org13b203f" class="outline-4">
+<h4 id="org13b203f"><span class="section-number-4">4.1.1</span> 基本方法</h4>
+<div class="outline-text-4" id="text-4-1-1">
+<p>
+朴素贝叶斯法通过训练数据集学习联合概率分布P(X, Y)。具体地，学习以下先验条件概率分布以及条件概率分布。
+</p>
+\begin{align}
+&P(Y=c_k), \ k=1,2,\cdots, K \tag{4.1}\\
+&P(X=x|Y=c_k) = P(X^{(1)}=x^{(1)}, \cdots, X^{(n)}=x^{(n)} | c_k),\ k=1,2,\cdots, K \tag{4.2}
+\end{align}
+<p>
+由于条件概率的参数是指数级的，估计是不可行的。所以朴素贝叶斯增加了属性独立性假设，即分类的特征在类确定的条件下都是条件独立的。
+预测时，根据训练的先验概率和条件概率计算出后验概率P(Y=c<sub>k</sub>|X=x)，将后验概率最大的类作为x的预测输出。
+</p>
+</div>
+</div>
+<div id="outline-container-org6a2696e" class="outline-4">
+<h4 id="org6a2696e"><span class="section-number-4">4.1.2</span> 后验概率最大化的含义</h4>
+<div class="outline-text-4" id="text-4-1-2">
+<p>
+等价于期望风险最小化准则
+证
+假定选择0-1损失函数时，期望风险为
+</p>
+\begin{equation}
+R_{exp}(f) = E[L(Y, f(X))]
+\end{equation}
+<p>
+损失函数是X和Y的函数，此时固定Y有
+</p>
+\begin{equation}
+R_{exp}(f) = E_X[\sum_{k=1}^K L(c_k, f(X)) P(c_k|X)]
+\end{equation}
+<p>
+此时为了使期望风险最小化，对X=x逐个极小化，得
+</p>
+\begin{align}
+f(x) &= \arg\min_{y \in \mathcal{Y}} \sum_{k=1}^K L(c_k, y) P(c_k|X=x) \\
+&= \arg\min_{y \in \mathcal{Y}} \sum_{k=1}^K P(y \neq c_k | X=x) \\
+&= \arg\min_{y \in \mathcal{Y}} \sum_{k=1}^K (1 - P(y = c_k | X=x)) \\
+&= \arg\max_{y \in \mathcal{Y}} P(y=c_k|X=x)
+\end{align}
+</div>
+</div>
+</div>
+<div id="outline-container-org70e2674" class="outline-3">
+<h3 id="org70e2674"><span class="section-number-3">4.2</span> 朴素贝叶斯法的参数估计</h3>
+<div class="outline-text-3" id="text-4-2">
+</div>
+<div id="outline-container-org2c083fe" class="outline-4">
+<h4 id="org2c083fe"><span class="section-number-4">4.2.1</span> 极大似然估计</h4>
+</div>
+<div id="outline-container-org814c29a" class="outline-4">
+<h4 id="org814c29a"><span class="section-number-4">4.2.2</span> 学习与分类算法</h4>
+</div>
+</div>
+<div id="outline-container-orgd6fd971" class="outline-3">
+<h3 id="orgd6fd971"><span class="section-number-3">4.3</span> 习题</h3>
+<div class="outline-text-3" id="text-4-3">
+</div>
+<div id="outline-container-org8c2c706" class="outline-4">
+<h4 id="org8c2c706"><span class="section-number-4">4.3.1</span> 用极大似然估计推出朴素贝叶斯法中的概率估计公式4.8和4.9</h4>
+<div class="outline-text-4" id="text-4-3-1">
+<p>
+<a href="https://zhuanlan.zhihu.com/p/89249562">习题答案</a>
+起初不明白的地方是为什么将所要求先验概率和条件概率作为参数代入似然方程。仔细研究思考之后，认为应该是将潜在的分布认为是离散分布。
+</p>
+</div>
+</div>
+<div id="outline-container-org9fa9b26" class="outline-4">
+<h4 id="org9fa9b26"><span class="section-number-4">4.3.2</span> 用贝叶斯估计法推出朴素贝叶斯法中的概率估计公式4.10和4.11</h4>
+<div class="outline-text-4" id="text-4-3-2">
+<p>
+需要用的狄利克雷分布，暂时还不理解，暂时跳过。
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org33fcb83" class="outline-2">
+<h2 id="org33fcb83"><span class="section-number-2">5</span> 决策树</h2>
+<div class="outline-text-2" id="text-5">
+</div>
+<div id="outline-container-org55d6a45" class="outline-3">
+<h3 id="org55d6a45"><span class="section-number-3">5.1</span> 决策树模型与学习</h3>
+<div class="outline-text-3" id="text-5-1">
+</div>
+<div id="outline-container-org4bc5bce" class="outline-4">
+<h4 id="org4bc5bce"><span class="section-number-4">5.1.1</span> 决策树模型</h4>
+<div class="outline-text-4" id="text-5-1-1">
+<p>
+分类决策树是一种描述对实例进行分类的树形结构。由结点和有向边构成，结点分为内部结点和叶结点，内部结点表示一个特征或属性，叶结点表示一个类。
+</p>
+</div>
+</div>
+<div id="outline-container-org3875819" class="outline-4">
+<h4 id="org3875819"><span class="section-number-4">5.1.2</span> 决策树与if-then规则</h4>
+</div>
+<div id="outline-container-org07dd3bd" class="outline-4">
+<h4 id="org07dd3bd"><span class="section-number-4">5.1.3</span> 决策树与条件概率分布</h4>
+</div>
+<div id="outline-container-orgcd6d72c" class="outline-4">
+<h4 id="orgcd6d72c"><span class="section-number-4">5.1.4</span> 决策树学习</h4>
+<div class="outline-text-4" id="text-5-1-4">
+<p>
+学习目标是根据给定的训练数据集构建一个决策树模型，使它能够对实例正确分类。
+本质上是从训练集中归纳出一组分类规则。
+需要训练一个与训练集矛盾较小同时具有很好泛化能力的决策树。
+</p>
+
+<p>
+决策树学习的损失函数通常是正则化的极大似然函数，学习策略是最小化损失函数。
+损失函数确定后，问题转变为在损失函数意义下选择最优决策树，是个NP完全问题。
+</p>
+
+<p>
+决策树学习算法通常是一个递归地选择最优特征，并根据特征对训练数据进行分割，使得各个子数据集有一个最后的分类过程。
+训练后，需要对以生成的树进行剪枝，使决策树有更好的泛化能力，避免过拟合。
+</p>
+
+<p>
+决策树算法包含特征选择、决策树的生成与决策树的剪枝过程。
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org8c61f64" class="outline-3">
+<h3 id="org8c61f64"><span class="section-number-3">5.2</span> 特征选择</h3>
+<div class="outline-text-3" id="text-5-2">
+</div>
+<div id="outline-container-org98469f6" class="outline-4">
+<h4 id="org98469f6"><span class="section-number-4">5.2.1</span> 特征选择问题</h4>
+<div class="outline-text-4" id="text-5-2-1">
+<p>
+特征选择在于选取对训练数据具有分类能力的特征，可以提高决策树的学习效率。如果利用一个特征进行分类的结果与随机分类的结果没有很大的差别，则称这个特征是没有分类能力的。
+通常特征选择的准则是信息增益或信息增益比。
+</p>
+</div>
+</div>
+<div id="outline-container-orge623389" class="outline-4">
+<h4 id="orge623389"><span class="section-number-4">5.2.2</span> 信息增益</h4>
+<div class="outline-text-4" id="text-5-2-2">
+<p>
+熵表示随机变量不确定性的度量。熵越大，随机变量的不确定性越大呢。
+随机变量X给定的条件下随机变量Y的条件熵H(Y|X)，定位为随机变量X给定条件下Y的条件概率分类的熵对X的数学期望。
+当熵和条件熵中的概率有数据估计得到时，所对应的熵与条件熵分别称为经验熵和经验条件熵。
+信息增益表示得知特征X的信息使得Y的信息不确定性减少的程度。
+定义 5.2 信息增益
+特征A对训练数据集D的信息增益g(D,A)，定义为集合D的经验熵H(D)特征A给定条件下D的经验条件熵之差，即
+</p>
+\begin{equation}
+g(D, A) = H(D) - H(D|A) \tag{5.6}
+\end{equation}
+<p>
+熵H(Y)与条件熵H(Y|X)之差称为互信息。信息增益等价于数据集D中类与特征的互信息。信息增益越大则特征的分类能力更强。
+算法 5.1 信息增益的算法
+输入：训练数据集D和特征A
+输出：特征A对训练数据集D的信息增益g(D, A)
+</p>
+<ol class="org-ol">
+<li>计算数据集D的经验熵H(D)</li>
+<li>计算特征A对数据集D的经验条件熵H(D|A)</li>
+<li>计算信息增益</li>
+</ol>
+<p>
+信息增益偏向选择取值较多的特征
+</p>
+</div>
+</div>
+<div id="outline-container-org8f29311" class="outline-4">
+<h4 id="org8f29311"><span class="section-number-4">5.2.3</span> 信息增益比</h4>
+<div class="outline-text-4" id="text-5-2-3">
+<p>
+信息增益比是特征选择的另一个准则
+定义 5.3 信息增益比
+特征A对训练数据集D的信息增益比g<sub>R</sub>(D,A)定义为其信息增益g(D, A)与特征A的经验熵之比
+</p>
+\begin{equation}
+g_R(D, A) = \frac {g(D, A)} {H(A)} \tag{5.10}
+\end{equation}
+<p>
+信息增益比倾向于选择取值较少的特征。
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orga589671" class="outline-3">
+<h3 id="orga589671"><span class="section-number-3">5.3</span> 决策树的生成</h3>
+<div class="outline-text-3" id="text-5-3">
+</div>
+<div id="outline-container-org1b4a1f8" class="outline-4">
+<h4 id="org1b4a1f8"><span class="section-number-4">5.3.1</span> ID3算法</h4>
+<div class="outline-text-4" id="text-5-3-1">
+<p>
+ID3算法的核心是在决策树各个结点熵应用信息增益准则选择特征，递归构建决策树。
+算法 5.2 ID3算法
+输入：训练集D，特征A，阈值&epsilon;
+输出：决策树T
+</p>
+<ol class="org-ol">
+<li>若D中所有实例属于同一类C<sub>k</sub>，则T为单结点树，将类C<sub>k</sub>作为该结点的类标记，返回T。</li>
+<li>若A=&empty;，则T为单结点树，并将D中实例树最大的类C<sub>k</sub>作为该结点的类标记，返回T。</li>
+<li>计算A中各个特征对D的信息增益，选择信息增益最大的特征A<sub>g</sub>。</li>
+<li>如果A<sub>g</sub>的信息增益小于阈值&epsilon;，置T为单结点树，将D中实例树最大的类C<sub>k</sub>作为该结点的类标记，返回T。</li>
+<li>否则，对A<sub>g</sub>的每一个可能值a<sub>i</sub>，以A<sub>g</sub>=a<sub>i</sub>将dD分割为若干非空子集D<sub>i</sub>，将D<sub>i</sub>中实例树最大的类作为标记，构建子结点，由结点及其子结点构成树T，返回T；</li>
+<li>对第i个自己点，以D<sub>i</sub>为训练集，以A-{A<sub>g</sub>}为特征集，递归地调用上述步骤，得到子树T<sub>i</sub>, 返回T<sub>i</sub></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org5725bfb" class="outline-4">
+<h4 id="org5725bfb"><span class="section-number-4">5.3.2</span> C4.5的生成算法</h4>
+<div class="outline-text-4" id="text-5-3-2">
+<p>
+C4.5算法对ID3算法进行了改进，在生成过程中使用信息增益比来选择特征。
+算法 5.3 C4.5的生成算法
+输入：训练集D，特征A，阈值&epsilon;
+输出：决策树T
+</p>
+<ol class="org-ol">
+<li>若D中所有实例属于同一类C<sub>k</sub>，则T为单结点树，将类C<sub>k</sub>作为该结点的类标记，返回T。</li>
+<li>若A=&empty;，则T为单结点树，并将D中实例树最大的类C<sub>k</sub>作为该结点的类标记，返回T。</li>
+<li>计算A中各个特征对D的信息增益比，选择信息增益比最大的特征A<sub>g</sub>。</li>
+<li>如果A<sub>g</sub>的信息增益比小于阈值&epsilon;，置T为单结点树，将D中实例树最大的类C<sub>k</sub>作为该结点的类标记，返回T。</li>
+<li>否则，对A<sub>g</sub>的每一个可能值a<sub>i</sub>，以A<sub>g</sub>=a<sub>i</sub>将dD分割为若干非空子集D<sub>i</sub>，将D<sub>i</sub>中实例树最大的类作为标记，构建子结点，由结点及其子结点构成树T，返回T；</li>
+<li>对第i个自己点，以D<sub>i</sub>为训练集，以A-{A<sub>g</sub>}为特征集，递归地调用上述步骤，得到子树T<sub>i</sub>, 返回T<sub>i</sub></li>
+</ol>
+</div>
+</div>
+</div>
+<div id="outline-container-org7936a4a" class="outline-3">
+<h3 id="org7936a4a"><span class="section-number-3">5.4</span> 决策树的剪枝</h3>
+<div class="outline-text-3" id="text-5-4">
+<p>
+决策树容易出现过拟合，原因在于过多地考虑了如何提高对训练数据的正确分类，构建出过于复杂的决策树。
+解决办法是对已生成的决策树进行简化，这个过程称为剪枝。
+决策树剪枝通常考虑极小化决策树整体的损失函数或代价函数来实现。
+设树T的叶结点个数为|T|，t是树T的叶结点，该叶结点有N<sub>t</sub>个样本点，其中k类的样本点有N<sub>tk</sub>个，H<sub>t</sub>(T)为叶结点t上的经验熵，&alpha; &ge; 0为参数，则决策树学习的损失函数可定义为
+</p>
+\begin{align}
+C_\alpha(T) &= \sum_{t=1}^{|T|}N_t H_t(T) + \alpha |T| \tag{5.11} \\
+&= C(T) + \alpha |T|
+\end{align}
+<p>
+其中C(T)表示模型对训练集的预测误差，|T|表示模型复杂度，参数&alpha; &ge; 0控制两者之间的影响。
+剪枝是当&alpha; 确定时，选择损失函数最小的模型。
+</p>
+
+<p>
+算法 5.4 树的剪枝算法
+输入：决策树T，参数&alpha;
+输出：修剪后的子树T<sub>&alpha;</sub>
+</p>
+<ol class="org-ol">
+<li>计算每个结点的经验熵</li>
+<li>递归地从树的叶结点向上回缩。回缩到父结点之前与之后的树为T<sub>B</sub>与T<sub>A</sub>。若C<sub>&alpha;</sub>(T<sub>A</sub>) &le; C<sub>&alpha;</sub>(T<sub>B</sub>),则进行剪枝，将父节点变为新的叶结点。</li>
+<li>重复步骤二，直到不能继续为止，得到损失函数最小的子树T<sub>&alpha;</sub></li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org6f54082" class="outline-3">
+<h3 id="org6f54082"><span class="section-number-3">5.5</span> CART算法</h3>
+<div class="outline-text-3" id="text-5-5">
+<p>
+分类与回归树(CART)模型是应用广泛的决策树学习方法，即可以用于分类，也可以用于回归。
+CART是二叉树，内部结点特征的取值为是和否，左树为是，右树为否。等价与递归二分每个特征，将特征空间划分为有限个单元，并在这些单元上确定预测的概率分布。
+</p>
+</div>
+<div id="outline-container-orgaaedf73" class="outline-4">
+<h4 id="orgaaedf73"><span class="section-number-4">5.5.1</span> CART生成</h4>
+<div class="outline-text-4" id="text-5-5-1">
+<p>
+CART对回归树使用平方误差最小化准则，对分类树使用基尼指数最小化准则，进行特征选择生成二叉树。
+</p>
+
+<p>
+假设X是输入变量，Y是连续的输出变量。给定数据集T，假定将输入空间划分为M个单元R<sub>1</sub>,&ctdot;,R<sub>m</sub>，并在每个单元上有一个固定的输出值c<sub>m</sub>，则回归树模型可表示为
+</p>
+\begin{equation}
+f(x) = \sum_{m=1}^M c_m I(x \in R_m) \tag{5.16}
+\end{equation}
+<p>
+当划分确定的时候，用平方误差来表示回归树的预测误差，解得每个单元上的最优输出是这个单元所有样例输出的均值，即
+</p>
+\begin{equation}
+\hat{c}_m = \arg(y_i | x_i \in R_m) \tag{5.17}
+\end{equation}
+
+<p>
+问题在于如何进行划分，CART采用启发式的方法。
+选择第j个变量x<sup>(j)</sup>和它的取值s，作为切分变量和切分点，并定义两个区域
+</p>
+\begin{align}
+R_{1}(j, s) = \{x | x^{(j)} \le s \} \\
+R_{2}(j, s) = \{x | x^{(j)} > s \}
+\end{align}
+<p>
+求解
+</p>
+\begin{equation}
+\min_{j, s}\left[ \min_{c_1} \sum_{x_i \in R_1(j,s)} (y_i - c_1)^2 + \min_{c_2} \sum_{x_i \in R_2(j,s)} (y_i - c_2)^2  \right] \tag{5.19}
+\end{equation}
+<p>
+固定特征j可以找到j的最优切分点，遍历所有变量可找到最优切分变量。递归对每个区域进行划分，直到满足停止条件为止。
+</p>
+
+<p>
+算法 5.5 最小二乘回归树生成算法
+输入：训练集D
+输出：回归树
+</p>
+<ol class="org-ol">
+<li>求解式5.19，选择最优切分变量j与切分点s。</li>
+<li>用j和s划分输入空间，并决定相应的输出值。</li>
+<li>对划分的两个子空间递归调用上述两个步骤，直到满足停止条件。</li>
+<li>将输入空间划分为M个区域R<sub>1</sub>,R<sub>2</sub>,&ctdot;,R<sub>M</sub>，生成决策树</li>
+</ol>
+
+<p>
+分类树用基尼指数选择最优特征只，同时决定该特征的最优二值切分点
+定义 5.4 基尼指数
+分类问题中，假设有K个类，样本点属于第k类的概率为p<sub>k</sub>，则概率分布基尼指数定义为
+</p>
+\begin{equation}
+Gini(p) = \sum_{k=1}^K p_k (1 - p_k) = 1 - \sum_{k=1}^m p_K^2 \tag{5.22}
+\end{equation}
+<p>
+样本集合D根据特征A是否取值a被分割为D<sub>1</sub>和D<sub>2</sub>，则在特征A条件下，集合D的基尼指数定义为
+</p>
+\begin{equation}
+Gini(D, A) = \frac {|D_1|} {|D|}Gini(D_1) + \frac {|D_2|}{|D|} Gini(D_2) \tag{5.25}
+\end{equation}
+
+<p>
+算法 5.6 CART生成算法
+输入：训练数据集D，停止计算条件
+输出：CART决策树
+</p>
+<ol class="org-ol">
+<li>结点的训练数据集D，计算现有的特征对该数据集的基尼指数。对每个一个特征A，该特征每个可能的取值a，根据A=a来进行划分，用式5.25计算A=a的基尼指数。</li>
+<li>选择基尼指数最小的A=a进行划分，生成两个子结点。</li>
+<li>递归对子结点进行划分，直到满足停止条件。</li>
+<li>生成CART决策树</li>
+</ol>
+<p>
+算法停止计算的条件是结点中的样本个数小于预定阈值，或样本集的基尼指数小于预定阈值，或没有更多特征。
+</p>
+</div>
+</div>
+
+<div id="outline-container-org08436b8" class="outline-4">
+<h4 id="org08436b8"><span class="section-number-4">5.5.2</span> CART剪枝</h4>
+<div class="outline-text-4" id="text-5-5-2">
+<p>
+CART剪枝由两步组成
+</p>
+<ol class="org-ol">
+<li>从生成算法产生的决策树T<sub>0</sub>底端开始不断剪枝，直到T<sub>0</sub>的跟结点。形成一个子树序列{T<sub>0</sub>, &ctdot;, T<sub>n</sub>}。</li>
+<li>通过交叉验证法在独立的验证数据集上对子树序列进行测试，选择最优子树。</li>
+</ol>
+
+<p>
+可用递归的方法对树进行剪枝，将&alpha; 从小增大，0=&alpha;<sub>0</sub> &lt; &alpha;<sub>1</sub> &lt; &ctdot; &lt; &alpha; &lt; &infin; ，产生一系列区间[&alpha;<sub>i</sub>, &alpha;<sub>i+1</sub>)，剪枝得到的子树序列对应这区间的最优子树序列，序列中的子树是嵌套的。
+</p>
+
+
+<p>
+对T<sub>0</sub>中每一内部结点，计算
+</p>
+\begin{equation}
+g(t) = \frac {C(t) - C(T_t)} {|T_t| - 1} \tag{5.31}
+\end{equation}
+<p>
+表示剪枝后整体损失函数减少的程度。在T<sub>0</sub>中减去g(t)最小的T<sub>t</sub>，将得到子树作为T<sub>1</sub>，同时将最小的g(t)设为&alpha;<sub>1</sub>。T<sub>1</sub>为区间[&alpha;<sub>1</sub>, &alpha;<sub>2</sub>)的最优子树。直到得到根结点。
+</p>
+
+<p>
+算法 5.7 CART剪枝算法
+输入：决策树T<sub>0</sub>
+输出：最优决策树T<sub>&alpha;</sub>
+</p>
+<ol class="org-ol">
+<li>设k=0，T=T<sub>0</sub>，&alpha;=+&infin;</li>
+<li><p>
+自下而上地对各内部结点t计算C(T<sub>t</sub>)，|T<sub>t</sub>|以及
+</p>
+\begin{align}
+g(t) = \frac {C(t) - C(T_1)} {|T_1| - 1} \notag \\
+\alpha = \min(\alpha, g(t)) \notag
+\end{align}</li>
+<li>对有g(t)=&alpha; 的内部结点t进行剪枝，并对叶结点t以多数表决法决定其类，得到树T。</li>
+<li>设k=k+1, &alpha;<sub>k</sub> = &alpha;, T<sub>k</sub>=T</li>
+<li>如果T<sub>k</sub>不是根结点及两个叶结点构成的树则返回步骤2，否则令T<sub>k</sub> = T<sub>n</sub></li>
+<li>采用交叉验证法在子树序列中选取最优子树T<sub>&alpha;</sub></li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgcccfcb5" class="outline-2">
+<h2 id="orgcccfcb5"><span class="section-number-2">6</span> 逻辑回归与最大熵模型</h2>
+<div class="outline-text-2" id="text-6">
+</div>
+<div id="outline-container-org3091205" class="outline-3">
+<h3 id="org3091205"><span class="section-number-3">6.1</span> 逻辑回归模型</h3>
+<div class="outline-text-3" id="text-6-1">
+</div>
+<div id="outline-container-org5e27595" class="outline-4">
+<h4 id="org5e27595"><span class="section-number-4">6.1.1</span> 逻辑斯谛分布</h4>
+<div class="outline-text-4" id="text-6-1-1">
+<p>
+定义 6.1 逻辑斯谛分布
+设X是连续随机变量，X服从逻辑斯谛分布是指X具有下列分布函数和密度函数
+</p>
+\begin{align}
+F(X) = P\{X \le x\} = \frac 1 {1 + e^{-(x-\mu)/\gamma}} \tag{6.1} \\
+f(x) = F'(x) = \frac {e^{-(x-\mu) / \gamma}} {\gamma(1+e^{-(x-\mu)/\gamma})^2} \tag{6.2}
+\end{align}
+<p>
+分布函数其实就是sigmoid函数，&mu; 用来控制中心（对称点），&gamma; 用来控制变化程度。
+</p>
+</div>
+</div>
+<div id="outline-container-org7be4a6d" class="outline-4">
+<h4 id="org7be4a6d"><span class="section-number-4">6.1.2</span> 二项逻辑斯谛回归模型</h4>
+<div class="outline-text-4" id="text-6-1-2">
+<p>
+就是逻辑回归模型，&mu;=0，&sigma;=1
+事件的几率(odds)指该事件发生的概率与不发生的概率的比值
+该事件的对数几率(log odds)是
+</p>
+\begin{equation}
+logit(p) = \log \frac {p} {1-p} \notag
+\end{equation}
+<p>
+在统计学中，几率(odds)与概率是两个不同的东西。
+几率这个定义的相关问题没有找到。
+在wiki中，odds的这个词的翻译是发生比。google上前几页有意义的信息基本上都与逻辑回归想关联。
+</p>
+<p>
+在逻辑回归中，输出y=1的对数几率是输入x的线性函数。
+</p>
+</div>
+</div>
+<div id="outline-container-orgf579f05" class="outline-4">
+<h4 id="orgf579f05"><span class="section-number-4">6.1.3</span> 参数模型估计</h4>
+<div class="outline-text-4" id="text-6-1-3">
+<p>
+在逻辑回归模型中，对给定的数据集D，应用极大似然法估计模型参数，可得到逻辑回归模型
+设P(Y=1|x)=&pi;(x), P(Y=0|x)=1-&pi;(x)
+则似然函数为
+</p>
+\begin{equation}
+\prod_{i=1}^N \pi^{y_i}(x_i) (1-\pi(x_i))^{1-y_i} \notag
+\end{equation}
+
+<p>
+得到对数似然函数
+</p>
+\begin{equation}
+L(w) = \sum_{i=1}^N [y_i \log(\pi(x_i)) + (1-y_i)\log(1-\pi(x_i))] \notag
+\end{equation}
+</div>
+</div>
+<div id="outline-container-org6cc519c" class="outline-4">
+<h4 id="org6cc519c"><span class="section-number-4">6.1.4</span> 多项逻辑斯谛回归</h4>
+<div class="outline-text-4" id="text-6-1-4">
+<p>
+简单概括就是，如果有N类分类，则训练N-1个逻辑回归模型。
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org12c6e9c" class="outline-3">
+<h3 id="org12c6e9c"><span class="section-number-3">6.2</span> 最大熵模型</h3>
+<div class="outline-text-3" id="text-6-2">
+</div>
+<div id="outline-container-org1ab8087" class="outline-4">
+<h4 id="org1ab8087"><span class="section-number-4">6.2.1</span> 最大熵原理</h4>
+<div class="outline-text-4" id="text-6-2-1">
+<p>
+最大熵原理是概率模型学习的一个准则，学习概率模型时，在所有可能的概率模型分布中，熵最大的模型是最好的模型。通常用约束条件了确定概率模型的集合。所以，最大熵模型也可以表述为，在满足约束条件的模型集合中选取熵最大的模型。
+</p>
+
+<p>
+最大熵原理应该是一种偏好。机器学习可以看作中假设空间中选择出符合训练数据集的假设，但是，选择出的假设可能有很多，或者说一般来讲都有很多，要从这许多假设中选出一个作为最终结果，最大熵原理就是用来做这个选择的方法，和经验风险最小方法的功能一致。
+</p>
+</div>
+</div>
+<div id="outline-container-org351db01" class="outline-4">
+<h4 id="org351db01"><span class="section-number-4">6.2.2</span> 最大熵模型的定义</h4>
+<div class="outline-text-4" id="text-6-2-2">
+<p>
+设分类模型是一个条件概率分布P(Y|X)，表示对于给定的输入X以条件概率P(Y|X)输出Y。
+给定训练集D，学习的目标是用最大熵原理选择最好的分类模型。
+在应用最大熵原理之前，模型应能满足训练数据集D。
+在给定训练数据集时，可以得到联合分布P(X, Y)和边缘分布P(X)的经验分布，即
+</p>
+\begin{align}
+\tilde{P}(X=x, Y=y) = \frac {v(X=x, Y=y)} N \\
+\tilde{P}(X=x) = \frac {v(X=x)} N
+\end{align}
+<p>
+用特征函数f(x,y)描述输入x和输出y之间的某一个事实，定义为
+</p>
+\begin{equation}
+f(x,y) = \begin{cases}
+1, & x与y满足某一事实 \\
+0, & 其他
+\end{cases}
+\end{equation}
+<p>
+特征函数可以是任意实值函数，这里是二值函数。
+特征函数f(x,y)关于经验分布 \(\tilde{P}(X,Y)\) 的期望值
+</p>
+\begin{equation}
+E_{\tilde{P}}(f) = \sum_{x, y} \tilde{P}(x, y)f(x,y)
+\end{equation}
+<p>
+特征函数f(x,y)关于模型与经验分布 \(\tilde{P}(X)\) 的期望值
+</p>
+\begin{equation}
+E_P(f) = \sum_{x, y} \tilde{P}(x) P(y|x) f(x,y)
+\end{equation}
+<p>
+如果模型能够获取训练数据中的信息，那么可以假设这两个期望值相等，即
+</p>
+\begin{equation}
+E_P(f) = E_{\tilde{P}}(f) \tag{6.10} \label{6.10}
+\end{equation}
+<p>
+将式 \(\eqref{6.10}\) 作为约束条件，假如有n个特征函数，那么就有n个约束条件。
+</p>
+
+<p>
+定义 6.3 最大熵模型
+假设满足所有约束条件的模型集合为
+</p>
+\begin{equation}
+\mathcal{C} \equiv = \{P \in \mathcal{P} | E_P(f_i) = E_{\tilde{P}}(f_i), i=1,2,\cdots,n \} \tag{6.12}
+\end{equation}
+<p>
+定义在条件概率分布P(Y|X)上的条件熵为
+</p>
+\begin{equation}
+H(P) = - \sum_{x,y} \tilde{P}(x) P(y|x) \ln P(y|x) \tag{6.13}
+\end{equation}
+<p>
+则模型集合中条件熵最大的模型称为最大熵模型。
+</p>
+</div>
+</div>
+<div id="outline-container-org0a7beda" class="outline-4">
+<h4 id="org0a7beda"><span class="section-number-4">6.2.3</span> 最大熵模型的学习</h4>
+<div class="outline-text-4" id="text-6-2-3">
+<p>
+等价为约束最优化问题，即
+</p>
+\begin{align}
+\min_{P \in C} & -H(P) = \sum_{x,y} \tilde{P}(x) P(y|x) \ln P(y|x) \notag \\
+s.t. & E_P(f_i)- E_{\tilde{P}}(f_i) = 0, i=1,2,\cdots,n \notag \\
+& \sum_{y} P(y|x) = 1 \notag
+\end{align}
+<p>
+使用拉格朗日乘子法得到函数
+</p>
+\begin{equation}
+L(P, w) = -H(P) + w_0 (1-\sum_y P(y|x)) + \sum_{i=1}^n w_i (E_P(f_i)- E_{\tilde{P}}(f_i)) \notag
+\end{equation}
+<p>
+原始问题为 \(\min_{P \in C} \max_w L(P, w)\) ，转化为对偶问题为 \(\max_w \min_{P \in C} L(P, w)\) ，且两者等价。
+先求解对偶问题内部最小化问题，即 \(\min_P L(P, w)\)
+对L(P,w)求关于P(y|x)的偏导数，即
+</p>
+\begin{align}
+\frac {\partial L(P,w)} {\partial P(y|x)} &= \sum_{x, y} \tilde{P}(x) (\log P(y|x) + 1) - \sum_{y} w_0 - \sum_{x, y} (\tilde{P}(x) \sum_{i=1}^n w_i f_i(x,y)) \\
+&= \sum_{x, y}\tilde{P}(x) \left( \log P(y|x) + 1 - w_0 - \sum_{i=1}^n w_i f_i(x,y) \right)
+\end{align}
+<p>
+令偏导数等于0，\(\tilde{P}(x) > 0\) 的情况下，解得
+</p>
+\begin{equation}
+P(y|x) = exp(\sum_{i=1}^n w_i f_i(x,y) + w_0 - 1) = \frac {exp(\sum_{i=1}^n w_i f_i(x,y))} {1-w_0} \notag
+\end{equation}
+<p>
+根据约束条件，可得
+</p>
+\begin{equation}
+\Phi(w) = \min_P L(P, w) = L(P_w, w) = \frac 1 {Z_w(x)} exp \left(\sum_{i=1}^n w_i f_i(x,y) \right) \tag{6.22}
+\end{equation}
+<p>
+其中，\(Z_w(x) = \sum_y exp \left( \sum_{i=1}^n w_i f_i(x,y) \right)\) ，称为规范化因子，f<sub>i</sub>(x, y)是特征函数，w<sub>i</sub>是特征的权值。P<sub>w</sub>(y|x)就是最大熵模型，w是模型的参数向量。
+然后，再求解外部极大化问题 $max<sub>w</sub> &Phi;(w)$，解记为w<sup>*</sup>，即
+</p>
+\begin{equation}
+w^{\star} = \arg\max_w \Phi(w) \tag{6.25}
+\end{equation}
+<p>
+即可得到最终模型。最大化过程就是学习过程。
+</p>
+</div>
+</div>
+<div id="outline-container-org93657b8" class="outline-4">
+<h4 id="org93657b8"><span class="section-number-4">6.2.4</span> 极大似然估计</h4>
+</div>
+</div>
+<div id="outline-container-orgb655de3" class="outline-3">
+<h3 id="orgb655de3"><span class="section-number-3">6.3</span> 模型学习的最优化算法</h3>
+<div class="outline-text-3" id="text-6-3">
+<p>
+常用的求解方法有改进的迭代尺度法、梯度下降法、牛顿法或拟牛顿法。牛顿法或拟牛顿法一般收敛速度更快。
+</p>
+</div>
+<div id="outline-container-org28f8cd1" class="outline-4">
+<h4 id="org28f8cd1"><span class="section-number-4">6.3.1</span> 改进的迭代尺度法（IIS）</h4>
+<div class="outline-text-4" id="text-6-3-1">
+<p>
+是一种最大熵模型学习的最优化算法。
+最大熵模型为
+</p>
+\begin{equation}
+P_w(y|x) = \frac 1 {Z_w(x)} exp \left(\sum_{i=1}^n w_i f_i(x,y) \right)
+\end{equation}
+<p>
+对数似然函数为
+</p>
+\begin{equation}
+L(w) = \sum_{x,y} \tilde{P}(x,y) \sum_{i=1}^n w_i f_i(x, y) - \sum_{x} \tilde{P}(x) \log Z_w(x)
+\end{equation}
+<p>
+目标是通过激动似然估计学习模型参数w，
+IIS的思路是，假设当前模型的参数向量是w，希望找到一个新的参数向量w+&delta;，使得模型的对数似然增大，直到找到对数似然的最大值。
+当模型从参数w到w+&delta; 时，对数似然函数的改变量是
+</p>
+\begin{align}
+L(w+\delta) - L(w) &= \sum_{x,y} \tilde{P}(x,y) \sum_{i=1}^n \delta_i f_i(x,y) - \sum_{x} \tilde{P}(x) \log \frac {Z_{w+\delta}(x)} {Z_w(x)} \notag \\
+& \ge \sum_{x,y} \tilde{P}(x,y) \sum_{i=1}^n \delta_i f_i(x,y) - \sum_{x} \tilde{P}(x)  \frac {Z_{w+\delta}(x)} {Z_w(x)} \notag \\
+& = \sum_{x,y} \tilde{P}(x,y) \sum_{i=1}^n \delta_i f_i(x,y) - \sum_{x} \tilde{P}(x) \frac {P_w(y|x)} {exp(\sum_{i=1}^n w_i f_i(x,y))} Z_{w+\delta}(x) \notag \\
+& = \sum_{x,y} \tilde{P}(x,y) \sum_{i=1}^n \delta_i f_i(x,y) - \sum_{x} \tilde{P}(x) \sum_{y} P_{w}(y|x) exp(\sum_{i=1}^n \delta_i f_i(x,y)) \notag
+\end{align}
+<p>
+将右端记为A(&delta;|w)，则A(&delta;|w)是对数似然函数改变量的一个下界。
+若能找到适当的&delta; 是下界提高，则对数似然函数也会提高，&delta; 有多个变量不易同时优化。所以，IIS一次只优化一个变量，固定其他变量。
+IIS引入一个量f<sup>\sharp</sup>(x,y) = &sum;<sub>i</sub> f<sub>i</sub>(x, y)表示所有特征在(x,y)出现的次数。将A(&delta;|w)改写为
+</p>
+\begin{equation}
+A(\delta|w) = \sum_{x,y} \tilde{P}(x,y) \sum_{i=1}^n \delta_i f_i(x,y) - \sum_{x} \tilde{P}(x) \sum_{y} P_{w}(y|x) exp(f^\sharp(x,y)\sum_{i=1}^n \frac {\delta_i f_i(x,y)} {f^\sharp(x, y)}) \tag{6.30}
+\end{equation}
+<p>
+利用指数函数的凸性，以及对任意i，有 \(\frac{f_{i}(x,y)}{f^\sharp{x,y}} \ge 0\) ，且 \(\sum_{i=1}^n \frac{f_{i}(x,y)}{f^\sharp{x,y}} = 1\) ，根据Jensen不等式有
+</p>
+\begin{equation}
+exp(\sum_{i=1}^n \frac {f_i(x,y)} {f^\sharp(x, y)} \delta_i f^\sharp(x,y)) \le \sum_{i=1}^n \frac {f_i(x,y)} {f^\sharp(x, y)} \exp(\delta_i f^\sharp(x,y))
+\end{equation}
+<p>
+过凸函数任意两点做割线，这两点之间的割线一定在这两点图像的上方。即 \(t f(x_1) + (1-t)f(x_2) \ge f(t x_1 + (1-t)x_2)\)
+这里将不等式推广到了多维空间，以&delta;<sub>i</sub>为定点做超平面，平面上的点大于函数值
+</p>
+<p>
+改写6.30得
+</p>
+\begin{equation}
+A(\delta|w) = \sum_{x,y} \tilde{P}(x,y) \sum_{i=1}^n \delta_i f_i(x,y) - \sum_{x} \tilde{P}(x) \sum_{y} P_{w}(y|x) \sum_{i=1}^n \frac {f_i(x,y)} {f^\sharp(x, y)} exp(\delta_i f^\sharp(x,y)) = B(\delta | w) \tag{6.31}
+\end{equation}
+<p>
+B(&delta; | w)是新的下界。对&delta;<sub>i</sub>求偏导数有
+</p>
+\begin{equation}
+\frac {\partial B(\delta|w)} {\partial \delta_i} = \sum_{x, y} \tilde{P}(x) f_i(x, y) - \sum_{x} \tilde{P}(x) \sum_{y} P_w(y|x) f_i(x,y) exp(\delta_i f^\sharp(x,y)) \tag{6.32}
+\end{equation}
+<p>
+令偏导数为0，可解出&delta;
+</p>
+
+<p>
+算法 6.1 改进的迭代尺度算法IIS
+输入：特征函数f<sub>1</sub>, f<sub>2</sub>, &ctdot;, f<sub>n</sub>，经验分布 \(\tilde{P}(x, u)\) ，模型P<sub>w</sub>(y|x)
+输出：最优参数值w<sub>i</sub><sup>star</sup>，最优模型P<sub>w</sub>
+</p>
+<ol class="org-ol">
+<li>w = 0</li>
+<li>对每个i &isin; {1,2,&ctdot;, n}
+<ol class="org-ol">
+<li>令&delta;<sub>i</sub>是方程 \(\sum_{x, y}\tilde{P}(x) P(y|x) f_i(x, u) exp(\delta_i f^\sharp(x, y)) = E_{\tilde{P}}(f_i)\) 的解。</li>
+<li>更新w<sub>i</sub>的值：w<sub>i</sub> = w<sub>i</sub> + &delta;<sub>i</sub></li>
+<li>如果不是所有w<sub>i都收敛</sub>，重复上述步骤。</li>
+</ol></li>
+</ol>
+<p>
+在求解&delta;<sub>i</sub>时，若f<sup>\sharp</sup>是常数，则&delta;<sub>i</sub>可以显示的表示为
+</p>
+\begin{equation}
+\delta_i = \frac 1 {f^\sharp(x,y)} \log \frac {E_{\tilde{P}}(f_i)} {E_P(f_i)} \tag{6.34}
+\end{equation}
+<p>
+否则，必须通过数值计算求&delta;<sub>i</sub>，可以使用牛顿法，以g(&delta;<sub>i</sub>)=0表示方程6.33，通过迭代求得，迭代公式为
+</p>
+\begin{equation}
+\delta_i^{(k+1)} = \delta_i^{(k)} - \frac {g(\delta_i^{(k)})} {g'(\delta_i^{(k)})} \tag{6.35}
+\end{equation}
+<p>
+牛顿房恒收敛且收敛速度快。
+</p>
+</div>
+</div>
+
+<div id="outline-container-orge4d27f7" class="outline-4">
+<h4 id="orge4d27f7"><span class="section-number-4">6.3.2</span> 拟牛顿法</h4>
+<div class="outline-text-4" id="text-6-3-2">
+<p>
+目标函数为
+</p>
+\begin{equation}
+\min_{w \in R^n} f(w) = \sum_{x} \tilde{P}(x) \log \sum_y exp\left( \sum_{i=1}^n w_i f_i(x,y) \right) - \sum_{x, u} \tilde{P}(x, y) \sum_{i=1}^n w_i f_i(x, y)
+\end{equation}
+<p>
+对w<sub>i</sub>求偏导数
+</p>
+\begin{equation}
+\frac {\partial f(w)} {\partial w_i} = \sum_{x}\tilde{P}(x) P_w(y|x) f_i(x, y) - \sum_{x, y} \tilde{P}(x,y) f_i(x,y)
+\end{equation}
+
+<p>
+算法 6.2 最大熵模型学习的BFGS算法
+输入：特征函数f<sub>1</sub>, f<sub>2</sub>, &ctdot;, f<sub>n</sub>，经验分布 $~{P}(x, u)$，目标函数f(w)，梯度g(w)=\Deltaf(w)，精度要求&epsilon;
+输出：最优参数w<sup>*</sup>，最优模型P<sub>w<sup>*</sup></sub>(y|x)
+</p>
+<ol class="org-ol">
+<li>选定初始点w<sup>(0)</sup>，取B<sub>0为正定对称矩阵</sub>，置k=0</li>
+<li>计算g<sub>k</sub> = g(w<sup>(k)</sup>)，若||g<sub>k</sub>|| &lt; &epsilon;，则停止计算，得w<sup>*</sup> = w<sup>(k)</sup>。</li>
+<li>否则，由B<sub>k</sub> p<sub>k</sub> = -g<sub>k</sub>求出p<sub>k</sub></li>
+<li>一维搜索，求&lambda;<sub>k</sub>使得f(w<sup>(k)</sup> + &lambda;<sub>k</sub>p<sub>k</sub>) = min<sub>&lambda; &ge; 0</sub> f(w<sup>(k)</sup> + &lambda; p<sub>k</sub>)</li>
+<li>w<sup>(k+1)</sup> = w<sup>(k)</sup> + &lambda;<sub>k</sub> p<sub>k</sub></li>
+<li><p>
+计算g<sub>k+1</sub>=g(w<sup>(k+1)</sup>)，若||g<sub>k+1</sub> &lt; &epsilon;，则停止计算，得w<sup>*</sup> = w<sup>(k+1)</sup>，否则求出B<sub>k+1</sub>
+</p>
+\begin{equation}
+\B_{k+1} = B_{k} + \frac {y_k y_k^T} {y_k^T \delta_k} - \frac {B_k \delta_k \delta_k^T B_k}{\delta_k^T B_k \delta_k}
+\end{equation}
+<p>
+其中，y<sub>k</sub> = g<sub>k+1</sub> - g<sub>k</sub>，&delta;<sub>k</sub> = w<sup>(k+1)</sup> - w<sup>(k)</sup>
+</p></li>
+<li>k=k+1，跳转至3</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgf1d320c" class="outline-2">
+<h2 id="orgf1d320c"><span class="section-number-2">7</span> 支持向量机</h2>
+<div class="outline-text-2" id="text-7">
+</div>
+<div id="outline-container-org4dda4e6" class="outline-3">
+<h3 id="org4dda4e6"><span class="section-number-3">7.1</span> 线性可分支持向量机与硬间隔最大化</h3>
+<div class="outline-text-3" id="text-7-1">
+<p>
+定义 7.1 线性可分支持向量机
+给定线性可分训练数据集，通过间隔最大化或等价地求解相应的凸二次规划问题学习得到的分类超平面为
+</p>
+\begin{equation}
+w^\star \cdot x + b^\star = 0 \tag{7.1}
+\end{equation}
+<p>
+以及相应的分类决策函数
+</p>
+\begin{equation}
+f(x) = sign(w^\star \cdot x + b^\star) \tag{7.2}
+\end{equation}
+<p>
+称为线性可分支持向量机。
+</p>
+</div>
+<div id="outline-container-org241f5ab" class="outline-4">
+<h4 id="org241f5ab"><span class="section-number-4">7.1.1</span> 函数间隔和几何间隔</h4>
+<div class="outline-text-4" id="text-7-1-1">
+<p>
+定义 7.2 函数间隔
+对于给定训练数据集T和超平面(w, b)，定义超平面(w, b)关于样本点(x<sub>i</sub>, y<sub>i</sub>)的函数间隔为
+</p>
+\begin{equation}
+\hat{\gammar}_i = y_i(w \cdots x_i + b) \tag{7.3}
+\end{equation}
+<p>
+定义超平面(w, b)关于训练数据集T的函数间隔为超平面(w,b)关于T中所有样本点(x<sub>i</sub>, y<sub>i</sub>)的函数间隔之最小值。
+</p>
+
+<p>
+定义 7.3 几何间隔
+对于给定训练数据集T和超平面(w, b)，定义超平面(w, b)关于样本点(x<sub>i</sub>, y<sub>i</sub>)的几何间隔为
+</p>
+\begin{equation}
+\gamma_i = y_i \left \frac w {||w||} \cdot x_i + \frac b {||w||} \tag{7.5}
+\end{equation}
+<p>
+定义超平面(w, b)关于训练数据集T的几何间隔为超平面(w,b)关于T中所有样本点(x<sub>i</sub>, y<sub>i</sub>)的几何间隔之最小值。
+</p>
+</div>
+</div>
+<div id="outline-container-org9f3661a" class="outline-4">
+<h4 id="org9f3661a"><span class="section-number-4">7.1.2</span> 间隔最大化</h4>
+<div class="outline-text-4" id="text-7-1-2">
+<p>
+线性可分支持向量机学习的最优化问题
+</p>
+\begin{align}
+\min_{w,b} & \frac 1 2 ||w||^2 \tag{7.13} \\
+s.t. & y_i(w \cdot x_i + b) - 1 \ge 0, i=1,2,\cdots, N \tag{7.14}
+\end{align}
+<p>
+是凸二次规划问题。
+</p>
+
+<p>
+算法 7.1 线性可分支持向量机学习算法——最大间隔法
+输入：线性可分训练集T
+输出：最大间隔分离超平面和分类决策函数
+</p>
+<ol class="org-ol">
+<li>构造并求解约束最优化问题，求得最优解w<sup>*</sup>, b<sup>*</sup></li>
+<li>得到分离超平面和分类决策函数。</li>
+</ol>
+
+<p>
+定理 7.1 最大间隔分离超平面的存在唯一性
+若训练数据集T线性科恩分，则可将训练数据集中的样本点完全正确分开的最大间隔分离超平面存在且唯一。
+</p>
+</div>
+</div>
+<div id="outline-container-orgff2307d" class="outline-4">
+<h4 id="orgff2307d"><span class="section-number-4">7.1.3</span> 学习的对偶算法</h4>
+</div>
+</div>
+<div id="outline-container-orge54c3f2" class="outline-3">
+<h3 id="orge54c3f2"><span class="section-number-3">7.2</span> 线性支持向量机与软间隔最大化</h3>
+<div class="outline-text-3" id="text-7-2">
+</div>
+<div id="outline-container-org3c69de4" class="outline-4">
+<h4 id="org3c69de4"><span class="section-number-4">7.2.1</span> 线性支持向量机</h4>
+<div class="outline-text-4" id="text-7-2-1">
+<p>
+线性不可分意味着某些样本点(x<sub>i</sub>, y<sub>i</sub>)不能满足最大间隔大于等于1的约束条件，为了解决这个问题，可对每个样本点引入一个松弛变量&xi;<sub>i</sub> &ge; 0，同时对每个松弛变量增加一个代价。则线性不可分的线性支持向量机的学习问题修改为
+\begin{algin}
+min<sub>w, b, &xi;</sub> &amp; \frac 1 2 ||w||<sup>2</sup> + C &sum;<sub>i=1</sub><sup>N</sup> &xi;<sub>i</sub> \tag{7.32} <br />
+s.t. &amp; y<sub>i</sub>(w &sdot; x<sub>i</sub> + b) &ge; 1 - &xi;<sub>i</sub>, i=1,2,&ctdot;, N \tag{7.33} <br />
+&amp; &xi;<sub>i</sub> &ge; 0, i=1,2,&ctdot;, N \tag{7.34}
+\end{align}
+</p>
+</div>
+</div>
+<div id="outline-container-org8b7ca83" class="outline-4">
+<h4 id="org8b7ca83"><span class="section-number-4">7.2.2</span> 学习的对偶问题</h4>
+<div class="outline-text-4" id="text-7-2-2">
+<p>
+对偶问题为
+\begin{align}
+min<sub>&alpha;</sub> &amp; \frac 1 2 &sum;<sub>i=1</sub><sup>N</sup> &sum;<sub>j=1</sub><sup>N</sup> &alpha;<sub>i</sub> &alpha;<sub>j</sub> y<sub>i</sub> y<sub>j</sub> x<sub>i</sub><sup>T</sup> x<sub>j</sub> - &sum;<sub>i=1</sub><sup>N</sup> &alpha; \tag{7.37}<br />
+s.t. &amp; &sum;<sub>i=1</sub><sup>N</sup> &alpha;<sub>i</sub> y<sub>i</sub> = 0 \tag{7.38} <br />
+&amp; 0 &le; &alpha;<sub>i</sub> &le; C \tag{7.39}
+</p>
+</div>
+</div>
+<div id="outline-container-org5943570" class="outline-4">
+<h4 id="org5943570"><span class="section-number-4">7.2.3</span> 支持向量</h4>
+<div class="outline-text-4" id="text-7-2-3">
+<p>
+线性不可分的情况下，&alpha;<sub>i</sub> &gt; 0的样本点x<sub>i</sub>称为支持向量。
+软件个的支持向量x<sub>i</sub>，即可以在边界上，也可以在边界与分离超平面之间，还可以在分离超平面误分一侧。
+</p>
+<ul class="org-ul">
+<li>若&alpha;<sub>i</sub> &lt; C，则&xi;<sub>i</sub>=0，支持向量在间隔边界上</li>
+<li>若&alpha;<sub>i</sub> = 0, 0 &lt; &xi;<sub>i</sub> &lt; 1，则分类正确，支持向量在间隔边界与分离超平面之间。</li>
+<li>若&alpha;<sub>i</sub> = C, &xi;<sub>i</sub> = 1，则支持向量在分离超平面上。</li>
+<li>若&alpha;<sub>i</sub> = C, &xi;<sub>i</sub> &gt; 1，则支持向量位于分离超平面误分类一侧。</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org7611d6a" class="outline-4">
+<h4 id="org7611d6a"><span class="section-number-4">7.2.4</span> 合页损失函数</h4>
+<div class="outline-text-4" id="text-7-2-4">
+<p>
+线性支持向量机学习还有另外一种解释，就是最小化一下目标函数
+</p>
+\begin{equation}
+\sum_{i=1}^N [1-y_i(w^T x + b)]_+ + \lambda ||w||^2 \tag{7.57}
+\end{equation}
+<p>
+第一项是经验算是或经验风险，函数
+</p>
+\begin{equation}
+L(y(w^T x + b)) =  [1-y_i(w^T x + b)]_+ \tag{7.58}
+\end{equation}
+<p>
+称为合页损失函数。下标+表示取正值。
+0-1损失函数是二分类问题的真正损失函数。合页损失函数是0-1损失函数的上界。
+<a href="./img/统计学习方法-7.6.png">合页损失函数</a>
+虚线是感知机的损失函数。
+合页损失函数不仅要求分类正确，而且确定度足够高时损失才是0，对学习有更高的要求。
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org418f8f7" class="outline-3">
+<h3 id="org418f8f7"><span class="section-number-3">7.3</span> 非线性支持向量机与核函数</h3>
+<div class="outline-text-3" id="text-7-3">
+</div>
+<div id="outline-container-org0c327b9" class="outline-4">
+<h4 id="org0c327b9"><span class="section-number-4">7.3.1</span> 核技巧</h4>
+<div class="outline-text-4" id="text-7-3-1">
+<p>
+对于给定一个训练集D，有两类标记，如果能用R<sup>n</sup>中的一个超曲面将正负例正确分开，则称这个问题为非线性可分问题。
+求解非线性分类问题的方法是进行一个非线性变换，将非线性问题变换为线性问题，解决变换后的线性问题来求解原来的非线性问题。
+核技巧就属于这样的方法。
+应用到支持向量机的基本想法是，通过一个非线性变换将输入空间对应于一个特征空间，使得在输入空间中的超曲面模型对应特征空间中的超平面模型。分类任务的学习通过在特征空间中求解线性支持向量机就可以完成。
+</p>
+
+<p>
+定义 7.6 核函数
+设 \(\mathcal{X}\) 是输入空间，\(\mathcal{H}\) 是特征空间。如果存在一个从 \(\mathcal{X}\) 到 \(\mathcal{H}\) 的映射
+</p>
+\begin{equation}
+\phi(x): \mathcal{X} \Rightarrwo \mathcal{H} \tag{7.65}
+\end{equation}
+<p>
+对所有 \(x, z \in \mathcal{X}\) ，函数K(x,z)满足条件
+</p>
+\begin{equation}
+K(x, z) = \phi(x) \phi(z) \tag{7.66}
+\end{equation}
+<p>
+则称K(x,z)为核函数，&phi;(x)为映射函数。
+</p>
+
+<p>
+核技巧的想法是，在学习与预测中只定义核函数K(x,z)，而不显示地定义映射函数&phi;。对于给定的核K(x, z)，特征空间和映射函数的取法不唯一。
+</p>
+
+<p>
+实际应用中，需要依赖领域知识直接选择核函数，核函数的选择的有效性需要通过实验验证。
+</p>
+</div>
+</div>
+<div id="outline-container-org3a63be1" class="outline-4">
+<h4 id="org3a63be1"><span class="section-number-4">7.3.2</span> 正定核</h4>
+<div class="outline-text-4" id="text-7-3-2">
+<p>
+假设K(x,z)是定义在 \(\mathcal{X} \times \mathcal{X}\) 上的对称函数，并且对任意的 $x<sub>1</sub>, x<sub>2</sub> &ctdot;, x<sub>m</sub> &isin; \mathcal{X}$，K(x,z)关于x<sub>1</sub>, x<sub>2</sub>, &ctdot;, x<sub>m</sub>的Gram矩阵是半正定的。依据函数K(x,z)，构成一个希尔伯特空间，步骤是
+</p>
+<ol class="org-ol">
+<li>定义映射&phi; 并构成向量空间S</li>
+<li>在S上定义内积构成内积空间</li>
+<li>将S完备化构成希尔伯特空间</li>
+</ol>
+
+<p>
+定理 7.5 正定核的充要条件
+设 \(K: \mathcal{X} \times \mathcal{X} \Rightarrow R\) 是对称函数，则K(x,z)为正定核函数的充要条件是对任意 $x<sub>i</sub> &isin; \mathcal{X}$，K(x, ze)对应的Gram矩阵是半正定矩阵
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgfc97df0" class="outline-4">
+<h4 id="orgfc97df0"><span class="section-number-4">7.3.3</span> 常用核函数</h4>
+<div class="outline-text-4" id="text-7-3-3">
+<ol class="org-ol">
+<li>多项式核函数: K(x,z) = (x &sdot; z + 1)<sup>p</sup></li>
+<li>高斯核函数：\(K(x,z) = exp (- \frac {||x-z||^2}{2 \simga^2})\)</li>
+<li>字符串核函数：在文本分类、信息检索、生物信息学等方面应用。</li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orgbe479b9" class="outline-4">
+<h4 id="orgbe479b9"><span class="section-number-4">7.3.4</span> 非线性支持向量分类机</h4>
+</div>
+</div>
+<div id="outline-container-orga88cae9" class="outline-3">
+<h3 id="orga88cae9"><span class="section-number-3">7.4</span> 序列最小最优化算法</h3>
+<div class="outline-text-3" id="text-7-4">
+<p>
+SMO算法是一种启发式的算法，基本思路是
+如果所有变量的解都满足此最优化问题的KKT条件，那么这个最优化问题的解就得到了。否则，选择两个变量，固定其他变量，针对两个变量构建一个二次规划问题，这个二次规划问题关于这两个变量的解应该更接近原始二次规划问题的解，应为会使得原始二次规划问题的目标函数值变得更小。
+子问题有两个变量，一个是违反KKT条件最严重的那一个，另一个由约束条件自动确定。
+SMO将原问题不断分解为子问题并对子问题求解，进而达到求解原问题的目的。
+SMO算法包括两个部分：求解两个变量二次规划的解析方法和选择变量的启发式方法。
+</p>
+</div>
+<div id="outline-container-orgeba84a3" class="outline-4">
+<h4 id="orgeba84a3"><span class="section-number-4">7.4.1</span> 两个变量二次规划的求解方法</h4>
+<div class="outline-text-4" id="text-7-4-1">
+<p>
+假设选择两个变量为&alpha;<sub>1</sub>,&alpha;<sub>2</sub>，则SMO子问题可写为
+</p>
+\begin{align}
+\min_{\alpha_1,\alpha_2} & W(\alpha_1, \alpha_2) = \frac 1 2 K_{11} \alpha_1^2 + \frac K_{22} \alpha_2^2 + y_1 y_2 K_{12}\alpha_1^T + \alpha_2 - (\alpha_1 + \alpha_2) + y_1 \alpha_1 \sum_{i=3}^N y_i \alpha_i K_{i1} + y_2 \alpha_2 \sum_{i=3}^N y_i \alpha_i K_{i2} \tag{7.101} \\
+s.t. & \alpha_1 y_1 + \alpha_2 y_2 = \sum_{i=3}^N \alpha_i y_i \tag{7.102} \\
+& 0 \le \alpha_i \le C \tag{7.103}
+\end{align}
+<p>
+目标函数中省略了不包含&alpha;<sub>1</sub>, &alpha;<sub>2</sub>的常数项
+不等式约束7.103使得(&alpha;<sub>1</sub>, &alpha;<sub>2</sub>)落在[0,C] &times; [0, C]内，等式约束7.102使(&alpha;<sub>1</sub>, &alpha;<sub>2</sub>)在平行于对角线的直线上。要是就是目标函数在一条平行与对角线的线段的上最优值。实质上可以变成单变量最优化问题。
+考虑&alpha;<sub>2</sub>最有化问题，设&alpha;<sub>1</sub><sup>old</sup>,&alpha;<sub>2</sub><sup>old</sup>是满足约束在目标函数的上一组解。最优化问题的解是&alpha;<sub>1</sub><sup>new</sup>,&alpha;<sub>2</sub><sup>new</sup>，在忽略约束条件7.103时&alpha;<sub>2</sub>的最优解为&alpha;<sub>2</sub><sup>new, unc</sup>。
+在&alpha;<sub>2</sub>满足约束条件7.103时，&alpha;<sub>2</sub><sup>new</sup>的取值范围为 $L &le; &alpha;<sub>2</sub><sup>new</sup> &le; H$，其中
+</p>
+<ul class="org-ul">
+<li>若 $y<sub>1</sub> &ne; y<sub>2</sub>$，则 $L=max(0, &alpha;<sub>2</sub><sup>old</sup> - &alpha;<sub>1</sub><sup>old</sup>), H = min(C, C + &alpha;<sub>2</sub><sup>old</sup> - &alpha;<sub>1</sub><sup>old</sup>)$。</li>
+<li>若 $y<sub>1</sub> = y<sub>2</sub>$，则 $L=max(0, &alpha;<sub>2</sub><sup>old</sup> + &alpha;<sub>1</sub><sup>old</sup> - C), H = min(C,&alpha;<sub>2</sub><sup>old</sup> + &alpha;<sub>1</sub><sup>old</sup>)$。</li>
+</ul>
+<p>
+令
+</p>
+\begin{equation}
+E_i = g(x_i) - y_i = (\sum_{j=1}^N \alpha_j y_j K(x_j, x_i)) - y_i \tag{7.105}
+\end{equation}
+<p>
+表示对于输入x<sub>i</sub>的预测值和真实值的差
+</p>
+
+<p>
+定理 7.5 最优化问题沿约束方向未经剪辑时的解为
+</p>
+\begin{equation}
+\alpha_2^{new, unc} = \alpha_2^{old} + \frac {y_2 (E_1 - E_2)}{\eta} \tag{7.106}
+\end{equation}
+<p>
+其中
+</p>
+\begin{equation}
+\eta = K_{11} + K_{22} - 2K_{12} = ||\Phi(x_1) - \Phi(x_2)||^2 \tag{7.107}
+\end{equation}
+<p>
+则经剪辑后&alpha;<sub>2</sub>的解为
+</p>
+\begin{equation}
+\alpha_2^{new} = \begin{cases}
+H, & \alpha_2^{new, unc} > 2 \\
+\alpha_2^{new, unc}, & L \le \alpha_2^{new, unc} \le H \\
+L, & \alpha_2^{new, unc} < L
+\end{cases} \tag{7.108}
+\end{equation}
+<p>
+&alpha;<sub>1</sub><sup>new</sup>的解为
+</p>
+\begin{equation}
+\alpha_1^{new} = \alpha_1^{old} + y_1 y_2 (\alpha_2^{old} - \alpha_2^{new}) \tag{7.109}
+\end{equation}
+</div>
+</div>
+
+<div id="outline-container-org38ef423" class="outline-4">
+<h4 id="org38ef423"><span class="section-number-4">7.4.2</span> 变量的选择方法</h4>
+<div class="outline-text-4" id="text-7-4-2">
+<p>
+SMO在每个子问题中选择两个变量优化，至少一个变量是违反KKT条件的。
+</p>
+
+<p>
+SMO称选择第一个变量的过程为外层循环。外层循环在训练样本中选取违反kKKT条件最严重的样本点，并将其对应的变量作为第一个变量。
+先遍历所有满足条件 \(0 < \alpha_i < C\) 的样本点，如果这些样本点都满足条件，则遍历整个训练集看是否满足KKT条件。
+</p>
+
+<p>
+SMO称选择第二个变量的过程为内层循环。第二个变量的选择标准是希望能使&alpha;<sub>2</sub>有足够大的变化。
+&alpha;<sub>2</sub><sup>new</sup>是依赖与 \(|E_1-E_2|\) 的，为了快速计算，一种简单的算法是选择&alpha;<sub>2</sub>使对应的与 \(|E_1-E_2|\) 最大。
+特殊情况下，如果内层循环通过以上方法选择的&alpha;<sub>2</sub>不能使目标函数有足够的下降，则采用启发式规则继续选择&alpha;<sub>2</sub>。遍历在间隔边界上的支持向量点，尝试对应的变量，知道目标函数有足够的下降。若找不到合适的&alpha;<sub>2</sub>，那么遍历训练数据集，若仍然找不到合适的&alpha;<sub>2</sub>，则放弃第一个&alpha;<sub>1</sub>，再找另一个&alpha;<sub>1</sub>
+</p>
+
+<p>
+每次完成两个变量的优化之后，都要重新计算阈值b，当 \(0 < \alpha_1^{new} < C\) 时，可知
+</p>
+\begin{equation}
+\sum_{i=1}^N \alpha_i y_i K_{i1} + b = y_{1}
+\end{equation}
+<p>
+于是
+</p>
+\begin{equation}
+b_1^{new} = y_1 - \sum_{i=3}^N \alpha_i y_i K_{i1} - \alpha_1^{new} y_i K_{11} - \alpha_2^{new} y_2 K_{21} \tag{7.114}
+\end{equation}
+<p>
+有E<sub>1</sub>的定义可将式7.114的前两项写成
+</p>
+\begin{equation}
+y_1 - \sum_{i=3}^N \alpha_i y_i K_{i1} = - E_1 + \alpha_1^{old} y_1 K_{11} + \alpha_2^{old} y_2 K_{21} + b^{old}
+\end{equation}
+<p>
+代入可得
+</p>
+\begin{equation}
+b_1^{new} = - E_1 - y_1 K_{11}(\alpha_1^{new} - \alpha_2^{old}) - y_2 K_{21} (\alpha_2^{new} - \alpha_2^{old}) + b^{old} \tag{7.115}
+\end{equation}
+<p>
+若 \(0 < \alpha_2^{new} < C\) 时，同理可得
+</p>
+\begin{equation}
+b_2^{new} = - E_2 - y_1 K_{12}(\alpha_1^{new} - \alpha_2^{old}) - y_2 K_{22} (\alpha_2^{new} - \alpha_2^{old}) + b^{old} \tag{7.116}
+\end{equation}
+<p>
+当$0 &lt; &alpha;<sub>1</sub><sup>new</sup> &alpha;<sub>2</sub><sup>new</sup> &lt; C$时，有 $b<sup>new</sup> = b<sub>1</sub><sup>new</sup> = b<sub>2</sub><sup>new</sup>$。否则 $b<sup>new</sup> = \frac 1 2 (b<sub>1</sub><sup>new</sup> + b<sub>2</sub><sup>new</sup>) $
+还需要更新对应的E<sub>i</sub>值
+</p>
+
+<p>
+算法 7.5 SMO算法
+输入： 训练数据集T，精度&epsilon;
+输出：近似解&alpha;
+</p>
+<ol class="org-ol">
+<li>取初值 $&alpha;<sup>(0)</sup> = 0$，令k=0</li>
+<li>选取优化变量 $&alpha;<sub>1</sub><sup>(k)</sup>, &alpha;<sub>2</sub><sup>(k)</sup>$，解得最优解 \(\alpha_1^{(k+1)}, \alpha_2^{(k+1)}, \alpha^{(k)} = \alpha^{(k+1)}\)</li>
+<li>若在精度&epsilon; 范围内满足停机条件，则返回；否则调整至2</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgcb3096c" class="outline-2">
+<h2 id="orgcb3096c"><span class="section-number-2">8</span> 提升方法</h2>
+<div class="outline-text-2" id="text-8">
+<p>
+提升方法是一种常用的统计学习方法，在分类问题中，通过改变训练样本的权重，学习多个分类器，并将这些分类器进行线性组合，提高分类性能。
+</p>
+</div>
+<div id="outline-container-org1c4197c" class="outline-3">
+<h3 id="org1c4197c"><span class="section-number-3">8.1</span> 提升方法AdaBoost算法</h3>
+<div class="outline-text-3" id="text-8-1">
+</div>
+<div id="outline-container-orgf973ae4" class="outline-4">
+<h4 id="orgf973ae4"><span class="section-number-4">8.1.1</span> 提升方法的基本思路</h4>
+<div class="outline-text-4" id="text-8-1-1">
+<p>
+提升方法的基本思想是：对于一个复杂任务来说，将多个专家的判断进行适当的综合所得出的判断，要比其中任何一个专家单独的判断好。
+</p>
+
+<p>
+在概率近似正确(PAC)学习的框架中，一个概念，如果存在一个多项式的学习算法能够学习它，并且正确率很高，就称这个概念是强可学习的；一个概念，如果存在一个多项式的学习算法能够学习它，学习的正确率仅比随机猜测略好，就称这个概念是弱可学习的。
+</p>
+
+<p>
+在PAC学习框架下，一个概念是强可学习的充分必要条件是这个概念是弱可学习的。
+</p>
+
+<p>
+提升方法就是从弱学习算法出发，反复学习，得到一系列弱分类器，然后组合这些弱分类器，构成一个强分类器。
+</p>
+
+<p>
+对于提升方法有两个问题
+</p>
+<ol class="org-ol">
+<li>在每一轮如何改变数据的权值或概率分布。</li>
+<li>如何将弱分类器组合称一个强分类器。</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org5f736e8" class="outline-4">
+<h4 id="org5f736e8"><span class="section-number-4">8.1.2</span> AdaBoost算法</h4>
+<div class="outline-text-4" id="text-8-1-2">
+<p>
+算法 8.1 AdaBoost
+输入：训练数据集T={(x<sub>1</sub>, y<sub>1</sub>), (x<sub>2</sub>, y<sub>2</sub>), &ctdot;, (x<sub>N</sub>, y<sub>N</sub>)}，其中 $x<sub>i</sub> &isin; \mathcal{X} \subst R<sup>n</sup>, y<sub>i</sub> &isin; \mathcal{Y}=\{-1, \+1\}$；弱学习算法
+输出：最终分类器
+</p>
+<ol class="org-ol">
+<li><p>
+初始化训练数据的权值分布，\(D_1=\{w_{11}, \cdots, w_{1N}\}, w_{1i} = \frac 1 N, i=1,2,\cdots, N\)
+</p>
+<p>
+先假设训练数据集是均匀分布，在原始训练集上学得基本分类器G<sub>1</sub>(x)
+</p></li>
+<li><p>
+对m=1,2,&ctdot;, M
+</p>
+<p>
+反复学得一系列基本分类器
+</p>
+<ol class="org-ol">
+<li>使用具有权值分布D<sub>m</sub>的训练数据集学习，得到基本分类器 \(G_m(x):\mathcal{X} \rightarrow \{-1, +1\}\)</li>
+<li><p>
+计算G<sub>m</sub>(x)在训练数据集上的分类误差率
+</p>
+\begin{equation}
+e_m = P(G_m(x_i) \neq y_i) = \sum_{i=1}^N w_{mi} I(G_m(x_i) \neq y_i) \tag{8.1}
+\end{equation}</li>
+<li><p>
+计算G<sub>m</sub>(x)的系数
+</p>
+\begin{equation}
+\alpha_m = \frac 1 2 \ln \frac {1-e_m} {e_m} \tag{8.2}
+\end{equation}
+<p>
+分类错误率越小，则分类器在最终分类器的作用越大。
+</p></li>
+<li><p>
+更新训练集数据的权值分布
+</p>
+\begin{equation}
+w_{m+1, i} = \frac w_{mi} Z_m exp(-\alpha_m y_i G_m(x_i)) \tag{8.4}
+\end{equation}
+<p>
+当训练集错误率低于50%时，&alpha;<sub>m</sub> &gt; 0，对于分类错误样本，增加权值；对于分类正确样本，降低权值。
+当训练集错误率高于50%时，&alpha;<sub>m</sub> &lt; 0，对于分类错误样本，降低权值；对于分类正确样本，增加权值。
+我的理解是，当正确率高于50%，则是一个弱分类器，算是一个正确的分类器，所以下次应该更关注分类错误的样本；当正确率低于50%时，这个分类器不好，下次训练应该更加关注正确样本。
+</p>
+<p>
+其中Z<sub>m</sub>是规范化因子
+</p></li>
+</ol></li>
+<li><p>
+构建基本分类器的线性组合得到最终分类器
+</p>
+\begin{align}
+f(x) = \sum_{m=1}^M \alpha_m G_m(x) \tag{8.6} \\
+G(x) = sign(f(x)) = sign(\sum_{m=1}^M \alpha_m G_m(x)) \tag{8.7}
+\end{align}</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgb2f1336" class="outline-3">
+<h3 id="orgb2f1336"><span class="section-number-3">8.2</span> AdaBoost算法的训练误差分析</h3>
+<div class="outline-text-3" id="text-8-2">
+<p>
+AdaBoost最基本的性质是它能在学习过程中不断减少训练误差。
+定理 8.1 AdaBoost的训练误差界
+AdaBoost算法最终分类器的训练误差界为
+</p>
+\begin{equation}
+\frac 1 N \sum_{i=1}^N I(G(x_i) \neq y_i) \le \frac 1 N \sum_i exp(-y_i f(x_i)) = \prod_m Z_m \tag{8.9}
+\end{equation}
+
+<p>
+定理说明，在每一轮选取适当的G<sub>m</sub>使得Z<sub>m</sub>最小，从而使训练误差下降最快。
+</p>
+
+<p>
+定理 8.2 二分类问题AdaBoost的训练误差界
+</p>
+\begin{equation}
+\prob_{m=1}^M Z_m = \prod_{m=1}^M[2 \sqrt{e_m (1-e_m)}] = \prob_{m=1}^M \sqrt{1-4 \gamma_m^2} \le exp(-\sum_{m=1}^M \gamma_m^2) \tag{8,10}
+\end{equation}
+<p>
+其中，\(\gamma_m = \frac 1 2 - e_m\)
+</p>
+
+<p>
+推论 8.1
+如果存在&gamma; &gt; 0，对所有m有&gamma;<sub>m</sub> &le; &gamma;，则
+</p>
+\begin{equation}
+\frac 1 N \sum_{i=1}^N I(G(x_i) \neq y_i) \le exp(-2M\gamma^2) \tag{8.12}
+\end{equation}
+<p>
+表明在此条件下AdaBoost的训练误差是以指数速率下降的。
+</p>
+</div>
+</div>
+<div id="outline-container-org24ac67a" class="outline-3">
+<h3 id="org24ac67a"><span class="section-number-3">8.3</span> AdaBoost算法的解释</h3>
+<div class="outline-text-3" id="text-8-3">
+<p>
+可以任务AdaBoost算法是模型为加法模型、损失函数为指数函数、学习算法为前向分布算法时的而分类学习算法。
+</p>
+</div>
+<div id="outline-container-org5eb0d7e" class="outline-4">
+<h4 id="org5eb0d7e"><span class="section-number-4">8.3.1</span> 前向分布算法</h4>
+<div class="outline-text-4" id="text-8-3-1">
+<p>
+考虑加法模型
+</p>
+\begin{equation}
+f(x) = \sum_{m=1}^M \beta_m b(x;\gamma_m) \tag{8.13}
+\end{equation}
+<p>
+其中，b(x;&gamma;<sub>m</sub>)为基函数，&gamma;<sub>m</sub>为基函数的参数，&beta;<sub>m</sub>为基函数的系数。
+给定训练数据及损失函数L(y, f(x))的条件下，学习加法模型f(x)成为经验风险极小化即损失函数极小化问题。
+</p>
+
+<p>
+前向分布算法求解这一优化问题的想法是：因为学习的是加法模型，如果能从前向后，每一步只学习一个基函数及其系数，逐步逼近优化目标函数，就可以简化优化的复杂度。
+</p>
+
+<p>
+算法 8.2 前向分布算法
+输入：训练数据集T，损失函数L(y, f(x))，基函数集{b(x;&gamma;)}
+输出：加法模型f(x)
+</p>
+<ol class="org-ol">
+<li>初始化f<sub>0</sub>(x)=0</li>
+<li>对m=1,2,&ctdot;, M
+<ol class="org-ol">
+<li><p>
+极小化损失函数得到参数&beta;<sub>m</sub>,&gamma;<sub>m</sub>
+</p>
+\begin{equation}
+(\beta_m, \gamma_m) = \arg\min_{\beta, \gamma} \sum_{i=1}^M L(y_i, f_{m-1}(x_i) + \beta b(x_i;\gamma)) \tag{8.16}
+\end{equation}</li>
+<li>更新 \(f_m(x) = f_{m-1}(x) + \beta_m b(x; \gamma_m)\)</li>
+</ol></li>
+<li>得到加法模型</li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orgc932df7" class="outline-4">
+<h4 id="orgc932df7"><span class="section-number-4">8.3.2</span> 前向分布算法与AdaBoost</h4>
+<div class="outline-text-4" id="text-8-3-2">
+<p>
+定理 8.3
+AdaBoost算法是前向分布加法算法的特例，此时，模型是由基本分类器组成的加法模型，损失函数是指数函数。
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org8b8bce4" class="outline-3">
+<h3 id="org8b8bce4"><span class="section-number-3">8.4</span> 提升树</h3>
+<div class="outline-text-3" id="text-8-4">
+<p>
+提升树是以分类树或回归树为基本分类器的提升方法。认为是统计学习中性能最好的方法之一。
+</p>
+</div>
+<div id="outline-container-orgeab72b5" class="outline-4">
+<h4 id="orgeab72b5"><span class="section-number-4">8.4.1</span> 提升树模型</h4>
+<div class="outline-text-4" id="text-8-4-1">
+<p>
+提升方法实际采用加法模型与前向分布算法，以决策树为基函数的提升方法称为提升树。
+第m步模型为
+</p>
+\begin{equation}
+f_m(x) = f_{m-1}(x) + T(x;\Theta_m) \tag{8.24}
+\end{equation}
+<p>
+其中，f<sub>m-1</sub>(x)为当前模型，通过经验风险极小化确定下一颗决策树的参数&Theta;<sub>m</sub>
+</p>
+\begin{equation}
+\hat{\Theta}_m = \arg \min_{\Theta_m} \sum_{i=1}^N L(y_i, f_{m-1}(x_i) + T(x_i;\Theta)) \tag{8.25}
+\end{equation}
+<p>
+针对不同问题的提升树学习算法，主要区别在与使用的损失函数不同。
+对于二分类问题，提升树算法只需将AdaBoost中的基本分类器限制为二分类树即可。
+</p>
+
+<p>
+对于回归树，已知训练数据集T，树可表示为
+</p>
+\begin{equation}
+T(x;\Theta) = \sum_{j=1}^J c_J I(x \in R_j) \tag{8.26}
+\end{equation}
+<p>
+J是回归树的复杂度即叶结点个数。
+在前向分布算法的第m步，需求解式8.25得到第m棵树的参数
+在采用平方误差损失函数时，其损失变为
+</p>
+\begin{equation}
+L(y, f_{m-1}(x) + T(x;\Theta_m)) = [y -  f_{m-1}(x) - T(x;\Theta_m)]^2 = [r - T(x;\Theta_m)]
+\end{equation}
+<p>
+其中r=y-f<sub>m-1</sub>(x)是当前模型拟合数据的残差。所以，对于回归问题的提升树算法来说，只需简单拟合当前模型的残差。
+</p>
+
+<p>
+算法 8.3 回归问题的提升树算法
+输入：训练数据集T
+输出：提升树f<sub>M</sub>(x)
+</p>
+<ol class="org-ol">
+<li>初始化f<sub>0</sub>(x) = 0</li>
+<li>对m=1,2,&ctdot;,M
+<ol class="org-ol">
+<li>计算残差 \(r_{mi} = y_i - f_{m-1}(x0)\)</li>
+<li>拟合残差r<sub>mi</sub>学习一个回归树，得到T(x;&Theta;<sub>m</sub>)</li>
+<li>更新 \(f_m(x) = f_{m-1}(x) + T(x;\Theta_m)\)</li>
+</ol></li>
+<li>得到回归问题提升树。</li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orgc390d37" class="outline-4">
+<h4 id="orgc390d37"><span class="section-number-4">8.4.2</span> 梯度提升</h4>
+<div class="outline-text-4" id="text-8-4-2">
+<p>
+当对一般损失函数而言，提升树每一步优化并不容易。梯度提升算法可解决这个问题，算法利用最速下降法的近似方法，关键是利用损失函数的负梯度在当前模型的值作为回归问题提升树算法中的残差的近似值，拟合一个回归树
+</p>
+\begin{equation}
+-\left[ \frac {\partial L(y, f(x_i))} {\partial f(x_i)} \right]_{f(x) = f_{m-1}(x)}
+\end{equation}
+<p>
+算法 8.4 梯度提升算法
+输入：训练数据集T，损失函数
+输出：回归树 $\hat{f}(x)
+</p>
+<ol class="org-ol">
+<li>初始化 \(f_0(x) = \arg \min_c \sum_{i=1}^N L(y_i, c)\)</li>
+<li>对m=1,2,&ctdot;,M
+<ol class="org-ol">
+<li>对n=1,2,&ctdot;,N，计算 \(r_{mi} = -\left[ \frac {\partial L(y, f(x_i))} {\partial f(x_i)} \right]_{f(x) = f_{m-1}(x)}\)</li>
+<li>对r<sub>mi</sub>拟合一个回归树，得到第m棵树的叶结点区域R<sub>mj</sub></li>
+<li>对j=1,2,&ctdot;,J，计算 $\c<sub>mj</sub> = argmin<sub>c</sub> &sum;<sub>x<sub>i</sub> &isin; R{mj}</sub> L(y<sub>i</sub>, f<sub>m-1</sub>(x<sub>i</sub>) + c)</li>
+<li>更新f<sub>m</sub>(x) = f<sub>m-1</sub>(x) + &sum;<sub>j=1</sub><sup>Jc</sup><sub>mj</sub>I(x &isin; R<sub>mj</sub>)</li>
+</ol></li>
+<li>得到回归树</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org467414b" class="outline-2">
+<h2 id="org467414b"><span class="section-number-2">9</span> EM算法及其推广</h2>
+<div class="outline-text-2" id="text-9">
+<p>
+EM算法是一种迭代算法，用于含有隐变量的概率模型参数的极大似然估计，或极大后验概率估计。EM算法的每次迭代由两步组成：E步，求期望；M步，求极大。所以称为期望极大算法。
+</p>
+</div>
+<div id="outline-container-orgf43aac4" class="outline-3">
+<h3 id="orgf43aac4"><span class="section-number-3">9.1</span> EM算法的引入</h3>
+<div class="outline-text-3" id="text-9-1">
+</div>
+<div id="outline-container-orgc95df01" class="outline-4">
+<h4 id="orgc95df01"><span class="section-number-4">9.1.1</span> EM算法</h4>
+<div class="outline-text-4" id="text-9-1-1">
+<p>
+例 9.1 三硬币模型
+假设有三枚硬币，记作A，B，C。这些硬币正面出现的概率分别为&pi;，p和q，进行如下掷硬币试验，先掷硬币A，根据其结果选出硬币B或硬币C，正面选硬币B，反面选硬币C；然后掷选出的硬币，掷硬币的结果，出现正面记作1，出现反面记作0。独立地重复n次试验，得到观测结果。
+假设只能观测到掷硬币的结果，不能观测掷硬币的过程，如何估计三硬币正面出现的概率，即三硬币模型的参数。
+</p>
+
+<p>
+设随机变量Y是观测变量，表示一次试验的观测结果，随机变量Z是隐变量，表示未观测到的掷硬币A的结果；&theta;=(&pi;, p, q)是模型参数。Y和Z一起称为完全数据，观测数据Y称为不完全数据。
+</p>
+<p>
+昨天一直没想明白，为什么要增加隐变量。已经得出了P(y|&theta;)的计算公式，用观测数据直接计算公式中的参数不就好了吗？为什么要增加隐变量？加不加隐变量有什么区别？昨天还想试着推一下加和不加隐变量的公式有什么区别，不过过于复杂，直接解不出来。
+今天早上回看了一下高斯混合模型，突然间就弄明白了。之前的算法都是根据训练数据估计X与Y的概率关系，其中很重要的一个前提是数据是独立同分布的。即来自相同的分布。但三硬币模型不是这样的，结果相当于来自两个模型硬币B和C，硬币A用于控制选择哪个模型的概率。在不增加隐变量Z的情况下，数据Y不是独立同分布的，之前的算法无法使用，所以要增加Z。
+</p>
+
+<p>
+当Z是观测数据的某个特征时，从决策树的角度来说，在对Z进行划分后，每个划分中的Y其实相当于有不同的分布。即P(y|z,&theta;)其实是不同的。
+</p>
+
+<p>
+感觉这里和决策树对缺失变量的处理很类似，当变量值缺失时，就以不同的概率，将对应样本划分到不同的子结点中。
+</p>
+<p>
+则观测数据的似然函数为
+</p>
+\begin{equation}
+P(Y|\theta) = \sum_Z P(Z|\theta) P(Y|Z, \theta) \tag{9.2}
+\end{equation}
+<p>
+求模型参数的极大似然估计，即
+</p>
+\begin{equation}
+\hat{\theta} = \arg\max_\thate \log P(Y|\theta) \tag{9.4}
+\end{equation}
+
+<p>
+算法 9.1 EM算法
+输入：观测变量数据Y，隐变量数据Z，联合分布P(Y, Z|theta)，条件分布P(Z|Y, theta)
+输出：模型参数&theta;
+</p>
+<ol class="org-ol">
+<li>选择参数的初值 $&theta;<sup>(0)</sup>$，开始迭代。</li>
+<li><p>
+E步，记 $\thate<sup>(i)</sup>$为第i次迭代参数\thate的估计值，在第i+1次迭代的E步，计算
+</p>
+\begin{align}
+Q(\theta, \theta^{(i)}) &= E_Z[\log P(Y, Z|\theta)|Y, \theta^{(i)}] \notag \\
+&= \sum_Z \log P(Y, Z|\theta) P(Z|Y, \theta^{(i)}) \tag{9.9}
+\end{align}</li>
+<li><p>
+M步：求使 \(Q(\theta, \theta^{(i)})\) 极大化的&theta;，确定第i+1次迭代的参数的估计值 \(\theta^{(i+1)}\)
+</p>
+\begin{equation}
+\theta^{(i+1)} = \arg\max_\theta Q(\theta, \thate^{(i)}) \tag{9.10}
+\end{equation}</li>
+</ol>
+
+<p>
+定义 9.1 Q函数
+完全数据的对数似然函数关于在给定观测数据Y和当前参数 \(\thate^{(i)}\) 下对未观测数据Z的条件各路分布的期望称为Q函数。
+</p>
+
+<p>
+EM算法的说明
+</p>
+<ol class="org-ol">
+<li>参数的初值可任意选择，但EM算法对参数初值是敏感的。</li>
+<li>E步求 $Q(&theta;, &theta;<sup>(i)</sup>)$，Q函数中Z是未观测数据，Y是观测数据。</li>
+<li>M步求 \(Q(\theta, \theta^{(i)})\) 的极大化，每次迭代使似然函数增大或达到局部极值。</li>
+<li>停止迭代的条件，一般是对较小的正数&epsilon;<sub>1</sub>, &epsilon;<sub>2</sub>，若满足 \(||\theta^{(i+1)} - \theta^{(i)}|| < \epsilon_1\) 或 $||Q(&theta;<sup>(i+1)</sup>, &theta;<sup>(i)</sup>) - Q(&theta;<sup>(i)</sup>,&theta;<sup>(i)</sup>) || &lt; &epsilon;<sub>2</sub>$，则停止迭代。</li>
+</ol>
+</div>
+</div>
+<div id="outline-container-orgdf63bed" class="outline-4">
+<h4 id="orgdf63bed"><span class="section-number-4">9.1.2</span> EM算法的导出</h4>
+<div class="outline-text-4" id="text-9-1-2">
+<p>
+面对含有隐变量的概率模型，目标是极大化观测数据Y关于参数\theta的对数似然函数，即极大化
+</p>
+\begin{align}
+L(\theta) &= \log P(Y|\theta) = \log \sum_Z P(Y, Z| \theta) \\
+&= \log(\sum_Z P(Y|Z, \theta) P(Z|\theta))
+\end{align}
+<p>
+极大化的困难在于式中含有为观测数据并有包含和或积分的对数。
+</p>
+
+<p>
+EM算法通过迭代逐步近似极大化L(&theta;)。设在第i次迭代后\theta的估计值是&theta;<sup>(i)</sup>，希望新的估计值能使L(&theta;)增加并逐步达到极大值，考虑两者的差
+</p>
+\begin{align}
+L(\theta) - L(\theta^{(i)}) &= \log \left( \sum_Z P(Y|Z,\theta) P(Z|\theta) \right) - \log P(Y|\theta^{(i)}) \\
+&= \log \left( \sum_Z P(Y|Z,\theta^{(i)}) \frac {P(Y|Z,\theta) P(Z|\theta)} {P(Z|Y, \theta^{(i)})} \right) - \log P(Y|\theta^{(i)}) \\
+& \ge \sum_Z P(Z|Y, \theta^{(i)}) \log \frac {P(Y|Z,\theta) P(Z|\theta)} {P(Z|Y, \theta^{(i)})} - \log P(Y|\theta^{(i)}) \\
+&= \sum_Z P(Z|Y, \theta^{(i)}) \log \frac {P(Y|Z, \theta) P(Z|\theta)} {P(Z|Y, \theta^{(i)}) P(Y|\theta^{(i)})}
+\end{align}
+<p>
+2-&gt;3，使用了Jensen不等式。0 &le; P(Z|Y, &theta;<sup>(i)</sup>) &le; 1且&sum;<sub>Z</sub> P(Z|Y, &theta;<sup>(i)</sup>) = 1。
+3-&gt;4，log P(Y|&theta;<sup>(i)</sup>) = &sum;<sub>Z</sub> P(Z|Y, &theta;<sup>(i)</sup>) log P(Y|&theta;<sup>(i)</sup>)
+</p>
+<p>
+令
+</p>
+\begin{equation}
+B(\theta, \theta^{(i)}) = L(\theta^{(i)}) + \sum_Z P(Z|Y, \theta^{(i)}) \log \frac {P(Y|Z, \theta) P(Z|\theta)} {P(Z|Y, \theta^{(i)}) P(Y|\theta^{(i)})} \tag{9.13}
+\end{equation}
+<p>
+函数B(&theta;, &theta;<sup>(i)</sup>)是L(&theta;)的下界且L(&theta;<sup>(i)</sup>) = B(&theta;<sup>(i)</sup>, &theta;<sup>(i)</sup>)
+所以为了让L(&theta;)尽可能增大，可求使B(&theta;, &theta;<sup>(i)</sup>)到达极大的参数&theta;<sup>(i+1)</sup>，即
+</p>
+\begin{align}
+\thate^{(i+1)} &= \arg \max_\theta B(\theta, \theta^{(i)}) \\
+&= \arg \max_\theta \left( L(\theta^{(i)}) + \sum_Z P(Z|Y, \theta^{(i)}) \log \frac {P(Y|Z, \theta) P(Z|\theta)} {P(Z|Y, \theta^{(i)}) P(Y|\theta^{(i)})} \right) \\
+&= \arg \max_\theta \left( \sum_Z P(Z|Y, \theta^{(i)}) \log P(Y|Z, \theta) P(Z|\theta) \right) \\
+&= \arg \max_\theta left( \sum_Z P(Z|Y, \theta^{(i)}) \log P(Y,Z| \theta) \right) \\
+&= \arg \max_\theta Q(\theta, \theta^{(i)})
+\end{align}
+<p>
+EM算法通过不断求解下界的极大化逼近求解对数似然函数的极大化算法。
+</p>
+</div>
+</div>
+<div id="outline-container-orgb63f584" class="outline-4">
+<h4 id="orgb63f584"><span class="section-number-4">9.1.3</span> EM算法在非监督学习中的应用</h4>
+</div>
+</div>
+
+<div id="outline-container-org773979f" class="outline-3">
+<h3 id="org773979f"><span class="section-number-3">9.2</span> EM算法的收敛性</h3>
+<div class="outline-text-3" id="text-9-2">
+<p>
+定理 9.1
+设P(Y|&theta;)为观测数据的似然函数，&theta;<sup>(i)</sup>为EM算法得到的参数估计序列，P(Y|&theta;<sup>(i)</sup>)为对应的似然函数序列，则P(|Y|&theta;<sup>(i)</sup>)是单调递增的。
+</p>
+
+<p>
+定理 9.2
+设L(&theta;)=log P(Y|theta)为规则数据的对数似然函数，&theta;<sup>(i)</sup>为EM算法得到的参数估计序列，L(&theta;<sup>(i)</sup>)为对应的对数似然函数序列
+</p>
+<ol class="org-ol">
+<li>如果P(Y|&theta;)有上届，则L(&theta;<sup>(i)</sup>)收敛到某一值L<sup>*</sup></li>
+<li>在函数Q(&theta;, &theta;')与L(&theta;)满足一定条件下，由EM算法得到的参数估计序列&theta;<sup>(i)</sup>的收敛值&theta;<sup>*</sup>是L(&theta;)的稳定点</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org7937b40" class="outline-3">
+<h3 id="org7937b40"><span class="section-number-3">9.3</span> EM算法在高斯混合模型学习中的应用</h3>
+<div class="outline-text-3" id="text-9-3">
+</div>
+<div id="outline-container-orgb91cd4a" class="outline-4">
+<h4 id="orgb91cd4a"><span class="section-number-4">9.3.1</span> 高斯混合模型</h4>
+<div class="outline-text-4" id="text-9-3-1">
+<p>
+定义 9.2 高斯混合模型
+高斯混合模型是具有如下形式的概率分布模型
+</p>
+\begin{equation}
+P(y|\theta) = \sum_{k=1}^K \alpha_k \phi(y|\theta_k) \tag{9.24}
+\end{equation}
+<p>
+其中 $&alpha;<sub>k</sub> &ge; 0, sum<sub>k=1</sub><sup>K</sup> &alpha;<sub>k</sub> = 1$，&phi;(y|&theta;<sub>k</sub>)是高斯分布密度，&theta;<sub>k</sub>=(&mu;<sub>k</sub>, \simga<sub>k</sub><sup>2</sup>)称为第k个分模型。
+</p>
+
+<p>
+一般混合模型可以由任意概率分布密度高斯分布密度。
+</p>
+</div>
+</div>
+<div id="outline-container-orgb2d28ff" class="outline-4">
+<h4 id="orgb2d28ff"><span class="section-number-4">9.3.2</span> 高斯混合模型参数估计的EM算法</h4>
+<div class="outline-text-4" id="text-9-3-2">
+<p>
+假设观测数据y<sub>1</sub>, y<sub>2</sub>, &ctdot;, y<sub>N</sub>由高斯混合模型生成
+</p>
+\begin{equation}
+P(y|\theta) = \sum_{k=1}^K \alpha_k \phi(y|\theta_k) \tag{9.6}
+\end{equation}
+<p>
+用EM算法估计高斯混合模型的参数&theta;.
+</p>
+<ol class="org-ol">
+<li><p>
+明确隐变量，写出完全数据的对数似然函数。
+定义隐变量&gamma;<sub>jk</sub>表示第j个观测变量来自第k个模型，是0-1随机变量。完全数据为(y<sub>j</sub>, &gamma;<sub>j1</sub>, &ctdot;, &gamma;<sub>jk</sub>)，所以完全数据的似然函数是
+</p>
+\begin{align}
+P(y, \gamma|\theta) &= \prod_{j=1}^N P(y_j, \gamma_{j1}, \cdots, \gamma_{jk}|\theta) \\
+&= \prod_{k=1}^K \prod_{j=1}^N [\alpha_k \phi(y_j |\theta_k)]^{\gamma_{jk}} \\
+&= \prod_{k=1}^K \alpha_k^{n_k} \prod_{j=1}^N [\phi(y_j|\theta_k)]^{\gamma_{jk}} \\
+&= \prod_{k=1}^K \alpha_k^{n_k} \prod_{j=1}^N \left[ \frac {1} {\sqrt{2\pi}\sigma_k} exp \left(-\frac {(y_j - u_k)^2} {2 \sigma_k^2} \right) \right]^{\gamma_{jk}}
+\end{align}
+<p>
+其中，\(n_k = \sum_{j=1}^N \gamma_{jk}\)
+则相应的对数自然函数为
+</p>
+\begin{equation}
+\ln P(y, \gamma |\theta) = \sum_{k=1}^K \left[ n_K \ln \alpha_k + \sum_{j=1}^N \gamma_{jk} \left[ \ln \frac 1 {\sqrt{2 \pi}} - \log \sigma_k - \frac {(y_j - \mu_k)^2} {2 \sigma_k^2} \right] \right] \notag
+\end{equation}</li>
+<li><p>
+EM算法的E步：确定Q函数
+</p>
+\begin{align}
+Q(\theta, \theta^{(i)}) &= E[\log P(y, \gamma|\theta)|y, \theta^{(i)}] \\
+&= E\left\{ \sum_{k=1}^K \left[ n_K \ln \alpha_k + \sum_{j=1}^N \gamma_{jk} \left[ \ln \frac 1 {\sqrt{2 \pi}} - \log \sigma_k - \frac {(y_j - \mu_k)^2} {2 \sigma_k^2} \right] \right] \right\} \\
+&= \sum_{k=1}^K \left[ n_K \ln \alpha_k + \sum_{j=1}^N \hat{\gamma}_{jk} \left[ \ln \frac 1 {\sqrt{2 \pi}} - \log \sigma_k - \frac {(y_j - \mu_k)^2} {2 \sigma_k^2} \right] \right] \tag{9.29}
+\end{align}
+<p>
+其中，需要计算 $\hat{\gamma}<sub>jk</sub>=E(&gamma;<sub>jk</sub>|y, theta)$，有
+</p>
+\begin{equation}
+\hat{\gamma}_{jk}=E(\gamma_{jk}|y,\theta) = \frac {\alpha_k \phi(y_j|\theta_k)} {\sum_{k=1}^K \alpha_k \phi(y_j|\theta_k)}
+\end{equation}</li>
+<li><p>
+确定EM算法的M步
+求解新一轮迭代的模型参数
+</p>
+\begin{equation}
+\theta^{(i+1)} = \arg\max_\theta Q(\theta, \theta^{(i)})
+\end{equation}
+<p>
+结果为
+</p>
+\begin{align}
+&\hat{\mu}_k = \frac {\sum_{j=1}^N \hat{\gamma}_{jk} y_j} {\sum_{j=1}^N \hat{\gamma}_{jk}} \tag{9.30} \\
+&\hat{\simga_k}^2 = \frac {\sum_{j=1}^N \hat{\gamma}_{jk}(y_j - \mu_k)^2} {\sum_{j=1}^N \hat{\gamma}_{jk}} \tag{9.31} \\
+&\hat{\alpha_k} = \frac {n_k} {N} = \frac{\sum_{j=1}^N \hat{\gamma}_{jk}} {N} \tag{9.32}
+\end{align}</li>
+</ol>
+<p>
+重复以上计算直到对数似然函数值不再有明显的变化为止。
+</p>
+
+<p>
+算法 9.2 高斯混合模型参数估计的EM算法
+输入：观测数据y<sub>1</sub>, y<sub>2</sub>, &ctdot;, y<sub>N</sub>，高斯混合模型
+输出：高斯混合模型参数
+</p>
+<ol class="org-ol">
+<li>取参数的初始值开始迭代</li>
+<li>E步：依当前模型参数，计算分模型k对观测数据y<sub>i的响应度</sub></li>
+<li>M步：计算新一轮迭代的模型参数</li>
+<li>重复E、M步直到收敛。</li>
+</ol>
+</div>
+</div>
+</div>
+<div id="outline-container-org811f236" class="outline-3">
+<h3 id="org811f236"><span class="section-number-3">9.4</span> EM算法的推广</h3>
+<div class="outline-text-3" id="text-9-4">
+<p>
+EM算法还可以解释为F函数的极大-极大算法，基于这个解释有若干变形与推广
+</p>
+</div>
+<div id="outline-container-orgd9c3ab6" class="outline-4">
+<h4 id="orgd9c3ab6"><span class="section-number-4">9.4.1</span> F函数的极大-极大算法</h4>
+<div class="outline-text-4" id="text-9-4-1">
+<p>
+定义 9.3 F函数
+假设隐变量数据Z的概率分布为\(\tilde{P}(Z)\) ，定义分布\(\tilde{P}\) 与参数&theta; 的函数\(F(\tilde{P}, \theta)\)
+</p>
+\begin{equation}
+F(\tilde{P}, \theta) = E_{\tilde{P}}[\log P(Y, Z|\theta)] + H(\tilde{P}) \tag{9.33}
+\end{equation}
+<p>
+称为F函数
+</p>
+
+<p>
+引理 9.1 对于固定的&theta;，存在唯一的分布\(\tilde{P}_\theta\) 极大化\(F(\tilde{P}, \theta)\) ，此时\(\tilde{P}_\theta(Z) = P(Z|Y, \theta)\) 且\(\tilde{P}_\theta\) 随&theta; 连续变化。
+</p>
+
+<p>
+引理 9.2 若$~{P}<sub>&theta;</sub>(Z) = P(Z|Y, &theta;)$，则\(F(\tilde{P}, \theta) = \log P(Y|\theta)\)
+</p>
+
+<p>
+定理 9.3 设L(&theta;)=log P(Y|&theta;)为观测数据的对数似然函数，&theta;<sup>(i)</sup>为EM算法得到的参数估计序列，函数\(F(\tilde{P}, \theta)\) 由式9.33定义，如果\(F(\tilde{P}, \theta)\) 在\(\tilde{P}^{\star}\) 和&theta;<sup>*</sup>有局部极大值，那么L(&theta;)也有局部极大值。若有全局最大值，则L(&theta;)也有全局最大值。
+</p>
+
+<p>
+定理 9.4 EM算法的一次迭代可由F函数的极大-极大算法实现
+设&theta;<sup>(i)</sup>为第i次迭代参数&theta; 的估计，\(\tilde{P}^{(i)}\) 为第i次迭代函数\(\tilde{P}\) 的估计，在第i+1次迭代的两步为。
+</p>
+<ol class="org-ol">
+<li>对固定的&theta;<sup>(i)</sup>，求\(\tilde{P}^{(i+1)}\) 使\(F(\tilde{P}, \theta^{(i)})\) 极大化</li>
+<li>对固定的$~{P}<sup>(i+1)</sup>$，求&theta;<sup>(i+1)</sup>使\(F(\tilde{P}^{(i+1)}, \theta)\) 极大化</li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org8980cfd" class="outline-4">
+<h4 id="org8980cfd"><span class="section-number-4">9.4.2</span> GEM算法</h4>
+<div class="outline-text-4" id="text-9-4-2">
+<p>
+算法 9.3 GEM算法1
+输入：观测数据，F函数
+输出：模型参数
+</p>
+<ol class="org-ol">
+<li>初始化参数&theta;<sup>(0)</sup>，开始迭代</li>
+<li>第i+1次迭代，
+<ol class="org-ol">
+<li>记&theta;<sup>(i)</sup>为参数\theta的估计值，\(\tilde{P}^{(i)}\) 为\(\tilde{P}\) 的估计，求\(\tilde{P}^{(i+1)}\) 使\(\tilde{P}\) 极大化$F(~{P}, &theta;<sup>(i)</sup>)</li>
+<li>求&theta;<sup>(i+1)</sup>使\(F(\tilde{P}^{(i+1)}, \theta)\) 极大化。</li>
+</ol></li>
+<li>重复第二步直到收敛。</li>
+</ol>
+<p>
+算法1中，有时求Q的极大化是很困难的。
+</p>
+
+<p>
+算法 9.4 GEM算法2
+输入：观测数据，Q函数
+输出：模型参数
+</p>
+<ol class="org-ol">
+<li>初始化参数&theta;<sup>(0)</sup>，开始迭代</li>
+<li>第i+1次迭代，
+<ol class="org-ol">
+<li><p>
+记&theta;<sup>(i)</sup>为参数\theta的估计值，计算
+</p>
+\begin{align}
+Q(\theta, \theta^{(i)}) &= E_Z[\log P(Y, Z|\theta)|Y, \theta^{(i)}] \notag \\
+&= \sum_Z P(Z|Y,\theta^{(i)}) \log P(Y, Z|\thtea) \notag
+\end{align}</li>
+<li>求&theta;<sup>(i+1)</sup>使\(Q(\theta^{(i+1)}, \theta^{(i)} > Q(\theta^{(i)}, \theta^{(i)}\)</li>
+</ol></li>
+<li>重复第二步直到收敛。</li>
+</ol>
+<p>
+当参数&theta; 的维数为d &ge; 2时，可采用一种特殊的GEM算法，将EM算法的M步分解为d次条件极大化，每次只改变参数向量的几个分类，其余分量不改变。
+</p>
+
+<p>
+算法 9.5 GEM算法3
+输入：观测数据，Q函数
+输出：模型参数
+</p>
+<ol class="org-ol">
+<li>初始化参数&theta;<sup>(0)</sup>，开始迭代</li>
+<li>第i+1次迭代，
+<ol class="org-ol">
+<li><p>
+记&theta;<sup>(i)</sup>为参数\theta的估计值，计算
+</p>
+\begin{align}
+Q(\theta, \theta^{(i)}) &= E_Z[\log P(Y, Z|\theta)|Y, \theta^{(i)}] \notag \\
+&= \sum_Z P(Z|Y,\theta^{(i)}) \log P(Y, Z|\thtea) \notag
+\end{align}</li>
+<li>进行d次条件极大化，得到&theta;<sup>(i+1)</sup>使\(Q(\theta^{(i+1)}, \theta^{(i)} > Q(\theta^{(i)}, \theta^{(i)}\)</li>
+</ol></li>
+<li>重复第二步直到收敛。</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org917f0a8" class="outline-2">
+<h2 id="org917f0a8"><span class="section-number-2">10</span> 隐马尔可夫模型</h2>
+<div class="outline-text-2" id="text-10">
+<p>
+隐马尔可夫模型是可用于标注问题的统计学习模型，描述又隐藏的马尔可夫链随机生成观测序列的过程，属于生成模型。
+</p>
+</div>
+<div id="outline-container-org7845119" class="outline-3">
+<h3 id="org7845119"><span class="section-number-3">10.1</span> 隐马尔可夫模型的基本概念</h3>
+<div class="outline-text-3" id="text-10-1">
+</div>
+<div id="outline-container-org2bbd192" class="outline-4">
+<h4 id="org2bbd192"><span class="section-number-4">10.1.1</span> 隐马尔可夫模型的定义</h4>
+<div class="outline-text-4" id="text-10-1-1">
+<p>
+定义 10.1 隐马尔可夫模型
+隐马尔可夫模型是关于时许的概率模型，描述由一个隐藏的马尔可夫链随机生成不可观测的状态随机序列，再由各个状态生成一个观测而产生观测随机序列的过程。隐藏的马尔可夫随机链生成的状态序列称为状态序列；每个状态生成一个观测，而由此产生的观测的随机序列，称为观测序列。序列的每一个位置又可以看作是一个时刻。
+隐马尔可夫模型由初始概率分布、状态转移概率分布以及观测概率分布确定。
+</p>
+
+<p>
+设Q是所有可能的状态集合，V是所有可能观测的集合。
+</p>
+\begin{equation}
+Q = \{q_1, q_2, \cdots, q_N\}, V = \{v_1, v_2, \cdots, v_M\}
+\end{equation}
+<p>
+I是长度为T的状态序列，O是对应的观测序列
+</p>
+\begin{equation}
+I = (i_1, i_2, \cdots, i_T), O = (o_1, o_2, \cdots, o_^)
+\end{equation}
+<p>
+A是状态转移矩阵，其中
+</p>
+\begin{equation}
+a_{ij} = P(i_{t+1}=q_j|i_t = q_i) \tag{10.2}
+\end{equation}
+<p>
+表示在t时刻状态为q<sub>i</sub>的条件下，t+1时刻状态为q<sub>j</sub>的概率。
+B是观测矩阵，其中
+</p>
+\begin{equation}
+b_{jk} = b_j(k) = P(o_t = v_k|i_t = q_j) \tag{9.4}
+\end{equation}
+<p>
+表示在t时刻状态为q<sub>j</sub>的条件下，观测值为v<sub>k</sub>的概率。
+&pi; 是初始状态向量，其中
+</p>
+\begin{equation}
+\pi_i = P(i=q_i) \tag{10.6}
+\end{equation}
+<p>
+表示t=1时刻的状态概率。
+</p>
+
+<p>
+隐马尔可夫模型由初始状态概率向量&pi;，状态转移概率矩阵A和观测矩阵B，&pi; 和A决定状态序列，B决定观测序列。&pi;，A，B称为隐马尔可夫模型的三要素。
+</p>
+
+<p>
+从定义知，马尔可夫模型做了两个基本假设。
+</p>
+<ol class="org-ol">
+<li><p>
+齐次马尔可夫性假设，即假设隐藏的马尔可夫连在任意时刻t的状态依赖于前一时刻的状态，与其他时刻的状态及观测无关，也与时刻t无关。即
+</p>
+\begin{equation}
+P(i_{i+1}|i_t, o_t, \cdots, i_1, o_1) = P(i_{t+1}|i_t) \tag{10.8}
+\end{equation}</li>
+<li><p>
+观测独立性假设，即假设任意时刻的观测只依赖于该时刻的马尔可夫链的状态，与其他观测及状态无关。
+</p>
+\begin{equation}
+P(o_{t+1}|i_{t+1}, o_t, i_t, \cdots, o_1, i_1) = P(o_{t+1}|i_{t+1}) \tag{10.9}
+\end{equation}</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-orga957ec7" class="outline-4">
+<h4 id="orga957ec7"><span class="section-number-4">10.1.2</span> 观测序列的生成过程</h4>
+<div class="outline-text-4" id="text-10-1-2">
+<p>
+算法 10.1 观测序列的生成
+输入：隐马尔可夫模型&lambda;=(A, B, &pi;)，观测序列长度T。
+输出：观测序列$O=(o<sub>1</sub>, o<sub>2</sub>, &ctdot;, o<sub>T</sub>)
+</p>
+<ol class="org-ol">
+<li>按照初始状态分布&pi; 产生状态i<sub>1</sub></li>
+<li>令t=1</li>
+<li>按照状态i<sub>t</sub>的观测概率分布生成o<sub>t</sub></li>
+<li>按照状态i<sub>t</sub>的状态转移概率分布产生状态i<sub>t+1</sub></li>
+<li>令t=t+1，如果t&lt;T，跳转至3，否则终止。</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org2f7813d" class="outline-4">
+<h4 id="org2f7813d"><span class="section-number-4">10.1.3</span> 隐马尔可夫模型的三个基本问题</h4>
+<div class="outline-text-4" id="text-10-1-3">
+<ol class="org-ol">
+<li>概率计算问题：给定模型&lambda;=(A,B,&pi;)和观测序列O，计算在模型&lambda; 下观测序列O出现的概率P(O|&lambda;)</li>
+<li>学习问题：已知观测序列O，估计模型&lambda; 的参数，使得在该模型下观测序列概率P(O|&lambda;)概率最大，即用极大似然估计的方法估计参数。</li>
+<li>预测问题：也称为解码问题，已知模型和观测序列，求对给定观测序列条件概率P(I|O)最大的状态序列I。</li>
+</ol>
+</div>
+</div>
+</div>
+<div id="outline-container-org47b169b" class="outline-3">
+<h3 id="org47b169b"><span class="section-number-3">10.2</span> 概率计算算法</h3>
+<div class="outline-text-3" id="text-10-2">
+</div>
+<div id="outline-container-org546ed1c" class="outline-4">
+<h4 id="org546ed1c"><span class="section-number-4">10.2.1</span> 直接计算法</h4>
+<div class="outline-text-4" id="text-10-2-1">
+<p>
+给定模型&lambda; 和观测序列O，计算观测序列O出现的概率P(O|&lambda;)。直接的算法是列举所有可能的状态序列I，求各个状态序列I与观测序列O的联合概率分布，对所有可能的状态序列求和，得到P(O|&lambda;)
+</p>
+\begin{align}
+P(I|\lambda) = \pi_{i_1}a_{i_1 i_2} \cdots a_{i_{T-1} i_T} \tag{10.10} \\
+P(O|I, \lambda) = b_{i_1, o_1} \cdots b_{i_T, o_T} \tag{10.11} \\
+P(O, I|\lambda) = P(O|I,\lambda) P(I|\lambda) \tag{10.12} \\
+P(O|\lambda) = \sum_{I} P(O, I|\lambda) \tag{10.13}
+\end{align}
+<p>
+上述算法计算量很大，是O(TN<sup>T</sup>)阶的
+</p>
+</div>
+</div>
+<div id="outline-container-org30acb72" class="outline-4">
+<h4 id="org30acb72"><span class="section-number-4">10.2.2</span> 前向算法</h4>
+<div class="outline-text-4" id="text-10-2-2">
+<p>
+定义 10.2 前向概率
+给定隐马尔可夫模型&lambda;，定义到时刻t部分观测序列为o<sub>1</sub>,o<sub>2</sub>,&ctdot;,o<sub>t</sub>且状态为q<sub>i</sub>的概率为前向概率，记为
+</p>
+\begin{equation}
+\alpha_t(i) = P(o_1, o_2, \cdots, o_t, i_t=q_i|\lambda) \tag{10.14}
+\end{equation}
+<p>
+可以递推地求得前向概率&alpha;<sub>t</sub>(i)及观测序列概率P(O|&lambda;)
+</p>
+
+<p>
+算法 10.2 观测序列概率的前向算法
+输入：隐马尔可夫模型&lambda;，观测序列O
+输出：观测序列概率P(O|&lambda;)
+</p>
+<ol class="org-ol">
+<li>初值：\(\alpha_1(i) = \pi_i b_{i}(o_1)\)</li>
+<li>递推：\(\alpha_{t+1}(i) = [ \sum_{j=1}^N \alpha_t(j) a_{ji}] b_i(o_{t+1})\)</li>
+<li>终止：\(P(O|\lambda) = \sum_{i=1} \alpha_T(i)\)</li>
+</ol>
+
+<p>
+前向算法实际是基于状态序列的路径结构递推计算P(O|&lambda;)的算法。高效的关键是其局部计算前向概率，然后利用路径结构将前向概率递推到全局。计算量减少的原因在与每一次计算直接引用前一个时刻的计算结果，避免重复计算，计算量为O(N<sup>2</sup>T)阶。
+可以转化为矩阵运算。
+</p>
+</div>
+</div>
+<div id="outline-container-org74f5c1e" class="outline-4">
+<h4 id="org74f5c1e"><span class="section-number-4">10.2.3</span> 后向算法</h4>
+<div class="outline-text-4" id="text-10-2-3">
+<p>
+定义 10.3 后向概率 给定马尔可夫模型&lambda;，定义在时刻t状态为q<sub>i</sub>的条件下，从t+1到T的部分观测序列为o<sub>t+1</sub>, o<sub>t+1</sub>, &ctdot;, o<sub>T</sub>的概率为后向概率，记为
+</p>
+\begin{equation}
+\beta_i(i) = P(o_{t+1}, \cdots, o_T|i_t = q_i, \lambda) \tag{10.18}
+\end{equation}
+
+<p>
+算法 10.3 观测序列概率的后向算法
+输入：隐马尔可夫模型&lambda;，观测序列O
+输出：观测序列概率P(O|&lambda;)
+</p>
+<ol class="org-ol">
+<li>\(\beta_T(i)=1\)</li>
+<li>\(\beta_t(i) = \sum_{j=1}^N \alpha_{ij}b_j(o_{t+1})\beta_{t+1}(j)\)</li>
+<li>P(O|&lambda;) = &sum;<sub>i=1</sub><sup>N</sup> &pi;<sub>i</sub> b<sub>i</sub>(o<sub>i</sub>) &beta;<sub>1</sub>(i)$</li>
+</ol>
+
+<p>
+利用前向概率和后向概率的定义可以将观测序列概率P(O|&lambda;)统一写成
+</p>
+\begin{equation}
+P(O|\lambda) = \sum_{i=1}^N \sum_{j=1}^N \alpha_t(i) a_{ij} b_j(o_{t+1}) \beta_{t+1}(j) \tag{10.22}
+\end{equation}
+<p>
+当t=1和t=T-1时分别为前向概率和后向概率计算P(O|&lambda;)的公式。
+</p>
+</div>
+</div>
+<div id="outline-container-org382e800" class="outline-4">
+<h4 id="org382e800"><span class="section-number-4">10.2.4</span> 一些概率与期望值的计算</h4>
+<div class="outline-text-4" id="text-10-2-4">
+<ol class="org-ol">
+<li><p>
+给定模型&lambda; 和观测序列O，在时刻t处于状态q<sub>i</sub>的概率，记为
+</p>
+\begin{equation}
+\gamma_t(i) = P(i_t = q_i |O, \lambda) \tag{10.23}
+\end{equation}
+<p>
+可通过前向概率和后向概率计算，即
+</p>
+\begin{align}
+\gamma_t(i) &= P(i_t=q_i|O, \lambda) = \frac {P(i_t|q_i, O|\lambda)} {P(O|\lambda)} \notag \\
+&= \frac {\alpha_t(i)\beta_t(i)} {P(O|\lambda)} = \frac {\alpha_t(i)\beta_t(i)} {\sum_{j=1}^N \alpha_t(i)\beta_t(i)} \tag{10.24}
+\end{align}</li>
+<li><p>
+给定模型&lambda; 和观测序列O，在时刻t处于状态q<sub>i</sub>且在时刻t+1处于状态q<sub>j</sub>的概率，记为
+</p>
+\begin{equation}
+\xi_t(i, j) = P(i_t = q_i, i_{t+1} = q_j|O, \lambda) \tag{10.25}
+\end{equation}
+<p>
+可通过前后向概率计算，即
+</p>
+\begin{align}
+\xi_t(i, j) &= \frac {P(i_t = q_i, i_{t+1} = q_j,O| \lambda)} {P(O|\lambda)} = \frac {P(i_t = q_i, i_{t+1} = q_j,O| \lambda)} {\sum_{i=1}^N \sum_{j=1}^N P(i_t = q_i, i_{t+1} = q_j,O| \lambda)} \\
+&= \frac {\alpha_t(i) a_{ij} b_j(o_{t+1}) \beta_{t+1}(j)} {\sum_{i=1}^N \sum_{j=1}^N \alpha_t(i) a_{ij} b_j(o_{t+1}) \beta_{t+1}(j)} \tag{10.26}
+\end{align}</li>
+<li>将\(\gamma_t(i)\) 和\(\xi_t(i, j)\) 对各个时刻t求和，可以得到一些有用的期望值
+<ol class="org-ol">
+<li>在观测O下状态i出现的期望值：\(\sum_{t=1}^T \gamma_t(i)\)</li>
+<li>在观测O下由状态i转移的期望：\(\sum_{t=1}^{T-1} \gamma_t(i)\)</li>
+<li>在观测O下由状态i转移到状态j的期望：\(\sum_{t=1}^{T-1} \xi_t(i, j)\)</li>
+</ol></li>
+</ol>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org71c4462" class="outline-3">
+<h3 id="org71c4462"><span class="section-number-3">10.3</span> 学习算法</h3>
+<div class="outline-text-3" id="text-10-3">
+</div>
+<div id="outline-container-orgf10fd70" class="outline-4">
+<h4 id="orgf10fd70"><span class="section-number-4">10.3.1</span> 监督学习算法</h4>
+<div class="outline-text-4" id="text-10-3-1">
+<p>
+假设训练数据包含S个长度相同的观测序列和对应的状态序列{(O<sub>1</sub>, I<sub>1</sub>), &ctdot;, (O<sub>S</sub>, I<sub>S</sub>)}，可以利用极大似然估计法来估计隐马尔可夫模型的参数
+</p>
+<ol class="org-ol">
+<li><p>
+转移概率a<sub>ij</sub>的估计
+</p>
+\begin{equation}
+\hat{a}_{ij} = \frac {A_{ij}} {sum_{j=1}^N A_{ij}} \tag{10.30}
+\end{equation}
+<p>
+其中A<sub>ij</sub>表示时刻t由状态i时刻t+1状态j的频数。
+</p></li>
+<li><p>
+观测概率b<sub>j</sub>(k)的估计
+</p>
+\begin{equation}
+\hat{b}_j(k) = \frac {B_{jk}} {\sum_{k=1}^M B_{jk}} \tag{10.31}
+\end{equation}
+<p>
+其中，B<sub>jk</sub>表示状态为j时观测值为k的频数
+</p></li>
+<li>初始状态概率&pi;<sub>i</sub>的估计为S个样本中初始状态为q<sub>i</sub>的频数</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-org2be2be9" class="outline-4">
+<h4 id="org2be2be9"><span class="section-number-4">10.3.2</span> Baum-Welch算法</h4>
+<div class="outline-text-4" id="text-10-3-2">
+<p>
+假定训练数据集仅包含S个长度为T的观测序列，而没有状态序列，目标是学习隐马尔可夫模型的参数，可将状态序列I看作是隐变量，由EM算法进行参数学习。
+</p>
+<ol class="org-ol">
+<li>确定完全数据的对数似然函数
+观测数据为O，隐数据为I，完全数据是(O, I)，完全数据对数自然函数为log P(O, I|&lambda;)</li>
+<li><p>
+EM算法的E步：求Q函数
+</p>
+\begin{equation}
+Q(\lambda, \bar{\lambda}) = E_I[\log P(O, I|\lambda)] = \sum_{I} \log P(O, I|\lambda) P(O, I|\bar{\lambda}) \tag{10.33}
+\end{equation}
+<p>
+此处省略了一个对&lambda; 而言的常数因子$\frac {1} {P(O|\bar{\lambda})}
+</p>
+<p>
+其中
+</p>
+\begin{equation}
+\P(O, I|\lambda) = \pi_{i_1} b_{i_1}(O_1) a_{i_1 i_2} \codts a_{i_{T-1} i_T} b_{i_T}(O_T)
+\end{equation}
+<p>
+所以，Q函数为
+</p>
+\begin{equation}
+Q(\lambda, \bar{\lambda}) = \sum_{I} \log \pi_{i_1} P(O, I |\bar{\lambda}) + \sum_{I} (\sum_{t=1}^{T-1} \log a_{i_t i_{t+1}}) P(O, I| \bar{\lambda}) + \sum_{I} (\sum_{t=1}^T) \log b_{i_t}(o_t)) P(O, I|\bar{\lambda}) \tag{10.34}
+\end{equation}</li>
+<li><p>
+EM算法的M步：极大化Q函数求出模型参数
+只需对各项分别极大化，每项根据拉格朗日乘子法来求解，可得
+</p>
+\begin{align}
+&\pi_i \frac {P(O, i_1 = i) |\bar{\lambda}} {P(O|\bar{\lambda})} \tag{10.36} \\
+&a_{ij} = \frac {\sum_{t=1}^{T-1} P(O, i_t=i, i_{t+1}=j|\bar{\lambda})} {\sum_{t=1}^{T-1} P(O, i_t=i|\bar{\lambdar})} \tag{10.37} \\
+&b_j(k) = \frac {\sum_{t=1}^T P(O, i_t=j|\bar{\lambdar}) I(o_t = v_k)} {\sum_{t=1}^T P(O, i_t=j|\bar{\lambdar})} \tag{10.38}
+\end{align}</li>
+</ol>
+</div>
+</div>
+<div id="outline-container-org3a42ec4" class="outline-4">
+<h4 id="org3a42ec4"><span class="section-number-4">10.3.3</span> Baum-Welch模型参数估计公式</h4>
+<div class="outline-text-4" id="text-10-3-3">
+<p>
+将式10.36～式10.38的中概率分别用&gamma;<sub>t</sub>(i), &xi;<sub>t</sub>(i, j)表示，则可将公式改写为
+</p>
+\begin{align}
+& a_{ij} = \frac {\sum_{t=1}^{T-1}\xi_t(i,j)} {\sum_{t=1}^{T-1} \gamma_t(i)} \tag{10.39} \\
+& b_j(k) = \frac {\sum_{t=1, o_t=v_k}^T \gamma_t(j)} {\sum_{t=1}^T \gamma_t(j)} \tag{10.40}
+& \pi_i = \gamma_1(i) \tag{10.41}
+\end{align}
+
+<p>
+算法 10.4 Baum-Welch算法
+输入：观测数据O=(o<sub>1</sub>, o<sub>2</sub>, &ctdot;, o<sub>T</sub>)
+输出：隐马尔可夫模型参数
+</p>
+<ol class="org-ol">
+<li>初始化，初始化模型参数&lambda;<sup>(0)</sup>=(A<sup>(0)</sup>, B<sup>(0)</sup>, &pi;<sup>(0)</sup>)</li>
+<li>根据公式10.39-10.41递推获得新的模型参数。</li>
+<li>终止，得到模型参数&lambda;<sup>(n+1)</sup>=(A<sup>(n+1)</sup>, B<sup>(n+1)</sup>, &pi;<sup>(n+1)</sup>)</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgd643647" class="outline-3">
+<h3 id="orgd643647"><span class="section-number-3">10.4</span> 预测算法</h3>
+<div class="outline-text-3" id="text-10-4">
+</div>
+<div id="outline-container-org35cda66" class="outline-4">
+<h4 id="org35cda66"><span class="section-number-4">10.4.1</span> 近似算法</h4>
+<div class="outline-text-4" id="text-10-4-1">
+<p>
+近似算法的想法是，在每个时刻t选择在该时刻最有可能出现的状态i<sub>t</sub><sup>*</sup>，从而得到一个状态序列I<sup>*</sup>，将它作为预测结果。
+给定隐马尔可夫模型&lambda; 和观测序列O，在t时刻处于状态q<sub>i</sub>的概率&gamma;<sub>t</sub>(i)是
+</p>
+\begin{equation}
+\gamma_{t}(i) = \frac {\alpha_t(i)\beta_t(i)} {P(O|\lambda)} = \frac {\alpha_t(i)\beta_t(i)} {\sum_{j=1}^N {\alpha_t(j)\beta_t(j)} \tag{10.42}
+\end{equation}
+<p>
+则在每一时刻t最有可能的状态是
+</p>
+\begin{equation}
+i_t^\star = \arg\max_{1 \le i \le N} \gamma_t(i) \tag{10.43}
+\end{equation}
+
+<p>
+近似算法的优点是计算简单，缺点是不能保证预测的状态序列整体是最有可能的状态序列，因为预测的状态序列可能有实际不发生的部分。
+</p>
+</div>
+</div>
+
+<div id="outline-container-org01e1ba3" class="outline-4">
+<h4 id="org01e1ba3"><span class="section-number-4">10.4.2</span> 维特比算法</h4>
+<div class="outline-text-4" id="text-10-4-2">
+<p>
+维特比算法实际是用动态规划解隐马尔可夫模型预测问题，即用动态规划求概率最大路径，这是一条路径对应一个状态序列。
+根据动态规划原理，最优路径具有这样的性质：如果最优路径在时刻t通过结点i<sub>t</sub><sup>*</sup>，那么这一路径从结点i<sub>t</sub><sup>*</sup>到终点i<sub>T</sub><sup>*</sup>的部分路径，对于从i<sub>t</sub><sup>*</sup>到i<sub>T</sub><sup>*</sup>的所有可能的部分路径来说，必须是最优的。
+</p>
+
+<p>
+依据这一原理，从时刻t=1开始递推地计算在时刻t状态为i的各条部分路径的最大概率，直到得到t=T状态为i的各条路径的最大概率。同时得到最优路径的终结点，然后从终结点开始逐步向前找的最优路径的各个结点。
+</p>
+
+<p>
+引入两个变量&delta; 和&psi;。定义时刻t状态为i的所有单个路径中概率最大值为
+</p>
+\begin{equation}
+\delta_t(i) = \max_{i_1, i_2, \cdots, i_{t-1}} P(i_t = i, i_{t-1}, \cdots, i_i, o_t, \cdots, o_1|\lambda) \tag{10.44}
+\end{equation}
+<p>
+变量\delta的递推公式为
+</p>
+\begin{equation}
+\delta_{t+1}(i) = \max_{1 \le j \le N} [\delta_t(j) a_{ji}] b_i(o_{t+1}) \tag{10.45}
+\end{equation}
+<p>
+定义在时刻t状态为i的所有单个路径中概率最大的路径的第t-1个结点为
+</p>
+\begin{equation}
+\psi_t(i) = \arg\max_{1 \le j \le N} [\delta_{t-1} a_{ji}] \tag{10.46}
+\end{equation}
+
+<p>
+算法 10.5 维特比算法
+输入：模型&lambda; 和观测O
+输出：最优路径I<sup>*</sup>
+</p>
+<ol class="org-ol">
+<li><p>
+初始化
+</p>
+\begin{align}
+\delta_i = \pi_i b_i(o_1) \notag \\
+\psi(i) = 0 \notag
+\end{align}</li>
+<li><p>
+递推
+</p>
+\begin{align}
+\delta_t(i) = \max_{1 \le j \le N} [\delta_{t-1}(j) a_{ji}] b_i(o_t) \notag \\
+\psi_t(i) = \arg\max_{1 \le j \le N} [\delta_{t-1} a_{ji}] \notag
+\end{align}</li>
+<li><p>
+终止
+</p>
+\begin{align}
+P^{\star} = \max_{1 \le i \le N} \delta_T(i) \notag \\
+t_T^{\star} = \arg\max_{1 \le i \le N} \delta_T(i) \notag
+\end{align}</li>
+<li><p>
+最优路径回溯
+</p>
+\begin{equation}
+i_t^\star = \psi_{t+1}(i_{t+1}^\star)
+\end{equation}</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org0bbc596" class="outline-2">
+<h2 id="org0bbc596"><span class="section-number-2">11</span> 条件随机场</h2>
+<div class="outline-text-2" id="text-11">
+<p>
+条件随机场(CRF)是给定一组输入随机变量条件下另一组输出随机变量的条件概率分布模型，其特点是假设输出随机变量构成马尔可夫随机场。条件随机场可以用于不同的预测问题。
+</p>
+</div>
+<div id="outline-container-org068e086" class="outline-3">
+<h3 id="org068e086"><span class="section-number-3">11.1</span> 概率无向图模型</h3>
+<div class="outline-text-3" id="text-11-1">
+<p>
+概率无向图模型，又称马尔可夫随机场，是一个可以由无向图表示的联合概率分布。
+</p>
+</div>
+<div id="outline-container-orgdb15866" class="outline-4">
+<h4 id="orgdb15866"><span class="section-number-4">11.1.1</span> 模型定义</h4>
+<div class="outline-text-4" id="text-11-1-1">
+<p>
+概率图模型是由凸表示的概率分布。设由联合概率分布P(Y)，\(Y \in \mathcal{Y}\) 是一组随机变量，由无向图G=(V,E)表示概率分布P(Y)，即在图G中，结点 v &isin; V 表示一个随机变量Y<sub>v</sub>，Y=(Y<sub>v</sub>)<sub>v &isin; V</sub>，边 e
+&isin; E 表示随机变量之间概率依赖关系。
+给定一个联合概率分布P(Y)和表示它的无向图G，首先定义无向图表示的随机变量之间存在的成对马尔可夫性、局部马尔可夫性、全局马尔可夫性。
+</p>
+<ul class="org-ul">
+<li><p>
+成对马尔可夫性：设u和v是无向图G中任意两个没有边连接的结点，结点u和v分别对应随机变量Y<sub>u</sub>和Y<sub>v</sub>。其他所有结点为O，对应随机变量为Y<sub>O</sub>。成对马尔可夫性是指给定随机变量组Y<sub>O</sub>的条件下，随机变量Y<sub>u</sub>和Y<sub>v</sub>是条件独立的，即
+</p>
+\begin{equation}
+P(Y_u, Y_v | Y_O) = P(Y_u | Y_O) P(Y_v | Y_O) \tag{11.1}
+\end{equation}</li>
+<li><p>
+局部马尔可夫性：设 v &isin; V 是无向图G中任意一个结点，W是与v有边连接的所有结点，O是其他结点，v表示的随机变量是Y<sub>v</sub>，W表示的随机变量是Y<sub>W</sub>，O表示的随机变量是Y<sub>O</sub>，局部马尔可夫性是指在给定随机变量组Y<sub>W</sub>的条件下随机变量Y<sub>v</sub>和随机变量组Y<sub>O</sub>是独立的，即
+</p>
+\begin{equation}
+P(Y_v, Y_O|Y_W) = P(Y_v|Y_W) P(Y_O | Y_W) \tag{11.2}
+\end{equation}
+<p>
+当P(Y<sub>O</sub>|P<sub>W</sub>) &gt; 0时，等价地
+</p>
+\begin{equation}
+P(Y_v|Y_W) = P(Y_v|Y_W, Y_O) \tag{11.3}
+\end{equation}</li>
+<li><p>
+全局马尔可夫性：设结点集合A，B在无向图G中被结点集合分开的任意结点集合，结点集合A，B，C对应的随机变量组为Y<sub>A</sub>，Y<sub>B</sub>，Y<sub>C</sub>。全局马尔可夫性是指在给定随机变量组Y<sub>C</sub>的条件下，随机变量组Y<sub>A</sub>和Y<sub>B</sub>条件独立，即
+</p>
+\begin{equation}
+P(Y_A, Y_B|Y_C) = P(Y_A|Y_C) P(Y_B|Y_C) \tag{11.4}
+\end{equation}</li>
+</ul>
+<p>
+上述三个性质定义是等价的
+定义 11.1 概率无向图模型
+设由联合分布P(Y)，由无向图G表示，在G中，结点表示随机变量，边表示随机变量之间的依赖关系，如果联合概率分布P(Y)满足成对、局部或全局马尔可夫性，就称此联合概率分布为概率无向图模型，或马尔可夫随机场。
+</p>
+
+<p>
+实际中，更加关心如何求联合概率分布，对给定概率图模型，可以将联合概率写成若干子联合概率的乘积的形式，即将联合概率进行因子分解。
+</p>
+</div>
+</div>
+
+<div id="outline-container-org431ee66" class="outline-4">
+<h4 id="org431ee66"><span class="section-number-4">11.1.2</span> 概率无向图模型的因子分解</h4>
+<div class="outline-text-4" id="text-11-1-2">
+<p>
+定义 11.2 团与最大团
+无向图G中任何两个结点均有边连接的结点自己称为团(clique)。若C是无向图G的一个团。若C是无向图G的一个团，并且不能再加进任何一个G的结点，使其称为一个更大的团，则称此C为最大团。
+</p>
+
+<p>
+将概率无向图模型的联合概率分布表示为其最大团上的随机变量的函数的乘积的操作，称为概率无向图模型的因子分解。
+</p>
+
+<p>
+给定概率无向图模型，设其无向图为G，C为G上的最大团，Y<sub>C</sub>表示C对应的随机变量，那么概率无向图模型的联合概率分布P(Y)可写作图中所有最大团C上的势函数&Psi;<sub>C</sub>(Y<sub>C</sub>)的乘积形式，即
+</p>
+\begin{equation}
+P(Y) = \frac 1 Z \prod_{C} \Psi_C(Y_C) \tag{11.5}
+\end{equation}
+<p>
+其中，Z是规范化因子
+函数&Psi;<sub>C</sub>(Y<sub>C</sub>)称为势函数，要求势函数&Psi;<sub>C</sub>(Y<sub>C</sub>)是严格正的，通常定义为指数函数
+</p>
+\begin{equation}
+\Psi_C(Y_C) = exp\{ -E(Y_c) \} \tag{11.7}
+\end{equation}
+
+<p>
+定理 11.1 Hammersley-Clifford定理
+概率无向图模型的联合概率分布P(Y)可以表示为如下形式
+</p>
+\begin{equation}
+P(Y) = \frac 1 Z \prod_{C} \Psi_C(Y_C) \notag
+\end{equation}
+<p>
+其中，C是无向图的最大团，Y<sub>C</sub>是C的结点对应的随机变量，&Psi;<sub>C</sub>(Y<sub>C</sub>)是C上定义的严格正函数，乘积是在无向图所有的最大团上进行的。
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org06bc18a" class="outline-3">
+<h3 id="org06bc18a"><span class="section-number-3">11.2</span> 条件随机场的定义与形式</h3>
+<div class="outline-text-3" id="text-11-2">
+<p>
+对于转移特征t<sub>k</sub>(y<sub>i-1</sub>, y<sub>i</sub>, x, i)，k最大应该为m &times; m &times; n-1个，前一个状态可能有m个，当前状态可能有m个，共有n-1次状态转移，此时每个转移特征对应一个数。当k小于最大值时，可以认为存在一些转移特征函数，他们的值相同且权值相同，所以进行了合并。
+</p>
+
+<p>
+同理，对于状态特征，l最大应该是m &times; n个。
+</p>
+
+<p>
+那么，在理解条件随机场时，可以分别将转移特征和状态特征扩充为最大数量，即将原本合并的表达式仅进行拆分。扩充后，转移特征是n-1个m &times; m的矩阵，状态特征是n个m &times; 1的向量。
+</p>
+
+<p>
+对于简化形式和矩阵形式，可以通过扩充后的特征函数来考虑。
+对于简化形式，相当于矩阵元素乘以对应权值，再将所有元素求和。
+</p>
+
+<p>
+矩阵形式就是，将状态特征乘以权值后加到乘以权值后的转移特征矩阵的每一行，再增加开始矩阵和结束矩阵。开始矩阵仅有第一行不全为零，以不同概率转移到起始状态。结束矩阵的第一列全为1，其余全为零，表示所有路径以1的概率转移到结束结点。
+</p>
+
+<p>
+这里暂时没有考虑x的因素
+</p>
+</div>
+<div id="outline-container-org0d4e6d2" class="outline-4">
+<h4 id="org0d4e6d2"><span class="section-number-4">11.2.1</span> 条件随机场的定义</h4>
+<div class="outline-text-4" id="text-11-2-1">
+<p>
+条件随机场是给定随机变量X条件下，随机变量Y的马尔可夫随机场。主要介绍线性链条件随机场，可以用于标注等问题。
+</p>
+
+<p>
+定义 11.3 条件随机场
+设X与Y是随机变量，若随机变量Y构成一个由无向图G表示的马尔可夫随机场，即
+</p>
+\begin{equation}
+P(Y_v |X, Y_w, w \neq v) = P(Y_v |X, Y_w, w \sim v) \tag{11.8}
+\end{equation}
+<p>
+对任意结点v成立，则称条件概率分布P(Y|X)为条件随机场。式中w &sim; v表示在图中与结点v有边连接的所有结点w。
+</p>
+
+<p>
+定义中不要求X和Y有相同的结构，但现实中，一般假设X和Y有相同的图结构。
+</p>
+
+<p>
+这里主要考虑下图中两个结构的情况
+<img src="./img/统计学习方法11-4.png" alt="统计学习方法11-4.png" />
+此时，最大团是相邻的两个结点的集合。
+</p>
+
+<p>
+定义 11.4 线性链条件随机场
+设X=(X<sub>1</sub>, X<sub>2</sub>, &ctdot;, X<sub>N</sub>)，Y=(Y<sub>1</sub>, Y<sub>2</sub>, &ctdot;, Y<sub>n</sub>)均为线性连表示的随机变量序列，若在给定随机变量序列X的条件下，随机变量序列Y的条件概率分布P(Y|X)构成条件随机场，即满足马尔可夫性
+</p>
+\begin{equation}
+P(Y_i|X, Y_{1}, \cdots, Y_{i-1}, Y_{i+1}, \cdots, Y_{n}) = P(Y_i|X, Y_{i-1}, Y_{i+1}) \tag{11.9}
+\end{equation}
+<p>
+则称P(Y|X)为线性链条件随机场。
+</p>
+</div>
+</div>
+<div id="outline-container-org5abde41" class="outline-4">
+<h4 id="org5abde41"><span class="section-number-4">11.2.2</span> 条件随机场的参数化形式</h4>
+<div class="outline-text-4" id="text-11-2-2">
+<p>
+定理 11.2 线性条件随机场的参数化形式
+设P(Y|X)为线性条件随机场，则在随机变量X取值为x的条件下，随机变量Y取值为y的条件概率具有如下形式
+</p>
+\begin{equation}
+P(y|x) = \frac 1 {Z(x)} exp\left( \sum_{i,k} \lambda_k t_k(y_{i-1}, y_i, x, i) + \sum_{i, l}\mu_i s_l(y_i, x, i) \right) \tag{11.10} \label{11.10}
+\end{equation}
+<p>
+其中，Z(x)是规范化因子，t<sub>k</sub>和s<sub>l</sub>是特征函数，&lambda;<sub>k</sub>和&mu;<sub>l</sub>是对应的权值。
+t<sub>k</sub>是定义在边上的特征函数，称为转移特征，依赖于当前和前一个位置，s<sub>l</sub>是定义在结点上的特征函数，称为状态特征，依赖于当前位置。两者都是局部特征函数。
+条件随机场完全有特征函数t<sub>k</sub>，s<sub>l</sub>和对应的权值&lambda;<sub>k</sub>，&mu;<sub>l</sub>确定。
+</p>
+</div>
+</div>
+<div id="outline-container-org5e85c76" class="outline-4">
+<h4 id="org5e85c76"><span class="section-number-4">11.2.3</span> 条件随机场的简化形式</h4>
+<div class="outline-text-4" id="text-11-2-3">
+<p>
+式\(\eqref{11.10}\) 中，同一特征在各个位置都有定义，可以对同一个特征在各个位置求和，将局部特征函数转化为一个全局特征函数，则可以将条件随机场写成权值向量和特征向量的内积形式，即条件随机场的简化形式
+</p>
+
+<p>
+设有K<sub>1</sub>个转移特征，K<sub>2</sub>个状态特征，K=K<sub>1</sub>+K<sub>2</sub>，则记
+</p>
+\begin{equation}
+f_k(y_{i-1}, y_i, x, i) = \begin{cases}
+t_k(y_{i-1}, y_i, x, i), & i = 1,2,\cdots, K_1 \\
+s_l(y_i, x, i), & i=K_1+l, l = 1,2,\cdots, K
+\end{cases} \tag{11.12}
+\end{equation}
+<p>
+对上述方程在各个位置求和得，
+</p>
+\begin{equation}
+f_k(y, x) = \sum_{i=1}^K f_k(y_{i-1}, y_i, x, i) \tag{11.13}
+\end{equation}
+<p>
+用w<sub>k</sub>表示权值，即
+</p>
+\begin{equation}
+w_k = \begin{cases}
+\lambda_k, & i = 1,2,\cdots, K_1 \\
+\mu_l, & i=K_1+l, l = 1,2,\cdots, K
+\end{cases} \tag{11.14}
+\end{equation}
+<p>
+则条件随机场可表示为
+</p>
+\begin{equation}
+P(y|x) = \frac 1 {Z(x)} exp(\sum_{k=1}^K w_k f_k(y, x)) \tag{11.15} \label{11.15}
+\end{equation}
+</div>
+</div>
+<div id="outline-container-org755a6af" class="outline-4">
+<h4 id="org755a6af"><span class="section-number-4">11.2.4</span> 条件随机场的矩阵形式</h4>
+<div class="outline-text-4" id="text-11-2-4">
+<p>
+给定观测序列x，相应的标记序列y的条件概率，引入特殊的起点和终点状态标记y<sub>0</sub>=start, y<sub>n+1</sub>=stop，此时P<sub>w</sub>(y|x)可以通过矩阵形式表示。
+</p>
+
+<p>
+对观测序列x的每一个位置定义一个m阶矩阵
+</p>
+\begin{align}
+& M_i(x) = [M_i(y_{i-1}, y_i|x)] \tag{11.21} \\
+& M_i(y_{i-1}, y_i, x) = exp(W_i(y_{i-1}, y_i|x)) \tag{11.22} \\
+& W_i(y_{i-1}, y_i|x) = \sum_{k=1}^K w_k f_k(y_{i-1}, y_i, x, i) \tag{11.23}
+\end{align}
+<p>
+简化形式和矩阵形式，一个是对i和，一个是对k求和。
+</p>
+<p>
+这样给定观测序列x，相应标记序列y的非规范化概率可通过该序列n+1个矩阵的乘积表示，即
+</p>
+\begin{equation}
+P_w(y|x) = \frac 1 {Z_w(x)} \prod_{i=1}^{n+1} M_i(y_{i-1}, y_i |x) \tag{11.24}
+\end{equation}
+<p>
+Z<sub>w</sub>(x)为规范化因子。
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org6a7aa70" class="outline-3">
+<h3 id="org6a7aa70"><span class="section-number-3">11.3</span> 条件随机场的概率计算问题</h3>
+<div class="outline-text-3" id="text-11-3">
+</div>
+<div id="outline-container-orgb91f1be" class="outline-4">
+<h4 id="orgb91f1be"><span class="section-number-4">11.3.1</span> 前向-后向算法</h4>
+<div class="outline-text-4" id="text-11-3-1">
+<p>
+对于每个指标i，定义前向向量&alpha;<sub>i</sub>(x)
+</p>
+\begin{equation}
+\alpha_0(y|x) = \begin{cases}
+1, & y=start \\
+0, & else
+\end{cases} \tag{11.26}
+\end{equation}
+<p>
+递推公式为
+\begin<sub>equation</sub>
+&alpha;<sub>i</sub><sup>T</sup>(y<sub>i</sub>|x) = &alpha;<sub>i-1</sub><sup>T</sup>(y<sub>i-1</sub>|x) [M<sub>i</sub>(y<sub>i-1</sub>, y<sub>i</sub>, x, i)] \tag{11.27}
+\end{equation}
+&alpha;<sub>i</sub>(y<sub>i</sub>|x)表示在位置i的标记是y<sub>i</sub>并且到位置i的前部分标记序列的非规范化概率，y<sub>i可取的值有m个</sub>，所以&alpha;<sub>i</sub>(x)是m维列向量。
+</p>
+
+<p>
+对每个指标i，定义后向向量&beta;<sub>i</sub>(x)
+</p>
+\begin{equation}
+\beta_{n+1}(y_{n+1}|x) = \begin{cases}
+1, & y_{n+1}=stop \\
+0, & else
+\end{cases} \tag{11.29}
+\end{equation}
+<p>
+递推公式为
+</p>
+\begin{equation}
+\beta_i(y_i|x) = [M_i(y_i, y_{i+1}|x)] \beta_{i+1}(y_i+1|x) \tag{11.30}
+\end{equation}
+<p>
+&beta;<sub>i</sub>(y<sub>i</sub>|x)表示在位置i的标记为y<sub>i</sub>并且从i+1到n的后部分标记序列的非规范化概率。
+有定义可得
+</p>
+\begin{equation}
+Z(x) = \alaph_n^T(x) \cdots 1 = 1^T \cdots \beta_1(x) \notag
+\end{equation}
+</div>
+</div>
+<div id="outline-container-orgf4728ce" class="outline-4">
+<h4 id="orgf4728ce"><span class="section-number-4">11.3.2</span> 概率计算</h4>
+<div class="outline-text-4" id="text-11-3-2">
+<p>
+根据前向-后向向量的定义，可以计算出标记序列在位置i是标记y<sub>i</sub>的条件概率和在位置i-1与i是标记y<sub>i-1</sub>和y<sub>i</sub>的条件概率
+</p>
+\begin{align}
+& P(Y_i=y_i|x) = \frac {\alpha_i^T(y_i|x) \beta_i(y_i|x)} {Z(x)} \tag{11.32} \\
+& P(Y_{i-1}=y_{i-1}, Y_i=y_i|x) = \frac {\alpha_{i-1}^T(y_{i-1}|x) M_i(y_{i-1}, y_i|x) \beta_i(y_i|x)} {Z(x)} \tag{11.33}
+\end{align}
+</div>
+</div>
+
+<div id="outline-container-org1b65f63" class="outline-4">
+<h4 id="org1b65f63"><span class="section-number-4">11.3.3</span> 期望值的计算</h4>
+<div class="outline-text-4" id="text-11-3-3">
+<p>
+利用前向-后向向量，可以计算特征函数关于联合分布P(X, Y)和条件分布P(Y|X)的数学期望。
+特征函数f<sub>k</sub>关于条件分布P(Y|X)的数学期望是
+</p>
+\begin{align}
+E_{P(Y|X)}[f_k] &= \sum_y P(y|x) f_k(y,x) \notag \\
+&= \sum_{i=1}^{n+1} \sum_{y_{i-1}, y_i} f_k(y_{i-1}, y_i, x, i) \frac {\alpha_{i-1}^T(y_{i-1}|x) M_i(y_{i-1}, y_i|x) \beta_i(y_i|x)} {Z(x)} \tag{11.34}
+\end{align}
+
+<p>
+假设经验分布为\(\tilde{P}(X)\) ，特征函数f<sub>k</sub>关于联合分布P(X,Y)的数学期望是
+</p>
+\begin{align}
+E_{P(X, Y)}[f_k] &= \sum_{x, y} P(x, y) \sum_{i=1}^{n+1}f_k(y_{i-1}, y_i, x, i) \notag \\
+&= \sum_x \tilde{P}(x) \sum_y P(y|x) \sum_{i=1}^{n+1}f_k(y_{i-1}, y_i, x, i) \notag \\
+&= \sum_x \tilde{P}(x) \sum_{i=1}^{n+1} \sum_{y_{i=1}, y_i} f_k(y_{i-1}, y_i, x, i) \frac {\alpha_{i-1}^T(y_{i-1}|x) M_i(y_{i-1}, y_i|x) \beta_i(y_i|x)} {Z(x)} \tag{11.35}
+\end{align}
+
+<p>
+对于给定的观测序列x与标记序列y，可以通过一次前向扫描计算&alpha;<sub>i</sub>及Z(x)，通过一次后向扫描计算&beta;<sub>i</sub>，从而计算所有的概率和特征的期望。
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org43f740f" class="outline-3">
+<h3 id="org43f740f"><span class="section-number-3">11.4</span> 条件随机场的学习算法</h3>
+<div class="outline-text-3" id="text-11-4">
+<p>
+条件算计场模型实际上是定义在时序数据上的对数线性模型，其学习方法包括极大似然估计和正则化的极大似然估计。具体实现有改进的迭代尺度法IIS、梯度下降法及拟牛顿法。
+</p>
+</div>
+<div id="outline-container-org16b45f3" class="outline-4">
+<h4 id="org16b45f3"><span class="section-number-4">11.4.1</span> 改进的迭代尺度法</h4>
+<div class="outline-text-4" id="text-11-4-1">
+<p>
+训练数据的对数似然函数为
+</p>
+\begin{equation}
+L(w) = L_{tilde{P}}(P_w) = \log \prod_{x, y} P_w(y|x)^{\tilde{P}(x, y)} = \sum_{x,y}\tilde{P}(x,y)\logP(y|x) \notag
+\end{equation}
+<p>
+当P<sub>w是有式</sub>\(\eqref{11.15}\) 给出的条件随机场模型时，对数似然函数为
+</p>
+\begin{align}
+L(w) &= \sum_{x,y} \tilde{P}(x,y) \log P(y,x) \notag \\
+&= \sum_{x, y} \left[ \tilde{P}(x,y) \sum_{k=1}^K w_k f_k(y, x) - \tilde{P}(x,y) \log Z_w(x) \right] \notag \\
+&= \sum_{j=1}^N \sum_{k=1}^K w_k f_k(y_j, x_j) - \sum_{j=1}^N \log Z_w(x_j) \notag
+\end{align}
+
+<p>
+改进的迭代尺度法通过迭代的方法不断优化对数似然函的改变量的下界，达到极大化对数似然函数的目的。
+每次迭代过程中，改进的迭代尺度法通过依次求解式\(\eqref{11.36}\) 和\(\eqref{11.37}\) 得到&delta;
+转移特征t<sub>k</sub>的更新方程为
+</p>
+\begin{align}
+E_{\tilde{P}}[t_k] &= \sum_{x, y} \tilde{P}(x, y) \sum_{i=1}^{n+1} t_k(y_{i-1}, y_i, x, i) \notag \\
+&= \sum_{x, y} \tilde{P}(x) P(y|x) \sum_{i=1}^{n+1}t_k(y_{i-1}, y_i, x, i) exp(\delta_k T(x,y)) \tag{11.36} \label{11.36}
+\end{align}
+<p>
+关于状态特征s<sub>l</sub>的更新方程为
+</p>
+\begin{align}
+E_{\tilde{P}} [s_l] &= \sum_{x, y} \tilde{P}(x, y) \sum_{i=1}^{n+1} s_l (y_i, x, i) \notag \\
+&= \sum_{x, y} \tilde{P}(x) P(y|x) \sum_{i=1}^n s_l(y_i, x, i) exp(\delta_{K_1+l} T(x,y)) \tag{11.37} \label{11.37}
+\end{align}
+<p>
+其中，T(x, y)是在数据中出现的所以特征数的总和
+</p>
+\begin{equation}
+T(x,y) = \sum_{k}f_k(y, x) = \sum_{k=1}^K \sum_{i=1}^{n=1} f_k(y_{i-1}, y_i, x, i) \tag{11.38}
+\end{equation}
+
+<p>
+算法 11.1 条件随机场模型学习的改进的迭代尺度法
+输入：特征函数\(t_1, t_2, \cdots, t_{K_1}, s_1, s_2, \cdots, s_{K_2}\) ；经验分布\(\tilde{P}(x, y)\)
+输出：参数估计值w；模型P<sub>w</sub>
+</p>
+<ol class="org-ol">
+<li>去初值w<sub>k</sub>=0</li>
+<li>对每一k &isin; {1,2,&ctdot;, K}
+<ol class="org-ol">
+<li>当k &le; K<sub>1</sub>时，令&delta;<sub>k</sub>是式\(\eqref{11.36}\) 的解；当K<sub>1</sub> &lt; k &le; K时，令&delta;<sub>k</sub>是式\(\eqref{11.37}\) 的解。</li>
+<li>更新w<sub>k</sub>：w<sub>k</sub> = w<sub>k</sub> + &delta;<sub>k</sub></li>
+</ol></li>
+<li>如果不是所有w<sub>k都收敛</sub>，重复步骤2。</li>
+</ol>
+
+<p>
+对于不同的数据，T(x,y)的取值可能不同，为了处理这个问题，定义松弛特征
+</p>
+\begin{equation}
+s(x, y) = S - \sum_{i=1}^{n+1} \sum_{k=1}^K f_k (y_{i-1}, y_i, x, i) \tag{11.39}
+\end{equation}
+<p>
+其中S是一个常数，选择足够大的常数S使得对训练数据集的所以数据都有s(x,y) &ge; 0成立，这是特征总数可取S，用S替代T(x,y)
+则对于转移特征t<sub>k</sub>，&delta;<sub>k</sub>的更新方程是
+</p>
+\begin{equation}
+\delta_{k} = \frac 1 S \log \frac {E_{\tilde{P}}[t_k]} {E_P[t_k]} \tag{11.41}
+\end{equation}
+<p>
+其中
+</p>
+\begin{equation}
+E_p(t_k) = \sum_x \tilde{P}(x) \sum_{i=1}^{n+1} \sum_{y_{i-1}, y_i} t_k (y_{i-1}, y_{i}, x, i) \frac {\alpha_{i-1}^T (y_{i-1}|x) M_i(y_{i-1}, y_i|x) \beta_i (y_i|x)} {Z(x)} \tag{11.42}
+\end{equation}
+<p>
+对于状态特征s<sub>l</sub>，&delta;<sub>k</sub>的更新方程为
+</p>
+\begin{equation}
+\delta{K_1+l} = \frac 1 S \log \frac {E_{\tilde{P}}[s_l]} {E_P[s_l]} \tag{11.44}
+\end{equation}
+<p>
+其中
+</p>
+\begin{equation}
+E_P(s_l) = \sum_x \tilde{P}(x) \sum_{i=1}^n \sum_{y_i} s_l(y_i, x, i) \frac {\alpha_i^T(y_i|x) \beta_i(y_i|x)} {Z(x)} \tag{11.45}
+\end{equation}
+<p>
+上述算法称为算法S，在该算法中需使常数S取足够大，此时，每步迭代的增量向量会变大，算法收敛会变慢。
+</p>
+
+<p>
+算法T对每个观测序列x计算其特征总数的最大值T(x)
+</p>
+\begin{equation}
+T(x) = \max_y T(x,y) \tag{11.46}
+\end{equation}
+<p>
+利用前向后向递推公式，可以很容易地计算T(x)=t
+则关于转移特征参数的更新方程可写成
+</p>
+\begin{align}
+E_{\tilde{P}}[t_k] &= \sum_{x, y} \tilde{P}(x) P(y|x) \sum_{i=1}^{n+1} t_k (y_{i-1}, y_i, x, i) exp(\delta_k T(x)) \notag \\
+&= \sum_x \tilde{P}(x) \sum_y P(y|x) \sum_{i=1}^{n+1} t_k(y_{i-1}, y_i, x, i) exp(\delta_k T(x)) \notag \\
+&= \sum_x \tilde{P}(x) a_{k, t} exp(\delta_k t) \notag \\
+&= sum_{t=0}^{T_{max}} a_{k, t} \beta_k^t \tag{11.47}
+\end{align}
+<p>
+其中a<sub>k, t</sub>是特征t<sub>k</sub>的期待值，&delta;<sub>k</sub> = log &beta;<sub>k</sub>。&beta;<sub>k</sub>是上述方程的唯一实根，可用牛顿法求解，从而求得相关&delta;<sub>k</sub>
+</p>
+
+<p>
+同理，关于状态特征的参数更新方程可写成
+</p>
+\begin{align}
+E_{\tilde{P}}[s_l] &= \sum_{x, y} \tilde{P}(x) P(y|x) \sum_{i=1}^n s_l (y_i, x, i) exp(\delta_{K_1+l} T(x)) \notag \\
+&= \sum_x \tilde{P}(x) \sum_y P(y|x) \sum_{i=1}^n s_l(y_i, x, i) exp(\delta_{K_1+l} T(x)) \notag \\
+&= \sum_x \tilde{P}(x) b_{l, t} exp(\delta_k t) \notag \\
+&= sum_{t=0}^{T_{max}} b_{l, t} \gamma_l^t \tag{11.48}
+\end{align}
+<p>
+其中，b<sub>l,t</sub>是特征s<sub>l</sub>的期望值，&delta;<sub>l</sub> = log &gamma;<sub>l</sub>
+</p>
+</div>
+</div>
+<div id="outline-container-org3026df9" class="outline-4">
+<h4 id="org3026df9"><span class="section-number-4">11.4.2</span> 拟牛顿法</h4>
+<div class="outline-text-4" id="text-11-4-2">
+<p>
+对于条件随机场模型
+</p>
+\begin{equation}
+P_w(y|x) = \frac {exp(\sum_{i=1}^n w_i f_i(x,y))} {\sum_y exp(\sum_{i=1}^n w_i f_i(x,y))} \tag{11.49}
+\end{equation}
+<p>
+学习的优化目标函数是
+</p>
+\begin{equation}
+\min_{w \in R^n} f(w) = \sum_x \tilde{P}(x) \log \sum_y exp(\sum_{i=1}^n w_i f_i f(x, y)) - \sum_{x, y} \tilde{P}(x, y) \sum_{i=1}^n w_i f_i(x, y) \tag{11.50}
+\end{equation}
+<p>
+其梯度函数是
+</p>
+\begin{equation}
+g(w) = \sum_{x, y} \tilde{P}(x) P_w(y|x) f(x,y) - E_{\tilde{P}}(f) \tag{11.51}
+\end{equation}
+<p>
+算法 11.2 条件随机场模型学习的BFGS算法
+输入：特征函数f<sub>1</sub>,f<sub>2</sub>, &ctdot;, f<sub>n</sub>；经验分布\(\tilde{P}(X, Y)\)
+输出：最优参数值w，最优模型P<sub>w</sub>(y|x)
+</p>
+<ol class="org-ol">
+<li>选点初始点w<sup>(0)</sup>，取B<sub>0为正定对阵矩阵</sub>，置k=0</li>
+<li>计算g<sub>k</sub>=g(w<sup>(k)</sup>)。若g<sub>k</sub>=0，则停止计算，否则进行下一步</li>
+<li>由B<sub>k</sub>p<sub>k</sub> = -g<sub>k</sub>，求出p<sub>k</sub></li>
+<li>一维搜索：求&lambda;<sub>k</sub>使得\(f(w^{(k)} + \lambda_k p_k) = \min_{\lambda \ge 0} f(w^{(k)} + \lambda p_k)\)</li>
+<li>置w<sup>(k+1)</sup> = w<sup>(k)</sup> + &lambda;<sub>k</sub> p<sub>k</sub></li>
+<li>计算g<sub>k+1</sub> = g(w<sup>(k+1)</sup>)，若g<sub>k</sub>=0，则停止计算，否则求出\(B_{k+1} = B_k + \frac {y_k y_k^T} {y_k^T \delta_k} - \frac {B_k \delta_k \delta_k^T B_k} {\delta_k^T B_k \delta_k}\)
+其中y<sub>k</sub> = g<sub>k+1</sub> - g<sub>k</sub>, &delta;<sub>k</sub> = w<sup>(k+1)</sup> - w<sup>(k)</sup></li>
+<li>置k=k+1，跳转置步骤3</li>
+</ol>
+</div>
+</div>
+</div>
+<div id="outline-container-org2064a8b" class="outline-3">
+<h3 id="org2064a8b"><span class="section-number-3">11.5</span> 条件随机和的预测算法</h3>
+<div class="outline-text-3" id="text-11-5">
+<p>
+预测问题是给定条件随机场P(Y|X)和输入序列x，求条件概率最大的输出序列，即对观测序列进行标注。条件随机场的预测算法是著名的维特比算法。
+由式\(\eqref{11.19}\) 得
+</p>
+\begin{align}
+y^\star &= \arg \max_y P_w(y|x) \notag \\
+&= \arg \max_y \frac {exp(w F(y, x))} {Z_w(x)} \notag \\
+&= \arg \max_y exp(w F(y, x)) \notag \\
+&= \arg \max_y w F(y, x) \notag
+\end{align}
+<p>
+于是，条件随机场的预测问题称为求非规范化概率最大的最优路径问题。
+其中
+</p>
+\begin{align}
+& w=(w_1, w_2, \cdots, w_K)^T \notag \\
+& F(y, x) = (f_1(y,x), f_2(y, x), \cdots, f_K(y, x))^T \notag \\
+& f_k(y, x) = \sum_{i=1}^n f_k(y_{i-1}, y_i, x, i) \notag
+\end{align}
+<p>
+为了求解最优路径，将问题改写成如下形式
+</p>
+\begin{equation}
+\max_y \sum_{i=1}^n w F_i(y_{i-1}, y_i, x) \tag{11.53}
+\end{equation}
+<p>
+其中F<sub>i</sub>(y<sub>i-1</sub>, y<sub>i</sub>, x)是局部特征向量。
+</p>
+
+<p>
+维特比算法
+首先求出位置1的各个标记的非规范化概率
+</p>
+\begin{equation}
+\delta_1(j) = w F_i(y_0=start, y_i=j, x) \tag{11.54}
+\end{equation}
+<p>
+由递推公式，求出位置i的各个标记的非规范化概率的最大值，同时记录非规范化概率最大值的路径
+</p>
+\begin{align}
+& \delta_i(l) = \max_{1 \le j \le m}\{ \delta_{i-1}(j) + w F_i(y_{i-1}=j, y_i=l, x)\} \tag{11.55} \\
+& \Psi_i(l) = \arg \max_{1 \le j \le m}\{ \delta_{i-1}(j) + w F_i(y_{i-1}=j, y_i=l, x)\} \tag{11.56}
+\end{algin}
+求得非规范化概率的最大值和最优路径的终点
+\begin{align}
+& \max_y (w F(y, x)) = \max_{1 \le j \le m} \delta_n(j) \tag{11.57} \\
+& y_n^\star = \arg \max_{1 \le j \le m} \delta_n(j) \tag{11.58}
+\end{align}
+<p>
+由此最优路径终点返回
+</p>
+\begin{equation}
+y_i^\star = \Psi_{i+1}(y_{i+1}^\stat) \tag{11.59}
+\end{equation}
+<p>
+综上，得到条件随机场的为比特算法。
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org25599da" class="outline-2">
+<h2 id="org25599da"><span class="section-number-2">12</span> 统计学习方法总结</h2>
+<div class="outline-text-2" id="text-12">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">方法</th>
+<th scope="col" class="org-left">适用问题</th>
+<th scope="col" class="org-left">模型特点</th>
+<th scope="col" class="org-left">模型类型</th>
+<th scope="col" class="org-left">学习策略</th>
+<th scope="col" class="org-left">学习损失函数</th>
+<th scope="col" class="org-left">学习算法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">感知机</td>
+<td class="org-left">二分类</td>
+<td class="org-left">分离超平面</td>
+<td class="org-left">判别模型</td>
+<td class="org-left">极小化误分点到超平面距离</td>
+<td class="org-left">误分点到超平面距离</td>
+<td class="org-left">随机梯度下降</td>
+</tr>
+
+<tr>
+<td class="org-left">k近邻法</td>
+<td class="org-left">多类分类，回归</td>
+<td class="org-left">样本空间，样本点</td>
+<td class="org-left">判别模型</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">-</td>
+<td class="org-left">-</td>
+</tr>
+
+<tr>
+<td class="org-left">朴素贝叶斯法</td>
+<td class="org-left">多类分类</td>
+<td class="org-left">特征与类别的联合概率分布，条件独立假设</td>
+<td class="org-left">生成模型</td>
+<td class="org-left">极大似然估计，极大后验概率估计</td>
+<td class="org-left">对数似然损失</td>
+<td class="org-left">概率计算公式，EM算法</td>
+</tr>
+
+<tr>
+<td class="org-left">决策树</td>
+<td class="org-left">多类分类，回归</td>
+<td class="org-left">分类树，回归树</td>
+<td class="org-left">判别模型</td>
+<td class="org-left">正则化的极大似然估计</td>
+<td class="org-left">对数似然损失</td>
+<td class="org-left">特征选择，生成，剪枝</td>
+</tr>
+
+<tr>
+<td class="org-left">逻辑斯谛回归与最大熵模型</td>
+<td class="org-left">多类分类</td>
+<td class="org-left">特征条件下类别的条件概率分布，对数线性模型</td>
+<td class="org-left">判别模型</td>
+<td class="org-left">极大似然估计，正则化的极大似然估计</td>
+<td class="org-left">逻辑斯谛损失</td>
+<td class="org-left">改进的迭代尺度算法，梯度下降，拟牛顿法</td>
+</tr>
+
+<tr>
+<td class="org-left">支持向量机</td>
+<td class="org-left">二分类</td>
+<td class="org-left">分离超平面核技巧</td>
+<td class="org-left">判别模型</td>
+<td class="org-left">极小化正则合页损失，软间隔最大化</td>
+<td class="org-left">合页损失</td>
+<td class="org-left">序列最小最优化算法</td>
+</tr>
+
+<tr>
+<td class="org-left">提升方法</td>
+<td class="org-left">二分类</td>
+<td class="org-left">弱分类器的线性组合</td>
+<td class="org-left">判别模型</td>
+<td class="org-left">极小化加法模型的指数损失</td>
+<td class="org-left">指数损失</td>
+<td class="org-left">前向分布加法算法</td>
+</tr>
+
+<tr>
+<td class="org-left">EM算法</td>
+<td class="org-left">概率模型参数估计</td>
+<td class="org-left">含隐变量概率模型</td>
+<td class="org-left">-</td>
+<td class="org-left">极大似然估计，极大后验概率估计</td>
+<td class="org-left">对数似然损失</td>
+<td class="org-left">迭代算法</td>
+</tr>
+
+<tr>
+<td class="org-left">隐马尔可夫模型</td>
+<td class="org-left">标注</td>
+<td class="org-left">观测序列与状态序列的联合概率分布模型</td>
+<td class="org-left">生成模型</td>
+<td class="org-left">极大似然估计，极大后验概率估计</td>
+<td class="org-left">对数似然损失</td>
+<td class="org-left">概率计算公式，EM算法</td>
+</tr>
+
+<tr>
+<td class="org-left">条件随机场</td>
+<td class="org-left">标注</td>
+<td class="org-left">状态序列条件下观测序列的条件概率分布，对数线性模型</td>
+<td class="org-left">判别模型</td>
+<td class="org-left">极大似然估计，正则化极大似然估计</td>
+<td class="org-left">对数似然损失</td>
+<td class="org-left">改进的迭代尺度算法，梯度下降，拟牛顿法</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div id="outline-container-orge13fcf2" class="outline-3">
+<h3 id="orge13fcf2"><span class="section-number-3">12.1</span> 适用问题</h3>
+<div class="outline-text-3" id="text-12-1">
+<p>
+分类问题是从实例的特征向量到类标记的预测问题。
+标注问题是从观测序列到标记序列的预测问题。标注问题中可能的预测结果是所有的标记序列，树木是指数级的。
+</p>
+
+<p>
+感知机、k近邻法、朴素贝叶斯法、决策树、逻辑斯谛回归与最大熵模型、支持向量机、提升方法的分类方法。
+原始的感知机、支持向量机以及提升方法是针对二分类的，可以扩展到多分类。
+隐马尔可夫模型、条件随机场是标注方法。
+EM算法是含有隐变量的概率模型的一般学习方法，可以用于生成模型的非监督学习
+</p>
+
+<p>
+感知机、k近邻法、朴素贝叶斯法、决策树是简单的分类方法，模型直观、方法简单、容易实现。
+逻辑斯谛回归与最大熵模型、支持向量机、提升方法是更复杂当更有效的方法，分类准确率更高。
+隐马尔可夫模型、条件随机场是主要的标注方法，通常后者准确率更高。
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgb237e59" class="outline-3">
+<h3 id="orgb237e59"><span class="section-number-3">12.2</span> 模型</h3>
+<div class="outline-text-3" id="text-12-2">
+<p>
+分类问题与标注问题的预测模型都可以认为是表示从输入空间到输出空间的映射，可以写成条件概率分布P(Y|X)或决策函数Y=f(X)的形式。前者表示给定输入条件下的输出的概率模型，后者表示输入的输出的非概率模型。
+</p>
+
+<p>
+朴素贝叶斯法、隐马尔可夫模型是概率模型。
+感知机、k近邻法、支持向量机、提升方法是非概率模型。
+决策树、逻辑斯谛回归与最大熵模型、条件随机场既可看作概率模型也可看作非概率模型
+</p>
+
+<p>
+直接学习条件概率分布或决策函数的方法称为判别方法，首先学习联合概率分布从而求得条件概率分布的方法是生成方法。
+感知既、k近邻法、决策树、逻辑斯谛回归与最大熵模型、支持向量机、提升方法、条件随机场是判别方法。
+朴素贝叶斯、隐马尔可夫模型是生成方法。
+</p>
+
+<p>
+决策树定义在一般特征空间上，可以还有连续变量或离散变量。
+感知机、支持向量机、k近邻法的特征空间是欧氏空间。
+提升方法是弱分类器的线性组合，特征空间是弱分类器的特征空间。
+</p>
+
+<p>
+感知机模型是线性模型。
+逻辑斯谛回归与最大熵模型，条件随机场是对数线性模型。
+k近邻法、决策树、支持向量机、提升方法是非线性模型。
+<a href="./img/统计学习方法12-1.png">部分模型之间的关系</a>
+</p>
+</div>
+</div>
+<div id="outline-container-org612cfbd" class="outline-3">
+<h3 id="org612cfbd"><span class="section-number-3">12.3</span> 学习策略</h3>
+<div class="outline-text-3" id="text-12-3">
+<p>
+在二分类监督学习中，支持向量机、逻辑斯谛回归与最大熵模型、提升方法使用合页损失函数、逻辑斯谛损失函数、指数损失函数。三种损失函数都是0-1损失函数的上界，具有相似的形状。所以这三个方法可以看作使用不同损失函数来表示分类的损失，定义经验风险或结构风险，实现二分类学习任务，学习策略是优化一下结构风险
+</p>
+\begin{equation}
+\min_{f \in H} \frac 1 N \sum_{i=1}^N L(y_i, f(x_i)) + \lambda J(f) \tag{12.4}
+\end{equation}
+<p>
+第一项为经验风险，第二项为正则化项。
+</p>
+
+<p>
+概率模型的学习可以形式化为极大似然估计或贝叶斯估计的极大喉炎概率估计，学习的厕率是极小化对数似然损失或极小化正则化的对数似然损失。
+极大后验概率估计时，正则化项是先验概率的负对数。
+</p>
+</div>
+</div>
+
+<div id="outline-container-org7c154c7" class="outline-3">
+<h3 id="org7c154c7"><span class="section-number-3">12.4</span> 学习算法</h3>
+<div class="outline-text-3" id="text-12-4">
+<p>
+统计学习的问题有了具体的形式以后，就变成了最优化问题。若存在解析解，最优解可以有公式简单计算。若没有解析解，需要用数值计算的方法或启发式的方法求解。
+朴素贝叶斯法与隐马尔可夫模型的监督学习，可由概率计算公式直接计算。
+感知机、逻辑斯谛回归与最大熵模型、条件随机场的学习利用梯度下降法、拟牛顿方法等。是一般的无约束最优化问题的接发。
+支持向量机学习，可以解凸二次规划的对偶问题。
+决策树学习是基于启发式算法，可认为特征选择、生成、剪枝是启发式地进行正则化的极大似然估计。
+提升方法启发式地从前向后逐步学习模型，以达到逼近优化目标函数的目的。
+EM算法收敛性可以保证，但保证收敛到全局最优。
+支持向量机、逻辑斯谛回归与最大熵模型学习、条件随机化学习是凸优化问题，全局最优解保证存在。
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Date: 2020-07-03 Fri 10:05</p>
+<p class="date">Created: 2020-07-22 Wed 08:21</p>
+</div>
+</body>
+</html>
