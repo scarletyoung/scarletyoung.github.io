@@ -1,0 +1,530 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="John Doe">
+  <meta name="keywords" content="graphics-material">
+  <meta name="description" content="Problem 训练神经网络从单张图片中提出物体表面的材质信息。  difficulty  许多不同的反射属性可以产生相同的结果，产生准确的结果需要许多训练数据。 无法获得足够的材质训练集。   Contribution  生成大量真实的SVBRDF训练数据 引入了渲染损失来评估预测的外观与真实外观的差异 引入了第二个网络从远处的像素提取全局信息，与局部信息组合，从而合成细节。   Relate">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Single-Image SVBRDF Capture with a Rendering-Aware Deep Network">
+<meta property="og:url" content="http://example.com/2021/07/06/20210706-Single-Image-SVBRDF-Capture-with-a-Rendering-Aware-Deep-Network/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Problem 训练神经网络从单张图片中提出物体表面的材质信息。  difficulty  许多不同的反射属性可以产生相同的结果，产生准确的结果需要许多训练数据。 无法获得足够的材质训练集。   Contribution  生成大量真实的SVBRDF训练数据 引入了渲染损失来评估预测的外观与真实外观的差异 引入了第二个网络从远处的像素提取全局信息，与局部信息组合，从而合成细节。   Relate">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-07-05T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-12-10T06:21:34.462Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="graphics">
+<meta property="article:tag" content="material">
+<meta property="article:tag" content="SVBRDF">
+<meta name="twitter:card" content="summary_large_image">
+  
+  <title>Single-Image SVBRDF Capture with a Rendering-Aware Deep Network - Hexo</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":"UA-177876633-1","gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>成长之路</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Single-Image SVBRDF Capture with a Rendering-Aware Deep Network">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-07-06 00:00" pubdate>
+        2021年7月6日 凌晨
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2.2k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      7 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Single-Image SVBRDF Capture with a Rendering-Aware Deep Network</h1>
+            
+            <div class="markdown-body">
+              <h2 id="problem"><a class="markdownIt-Anchor" href="#problem"></a> Problem</h2>
+<p>训练神经网络从单张图片中提出物体表面的材质信息。</p>
+<h3 id="difficulty"><a class="markdownIt-Anchor" href="#difficulty"></a> difficulty</h3>
+<ol>
+<li>许多不同的反射属性可以产生相同的结果，产生准确的结果需要许多训练数据。</li>
+<li>无法获得足够的材质训练集。</li>
+</ol>
+<h2 id="contribution"><a class="markdownIt-Anchor" href="#contribution"></a> Contribution</h2>
+<ol>
+<li>生成大量真实的SVBRDF训练数据</li>
+<li>引入了渲染损失来评估预测的外观与真实外观的差异</li>
+<li>引入了第二个网络从远处的像素提取全局信息，与局部信息组合，从而合成细节。</li>
+</ol>
+<h2 id="related-work"><a class="markdownIt-Anchor" href="#related-work"></a> Related Work</h2>
+<p>[Dror et al. 2001]第一次使用机器学习算法根据图像特征对材质进行分类。</p>
+<p>[Li et al. 2017]使用了encoder-decoder架构来估计漫反射参数和法线，对不同的材质训练的不同的网络。</p>
+<p>[Liu et al. 2017]引入了rendering loss。</p>
+<p>[Aittala et al. 2016]使用了可微分渲染器来比较估计材质的纹理统计和输出图像的纹理统计，在标准的inverse rendering框架中使用。</p>
+<h2 id="method"><a class="markdownIt-Anchor" href="#method"></a> Method</h2>
+<p>网络架构如下图所示</p>
+<p>[Network Architecture][…/_img/2021-07-06_UNet_Architecture.png]</p>
+<p>使用了两个网络，主要原因是，对于单张图片，高光部分可以提供强烈的specularity信息，而其他部分提供了漫反射和法线信息。因此，为了使得到的结果在图片各个部分是一致的，这两部分需要共享信息。但是，现有的encoder-decoder架构无法将收集远距离的信息并传播到细粒度的细节中。因此，需要添加额外的网络来提取全局特征，并与局部特征结合。</p>
+<h3 id="u-net-network"><a class="markdownIt-Anchor" href="#u-net-network"></a> U-Net Network</h3>
+<p>使用U-Net架构作为网络的基础，大部分实现细节与[Isola et al. 2017]相同。</p>
+<p>网络使用三通道的图像作为输出，输出是九通道的图，分别是三通道的漫反射、三通道的高光、两通道的法线（x和y），一通道的粗糙度。</p>
+<p>将输入转换到对数空间，并使用公式<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mfrac><mrow><mi>log</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>x</mi><mo>+</mo><mn>0.01</mn><mo stretchy="false">)</mo><mo>−</mo><mi>log</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>0.01</mn><mo stretchy="false">)</mo></mrow><mrow><mi>log</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>1.01</mn><mo stretchy="false">)</mo><mo>−</mo><mi>log</mi><mo>⁡</mo><mo stretchy="false">(</mo><mn>0.01</mn><mo stretchy="false">)</mo></mrow></mfrac></mrow><annotation encoding="application/x-tex">\frac {\log(x+0.01) - \log(0.01)} {\log(1.01) - \log(0.01)}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.53em;vertical-align:-0.52em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.01em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mop mtight">lo<span style="margin-right:0.01389em;">g</span></span><span class="mopen mtight">(</span><span class="mord mtight">1</span><span class="mord mtight">.</span><span class="mord mtight">0</span><span class="mord mtight">1</span><span class="mclose mtight">)</span><span class="mbin mtight">−</span><span class="mop mtight">lo<span style="margin-right:0.01389em;">g</span></span><span class="mopen mtight">(</span><span class="mord mtight">0</span><span class="mord mtight">.</span><span class="mord mtight">0</span><span class="mord mtight">1</span><span class="mclose mtight">)</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.485em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mop mtight">lo<span style="margin-right:0.01389em;">g</span></span><span class="mopen mtight">(</span><span class="mord mathdefault mtight">x</span><span class="mbin mtight">+</span><span class="mord mtight">0</span><span class="mord mtight">.</span><span class="mord mtight">0</span><span class="mord mtight">1</span><span class="mclose mtight">)</span><span class="mbin mtight">−</span><span class="mop mtight">lo<span style="margin-right:0.01389em;">g</span></span><span class="mopen mtight">(</span><span class="mord mtight">0</span><span class="mord mtight">.</span><span class="mord mtight">0</span><span class="mord mtight">1</span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.52em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>将输入压缩的<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[0,1]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mclose">]</span></span></span></span>范围内。</p>
+<p>U-Net的encoder和decoder各有八层，由于网络本身的特点，无法保留图像的细节，因此在对应层之间引入skip connection来缓解这个问题。</p>
+<p>在decoder之前，插入一个单个卷积层，输出64特征通道。</p>
+<p>编码器下采样的特征数分别为128，256，512，512，512，512，512，512。（这里不明白，在编码器的时候特征数量不应该是逐渐减少的吗？这里应该是通道数，当然到U-Net最低层之后就是特征数）</p>
+<p>每层使用的filter是<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>4</mn><mo>×</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">4\times4</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">4</span></span></span></span>的，对于非线性的，使用leaky ReLu激活函数，负数部分的权重是<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>−</mo><mn>0.2</mn></mrow><annotation encoding="application/x-tex">-0.2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">−</span><span class="mord">0</span><span class="mord">.</span><span class="mord">2</span></span></span></span>。最终的输出通过sigmoid函数使得值落在<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[0,1]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mclose">]</span></span></span></span>范围。</p>
+<p>在每个卷积层后，应用instance normalization，可以稳定图像生成任务的训练。通过在解码器的三个最粗的层上应用50%概率的放弃来进行规范化。（这里部分不太清楚，需要进一步查资料）</p>
+<h3 id="global-feature-network"><a class="markdownIt-Anchor" href="#global-feature-network"></a> Global Feature Network</h3>
+<p>尽管归一化对训练的稳定性有正面影响，但由于归一化会对学习到的特征进行标准化，对保留图像的非局部进行有负面影响，在生成的结果上会存在瑕疵。</p>
+<p>即便不使用归一化，生成的结果也存在明显的阴影。</p>
+<p>因此，增加一个与U-Net并行的网络来处理全局特征向量，网络的结构UNet相同，特征数量相同，卷积层改为了全连接层，并放弃了skip connection（这里需要的是全局的一些信息，所以不需要skip connection来恢复细节）。</p>
+<p>全局网络处理全局特征向量，而不是2维的特征图。</p>
+<p>这个网络和主网络在每一层交换信息，具体详情没看明白。</p>
+<p>卷积track信息通过实例化归一化层流向全局track信息。</p>
+<p>全局track信息在每个卷积之后非线性之前被注入回局部track。先将全局特征通过全连接层转换，将他们像biase一样加到下一层的每个特征图中。</p>
+<p>UNet每一层的第一个部分是IN（instance normalize），经过均值之后，与全局特征连接起来，然后通过一个全连接层（FC），之后再通过一个非线性层，再通过一个激活函数后传递到下一层，同时与UNet下一层的IN结果相加。</p>
+<h3 id="rendering-loss"><a class="markdownIt-Anchor" href="#rendering-loss"></a> Rendering Loss</h3>
+<p>损失函数是比较生成的SVBRDF的渲染结果与真实SVBRDF的渲染结果的逐像素比较。类似于[Aittala et al. 2016]中的方法，可以与神经网络训练的无缝集成，自动计算的导数，以及自动的GPU加速。</p>
+<p>具体的损失函数是使用渲染值的对数的<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>L</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">L_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> loss。</p>
+<h2 id="advantage"><a class="markdownIt-Anchor" href="#advantage"></a> Advantage</h2>
+<ol>
+<li>可以从单张图片中恢复出效果较好的SVBRDF。</li>
+</ol>
+<h2 id="limited"><a class="markdownIt-Anchor" href="#limited"></a> Limited</h2>
+<ol>
+<li>图像的分辨率是<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>256</mn><mo>×</mo><mn>256</mn></mrow><annotation encoding="application/x-tex">256 \times 256</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">2</span><span class="mord">5</span><span class="mord">6</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">2</span><span class="mord">5</span><span class="mord">6</span></span></span></span></li>
+<li>高动态范围的图像学习效果不佳。</li>
+<li>在生成的不同图中结构相似。</li>
+<li>复杂材质表现不佳。</li>
+<li>图片的角度是正向的，不能很好的反映菲涅尔项。</li>
+<li>单张图片提供的效果不佳，可能有部分信息无法恢复。</li>
+</ol>
+<h2 id="my-question"><a class="markdownIt-Anchor" href="#my-question"></a> My Question</h2>
+<ol>
+<li>high dynamic和low dynamic到底是什么，高频低频？</li>
+<li>对于网络这一块不熟，看起来有点费劲，需要查询大量资料。</li>
+</ol>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/note/">note</a>
+                    
+                      <a class="hover-with-bg" href="/categories/note/grpahics/">grpahics</a>
+                    
+                      <a class="hover-with-bg" href="/categories/note/grpahics/material/">material</a>
+                    
+                      <a class="hover-with-bg" href="/categories/note/grpahics/material/paper/">paper</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/graphics/">graphics</a>
+                    
+                      <a class="hover-with-bg" href="/tags/material/">material</a>
+                    
+                      <a class="hover-with-bg" href="/tags/SVBRDF/">SVBRDF</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"c9e92fe53c4f7c10bae4","clientSecret":"a096f7a1a72bea29b07f9fba28fe0b05856f1b8c","repo":"git","owner":"493488419@qq.com","admin":[],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: 'b5a517573f046ac80385238af87c7b06'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     #<a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> #<i class="iconfont icon-love"></i> #<a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+  
+
+  
+    <!-- KaTeX -->
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0/dist/katex.min.css" />
+  
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
