@@ -1,0 +1,1066 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="John Doe">
+  <meta name="keywords" content="">
+  <meta name="description" content="Move    命令 功能 示例 说明     w&#x2F;W 跳到下一个单词的开头  w是传统意义上的单词，而W则将一个非空字符串序列视为一个单词。   b&#x2F;B 跳到上一个单词的开头  b和w类似，B和W类似。   e&#x2F;E 跳到下一个单词的结尾  e和w类似，E和W类似。   ge&#x2F;gE 跳到上一个单词的结尾  ge和w类似，gE和W类似   f&#x2F;F{character} 跳到下一个&#x2F;上一个chara">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2021/12/10/20211128-Vim%20Command/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Move    命令 功能 示例 说明     w&#x2F;W 跳到下一个单词的开头  w是传统意义上的单词，而W则将一个非空字符串序列视为一个单词。   b&#x2F;B 跳到上一个单词的开头  b和w类似，B和W类似。   e&#x2F;E 跳到下一个单词的结尾  e和w类似，E和W类似。   ge&#x2F;gE 跳到上一个单词的结尾  ge和w类似，gE和W类似   f&#x2F;F{character} 跳到下一个&#x2F;上一个chara">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-12-10T10:45:29.007Z">
+<meta property="article:modified_time" content="2021-12-10T10:45:29.008Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary_large_image">
+  
+  <title>Hexo</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":"UA-177876633-1","gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>成长之路</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-12-10 18:45" pubdate>
+        2021年12月10日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2.9k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      9 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none"></h1>
+            
+            <div class="markdown-body">
+              <h1 id="move"><a class="markdownIt-Anchor" href="#move"></a> Move</h1>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>功能</th>
+<th>示例</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>w/W</td>
+<td>跳到下一个单词的开头</td>
+<td></td>
+<td>w是传统意义上的单词，而W则将一个非空字符串序列视为一个单词。</td>
+</tr>
+<tr>
+<td>b/B</td>
+<td>跳到上一个单词的开头</td>
+<td></td>
+<td>b和w类似，B和W类似。</td>
+</tr>
+<tr>
+<td>e/E</td>
+<td>跳到下一个单词的结尾</td>
+<td></td>
+<td>e和w类似，E和W类似。</td>
+</tr>
+<tr>
+<td>ge/gE</td>
+<td>跳到上一个单词的结尾</td>
+<td></td>
+<td>ge和w类似，gE和W类似</td>
+</tr>
+<tr>
+<td>f/F{character}</td>
+<td>跳到下一个/上一个character处</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>t/T{character}</td>
+<td>跳到下一个/上一个character的前一个字符出</td>
+<td></td>
+<td>这里的前一个字符，是指搜索方向上的前一个，即当T的时候是指字符后面的一个字符。</td>
+</tr>
+<tr>
+<td>0</td>
+<td>移动到当前行的第一个字符</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>^</td>
+<td>移动到当前行的第一个非空字符</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>$</td>
+<td>移动到当前行的最后一个字符</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>g_</td>
+<td>移动到当前行的最后一个非空字符</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>}/{</td>
+<td>向下/向上跳过一个段落</td>
+<td></td>
+<td>这里段落的定义应该是以空行隔开的行为一段。</td>
+</tr>
+<tr>
+<td>ctrl+d</td>
+<td>向下滚动半页</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>ctrl+u</td>
+<td>向上滚动半页</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>/{pattern} or ?{pattern}</td>
+<td>搜索/是向下搜索，?是向上搜索</td>
+<td></td>
+<td>搜索后，使用n可以看跳到下一个，N跳到上一个，这里上一个和下一个是对应于搜索方向的。gn表示跳转到下一个并选中，gN类似。</td>
+</tr>
+<tr>
+<td>gd</td>
+<td>跳到定义处</td>
+<td></td>
+<td>是VScode Vim定义的，不是原生的命令</td>
+</tr>
+<tr>
+<td>gf</td>
+<td>跳到导入的文件处</td>
+<td></td>
+<td>是VScode Vim定义的，不是原生的命令</td>
+</tr>
+<tr>
+<td>gg</td>
+<td>跳到文件的第一个行</td>
+<td></td>
+<td>前面若加上行号则是跳转到指定行，即23gg跳转到第23行，gg=1gg</td>
+</tr>
+<tr>
+<td>G</td>
+<td>跳转到文件最后一行</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>%</td>
+<td>光标在({[]})中或上时，会跳转到匹配的符号上。</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="edit"><a class="markdownIt-Anchor" href="#edit"></a> Edit</h1>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>功能</th>
+<th>示例</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>d</td>
+<td>删除</td>
+<td></td>
+<td>支持motion</td>
+</tr>
+<tr>
+<td>u</td>
+<td>撤销</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>ctrl+r</td>
+<td>撤销撤销</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>ctrl+o</td>
+<td>回到上次编辑的地方</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>c</td>
+<td>改变，删除并插入</td>
+<td></td>
+<td>支持motion</td>
+</tr>
+<tr>
+<td>dd</td>
+<td>删除整行</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>D</td>
+<td>从光标删除的行尾</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>.</td>
+<td>重复上一次的操作</td>
+<td></td>
+<td>前面也可以加数字表示重复次数</td>
+</tr>
+<tr>
+<td>cc</td>
+<td>类似dd</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>C</td>
+<td>类似D</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>y</td>
+<td>复制</td>
+<td></td>
+<td>支持motion</td>
+</tr>
+<tr>
+<td>p</td>
+<td>粘贴</td>
+<td></td>
+<td>d、c、y、x等操作都会改变粘贴板</td>
+</tr>
+<tr>
+<td>g~</td>
+<td>转换大小写</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>gU/u</td>
+<td>变为大写/小写</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>&gt;</td>
+<td>向右缩进</td>
+<td></td>
+<td>支持motion</td>
+</tr>
+<tr>
+<td>&lt;</td>
+<td>移除缩进</td>
+<td></td>
+<td>支持motion</td>
+</tr>
+<tr>
+<td>=</td>
+<td>格式化代码</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>x</td>
+<td>删除光标所在字符</td>
+<td></td>
+<td>等价于dl</td>
+</tr>
+<tr>
+<td>X</td>
+<td>删除光标前的字符</td>
+<td></td>
+<td>等价于dh</td>
+</tr>
+<tr>
+<td>s</td>
+<td>删除光标前的字符，并进入插入模式</td>
+<td></td>
+<td>等价于ch</td>
+</tr>
+<tr>
+<td>r</td>
+<td>替换单个字符</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>~</td>
+<td>切换单个字符的大小写</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>一些编辑操作可以与移动操作结合，具体格式为{operator}{count}{motion}，定义了操作作用的范围。如d2w表明删除后面两个单词，能够与移动结合的编辑操作在说明中说明。</p>
+<p>text object描述文档中各个部分的结构化文本片段：单词、句子、引用文本、段落、块、(HTML) 标签等。您可以将它们与运算符结合使用来更改单词、句子、段落、 等等，具体格式为{operator}{a|i}{text-object}</p>
+<p>其中，text-object有以下几个：w（单词），s（句子），p（段落），&quot;（引号）等，还有各种括号也是。a表示环绕，i表示内部，text-object为w、s、p是二者无区别，但若是引号和各种括号时，则a会连引号和括号一起修改，而i则保留引号和括号。</p>
+<h1 id="insert"><a class="markdownIt-Anchor" href="#insert"></a> insert</h1>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>功能</th>
+<th>示例</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>i</td>
+<td>在当前光标处插入，即在选中字符前插入</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>I</td>
+<td>在当前行的开头插入</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>a</td>
+<td>在当前光标后插入，即在选中字符后插入</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>A</td>
+<td>在当前行后面插入</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>o</td>
+<td>在下面插入一行</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>O</td>
+<td>在上面插入一行</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>ctrl + o</td>
+<td>跳到上一次编辑的位置</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>gi</td>
+<td>跳到最近一次编辑的地方</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>ctrl+h</td>
+<td>移除光标前一个字符</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>ctrl+w</td>
+<td>移除光标前一个单词</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>ctrl+u</td>
+<td>移除光标前一行</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="select"><a class="markdownIt-Anchor" href="#select"></a> Select</h1>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>功能</th>
+<th>示例</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>v</td>
+<td>进入选择模式，以字符为单位选择。</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>V</td>
+<td>进入选择模式，以行为单位进行选择。</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>ctrl+v</td>
+<td>进入选择模式，以块为单位进行选择。</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>I</td>
+<td>块选择模式下，在块前进入插入模式。</td>
+<td></td>
+<td>在VScode Vim中，v/V模式下也可以使用</td>
+</tr>
+<tr>
+<td>A</td>
+<td>块选择模式下，在块后进入插入模式。</td>
+<td></td>
+<td>在VScode Vim中，v/V模式下也可以使用</td>
+</tr>
+</tbody>
+</table>
+<p>选择模式也可以配合移动和编辑操作，具体的格式为{v|V|ctrl+v}{count}{motion}{operator}，含义是，进入选择模式，选择哪些字符/行/块，并对选择的块进行操作。</p>
+<h1 id="复制粘贴"><a class="markdownIt-Anchor" href="#复制粘贴"></a> 复制粘贴</h1>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>功能</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>y</td>
+<td>复制</td>
+<td></td>
+</tr>
+<tr>
+<td>p</td>
+<td>粘贴</td>
+<td></td>
+</tr>
+<tr>
+<td>ctrl+r {register}</td>
+<td>粘贴</td>
+<td>在插入模式下粘贴，若粘贴的内容是一行时，粘贴时不会换行。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="register"><a class="markdownIt-Anchor" href="#register"></a> Register</h2>
+<p>register类似剪贴板，可以存储一些东西</p>
+<p>默认的register名是&quot;，命名的register是a-z，这两种存储器存储的是复制和粘贴的内容。</p>
+<p>register 0存储最后复制的内容，删除和剪切不会影响。</p>
+<p>resigert 1-9存储最后9个剪切或删除的内容。</p>
+<p>使用指定register为{register name}c/d/y{motion}</p>
+<p>使用:reg {register}可以查看register的内容。</p>
+<h1 id="命令行模式"><a class="markdownIt-Anchor" href="#命令行模式"></a> 命令行模式</h1>
+<p>命令行模式下可以执行Ex命令（以:开头）和搜索模式（以/和?开头）</p>
+<p>Ex命令可以配置Vim、执行系统范围的操作、访问外部的shell命令等。VSCodeVim只支持有限的Ex命令。</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>功能</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>:edit {path}/:e</td>
+<td>打开或创建文件</td>
+<td>是相对于当前打开文件的路径，且不支持TAB补全。</td>
+</tr>
+<tr>
+<td>:write/:w</td>
+<td>保存文件</td>
+<td></td>
+</tr>
+<tr>
+<td>:quit/:w</td>
+<td>关闭文件</td>
+<td></td>
+</tr>
+<tr>
+<td>!</td>
+<td>强制执行命令</td>
+<td>和其他命令配合使用</td>
+</tr>
+<tr>
+<td>all/a</td>
+<td>对所有文件执行命令</td>
+<td>和其他命令配合使用</td>
+</tr>
+<tr>
+<td>@:</td>
+<td>重复前一个命令</td>
+<td>之后使用@@命令来重复</td>
+</tr>
+<tr>
+<td>:[range]s/{pattern}/{substitute}/{flags}</td>
+<td>替换文本</td>
+<td>flag：g表示当前行，%表示整个文件，i表示大小写敏感，c表示需要确认每个替换</td>
+</tr>
+</tbody>
+</table>
+<p>还可以再命令行模式下使用一些normal模式下的命令，区别是，命令行模式下的命令会一次操作多行，格式为[range] command [options]</p>
+<p>例如，10,12d a的意思是删除10到12行的内容，放到寄存器a中。</p>
+<p>行数的表达有以下几种方式</p>
+<ol>
+<li>10,12：指定开始和结束行数</li>
+<li>10,+2：指定开始行和便宜数</li>
+<li>.,+2：使用 . 来表示当前行</li>
+<li>%：表示整个文件</li>
+<li>0,$：0表示文件的开头，$表示文件的结尾。</li>
+</ol>
+<h1 id="分割"><a class="markdownIt-Anchor" href="#分割"></a> 分割</h1>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>功能</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>:sp/:vsp {path}</td>
+<td>水平/竖直分割窗口，在新窗口打开指定文件</td>
+<td></td>
+</tr>
+<tr>
+<td>ctrl+w s/ctrl+w v</td>
+<td>水平/竖直分割窗口</td>
+<td></td>
+</tr>
+<tr>
+<td>ctrl+w hjkl</td>
+<td>在窗口间移动</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="标签"><a class="markdownIt-Anchor" href="#标签"></a> 标签</h1>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>功能</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>:tabnew {file}</td>
+<td>在新tab中打开文件</td>
+<td></td>
+</tr>
+<tr>
+<td>:tabn</td>
+<td>跳转到下一个tab</td>
+<td></td>
+</tr>
+<tr>
+<td>:tabp</td>
+<td>跳转到前一个tab</td>
+<td></td>
+</tr>
+<tr>
+<td>:tabo</td>
+<td>关闭其他tab</td>
+<td></td>
+</tr>
+<tr>
+<td>:tabfir</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>:tabl</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>:tabe {file}</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>:tabc</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h1 id="surrounding"><a class="markdownIt-Anchor" href="#surrounding"></a> Surrounding</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ds</td>
+<td>删除surrounding</td>
+<td></td>
+</tr>
+<tr>
+<td>ys</td>
+<td>增加surrounding</td>
+<td></td>
+</tr>
+<tr>
+<td>cs</td>
+<td>替换surrounding</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>ds似乎只能删除同一行的surrounding，也不知道如何配合motion，试了没效果。使用dst可以删除标签，t指tag</p>
+<p>cs和ds的问题一样，被替换的似乎只能是单个字符，替换的可以是标签。cst替换当前的标签为指定的标签</p>
+<p>ys可以配合text-object进行使用。</p>
+<p>more example : <a target="_blank" rel="noopener" href="https://towardsdatascience.com/how-i-learned-to-enjoy-vim-e310e53e8d56">https://towardsdatascience.com/how-i-learned-to-enjoy-vim-e310e53e8d56</a></p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/09/30/20210930-Importance%20Sampling/">
+                        <span class="hidden-mobile">Importance Sampling</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"c9e92fe53c4f7c10bae4","clientSecret":"a096f7a1a72bea29b07f9fba28fe0b05856f1b8c","repo":"git","owner":"493488419@qq.com","admin":[],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '4c92f1364f6ccc8e365aef2a0e7f0c01'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     #<a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> #<i class="iconfont icon-love"></i> #<a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+  
+
+  
+    <!-- KaTeX -->
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0/dist/katex.min.css" />
+  
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
