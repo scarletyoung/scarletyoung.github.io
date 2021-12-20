@@ -530,3 +530,122 @@ Reference just a name for some existing object.
 Never return a pointer or reference to a local stack object, a reference to a heap-allocated object, or a pointer or reference to a local static object if there is a chance that more one such object will be need.
 
 # Declare data members private
+Making a data member private can implement more precise control of the accessibility. For example
+```c++
+class AccessLevels {
+  public:
+    int getReadOnly() const {return readOnly;}
+    void setReadWrite(int value) {readWrite=value;}
+    int getReadWrite() {return readWrite;}
+    void setWriteOnly(int value) {writeOnly = value;}
+  private:
+    int noAccess;
+    int readOnly;
+    int readWrite;
+    int writeOnly;
+};
+```
+
+Making a data member private can offer more flexibility. If a data member is public, when your ability to change it is extremely restricted, because too much code will be broken.
+
+Public means unencapsulated, and unencapsulated means unchangeable.
+
+For short getter and setter, you can declare them inline for speed up.
+
+# Prefer non-member non-friend functions to member functions
+Object-oriented principles dictate that data should be as encapsulated as possible.
+
+See the example below
+```c++
+class WebBrowser {
+  public:
+    void clearCache();
+    void clearHistory();
+    void removeCookies();
+};
+```
+Many users will want to perform all these actions together. There are two implementation
+1. add a new member function
+   ```c++
+   class WebBrowser {
+     publc:
+      void clearEverything();
+   };
+   ```
+2. add a non-member function
+   ```c++
+   void clearBrowser(WebBrowser& wb) {
+     wb.clearCache();
+     wb.clearHistory();
+     wb.removeCookier();
+   }
+   ```
+
+The better implementation is second. Because member function yields less encapsulation than the non-member function.
+The reason is shown as below.
+
+The more something is encapsulated, the fewer things can see it. The fewer things can see it, the greater flexibility we have to change it.
+
+As a coarse-grained measure of how much code can see a piece of data, we can count the number of functions that can access that data. The more functions that can access it, the less encapsulated the data.
+
+Thus, the member functions or the friend functions will yields less encapsulation.
+
+In C++, a more natural approach would be to make clearBrowser a non-member function in the same namespace as WebBrowser.
+
+A class like WebBrowser might have a large number of convenience functions, some related to bookmarks, others related to printing, etc. Most client will be interested in only a small sets of convenience functions. A practial is that declare bookmark-related convenience functsion in one header file, cookie-related convenience functions in a different headerf file, etc.
+```c++
+// header webbrowser.h
+namespace WebBrowserStuff {
+  class WebBrowser{};
+}
+// header webbrowserbookmarks.h
+namespace WebBrowserStuff {
+  // some bookmark-related convenience functions
+}
+//header webbrowsercookies.h
+namespace WebBrowserSTuff {
+  // some cookie-related convenience functions
+}
+```
+
+# Declare non-member functions when type conversions should apply to all parameters
+Considering a Rational class, you'd like to support arithmetic operations. It is natural to implement operator* inside the Ration class.
+```c++
+class Rational {
+  public:
+    Rational(int numerator=0, int denominator=1);
+
+    int numerator() const;
+    int denominator() const;
+
+    const Rational operator*(const Rational &rhs) const;
+  private:
+    int numerator, denominator;
+}
+```
+But when you try to do mixed-mode arthmetic, there is a problem
+```c++
+Rational oneHalf(1, 2);
+Rational result;
+result = oneHalf * 2;  // pass
+result = 2 * oneHalf;  // error
+```
+The first one successes because the compiler call a non-expllicit constructor to create a temporary Rational object from 2.
+```
+const Rational temp(2);
+result oneHalf * temp;
+```
+
+If you'd like to support mixed-mode arithmetic, you should make operator* a non-member function, thus allowing compilers to perform implict type conversions on all arguments.
+```c++
+class Rational {...};
+
+const Rational operator*(const Rational& lhs, const Rational& rhs) {...}
+
+Rational oneFourth(1, 4);
+Rational result;
+result = oneFourth * 2;  // pass
+result = 2 * oneFourth;  // pass
+```
+The sequence of such operator functions is, member function, non-member functions(at namespace or global scope)
+
