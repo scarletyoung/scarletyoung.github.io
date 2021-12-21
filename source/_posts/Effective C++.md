@@ -649,3 +649,150 @@ result = 2 * oneFourth;  // pass
 ```
 The sequence of such operator functions is, member function, non-member functions(at namespace or global scope)
 
+# Consider support for a non-throwing swap
+The default swap algorithm implementation is shown as below
+```c++
+namespace std {
+  template<typename T>
+  void swap(T& a, T& b) {
+    T temp(a);  //class should implement copy constructor and copy assignment operator
+    a = b;
+    b = temp;
+  }
+}
+```
+
+In the default swap implementation, it involves copying three objects. However, for some types, it is expensive. For example
+```c++
+class WidgetImpl {
+  public:
+
+  private:
+    int a, b, c;
+    std::vector<double> v;
+};
+class Widget {
+  public:
+
+  private:
+    WidgetImpl *pImpl;
+}
+```
+To swap the value of two Widget objects, we just need to swap their pImpl pointers instead of copying three objects.
+
+If we want default swap algorithm to swap internal pImpl pointers, what we need to do is specialized std::swap function for Widget.
+```c++
+namespace std{
+  template<>
+  void swap<Widget>(Widget &a, Widget &b) {
+    swap(a.pImpl, b.pImpl);
+  }
+}
+```
+The function above has a small problem, because the pImple is private member for Widget class.
+To solution this problem is simple: declare a public member function called swap that do actual swapping, the specialize std::swap to call the member function.
+```c++
+class Widget {
+  public:
+    void swap(Widget &other) {
+      using std::swap;
+      swap(pImpl, other.pImpl);
+    }
+};
+namespace std {
+  template<>
+  void swap<Widget>(Widget &a, Widget &b) {
+    a.swap(b);
+  }
+}
+```
+
+This will work because std allow total template specialization.
+
+But when class Widget and WidgetImpl is template, the scheme above does not work, because C++ doesn't allow partially specialize for function templates. If you want to partially specialize a function template, the usual approach is to simply add an overload, such as
+```c++
+namespace std {
+  template<typename T>
+  void swap(Widget<T> &a, Widget<T> &b) {
+    a.swap(b);
+  }
+}
+```
+But std is a special namespace. We can totally specialize template in std, but it doesn't allow to add new tempaltes to std.
+
+The answer is that we still declare a non-member swap that call the member swap instead of declaring a non-member to be a specialization or overloading of std::swap
+```c++
+namespace WidgetStuff {
+  template<typename T>
+  class Widget{};
+
+  template<typename T>
+  void swap(Widget<T> &a, Widget<T> &b) {
+    a.swap(b);
+  }
+}
+```
+If any code calls swap on two Widget objects, the name lookup rules in C++ will find the Widget-specific version in WidgetStuff.
+
+In summary, we need to write both a non-member version in the same namespace as your class and specialization of std::swap.
+
+In the client's view, we do not know that a specialization of the general one or a T-specific one may or may not exist. The better way is shown as below
+```c++
+template<typename T>
+void doSomething(T &obj1, T &obj2) {
+  using std::swap;  // make std::swap available
+
+  swap(obj1, obj2);  // make the compiler to choose the best swap.
+}
+```
+
+C++'s name lookup rules is that compiler will find any T-specific swap at global scope or in the same namespace as the type T. If no T-specific swap exists, compilers will use swap in std. If std::swap has been specialized for T, the compiler will prefer a T-specific specialization of std::swap.
+
+1. If the defulat implementation of swap is ok, you don't need to do anything.
+2. Otherwise, do the following things
+   1. Offer a public swap member function. This function should never throw an exception.
+   2. Offer a non-member swap in the same namespace as you class or template.
+   3. If writing a class, specialize std::swap for this class.
+3. when calling swap, be sure to include a suing declaration to make std::swap visible in function, then call swap without any namespace qualification.
+
+# Postpone variable definitions as long as possible
+```c++
+std::string encryptPassword(const std::string& password) {
+  using namespace std;
+  string encrypted;
+  if (password.length() < MinimumPasswordLength) {
+    throw logic_error("Password is too short");
+  }
+  ...
+  return encrypted;
+}
+```
+In the code above, if an exception is thrown, the object encrypted isn't unused. it is better to postponing encrypted's definition until it is needed.
+```c++
+std::string encryptPassword(const std::string& password) {
+  ...
+  string encrypted(password);
+  encrypt(encrypted);
+  return encrypted;
+}
+```
+
+If a variable is used only inside a loop, there are two approach
+```c++
+// Approach A: define outside loop
+Widget w
+for (int i = 0; i < n; ++i) {
+  w = ...
+}
+// Approach B: define inside loop
+for (int i = 0; i < n; ++i) {
+  Widget w(...);
+}
+```
+The cost of these two approaches are as follow
+* Approach A: 1 constructor + 1 destructor + n assignments
+* Approach B: n constructors + n destructors
+
+If an assignment costs less than a constructor-desctructor pair, Approach A is more efficient as n growing larger. Otherwise B is better.
+
+# Minimize casting
