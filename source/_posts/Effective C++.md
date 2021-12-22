@@ -796,3 +796,109 @@ The cost of these two approaches are as follow
 If an assignment costs less than a constructor-desctructor pair, Approach A is more efficient as n growing larger. Otherwise B is better.
 
 # Minimize casting
+C++ offers four new cast forms
+* const_cast<T>(), only way to remove the constness of objects.
+* dynamic_cast<T>(), used to perform safe downcasting. Only way that cannot be performed using the old-style syntax. Only way that may have a significant runtime cost.
+* reinterpret_cast<T>(), intended for low-level casts, such as casting a pointer to int.
+* static_cast<T>(), used to force implicit conversions.
+
+C++ also support C-style casts, such as (T) expression and T(expression). But new forms are preferable.
+1. mush easier to indentify in code.
+2. compiler can diagnose usage error.
+
+Type conversions often lead to code that is executed at runtime.
+```c++
+class Base{...};
+class Derived: public Base {...};
+Derived d;
+Base *bp = &d;
+```
+In the code above, the base class pointer and the derived class pointer will not be the same. An offset is applied at runtime to the derived pointer to get the correct base pointer value.
+
+The offset varies from compiler to compiler. So, you should generally avoid making assumptions about how things are laid out in C++, and you should certainly not perform casts based on such assumptions.
+
+Suppose we want the virtual member function in derived classes call their base class couterparts first. 
+```c++
+class Window {
+  public:
+    virtual void onResize(){...}
+};
+class SpecialWindow: public Window {
+  public:
+    virtual void onResize() {
+      static_cast<Window>(*this).onResize();
+      ...
+    }
+}
+```
+The implementation in the code is wrong, because cast will create a new, temporary copy of the base class part of *this, then invokes onResize on the copy.
+
+The correct way to implement what you expect is shown as below
+```c++
+class Window {
+  public:
+    virtual void onResize(){...}
+};
+class SpecialWindow: public Window {
+  public:
+    virtual void onResize() {
+      Window::onResize();
+      ...
+    }
+}
+```
+
+The dynamic_cast generally cast base class pointer or reference to what you believe to be a derived class object.
+
+A common implementation is based in part on string comparisons of class names. So the dyname_cast cost is expensive.
+
+Avoid casts whenever practical, especially dynamic_casts in performance-sensitive code. If requires casting, try to develop a cast-free alternative.
+
+When casting is necessary, try to hide it inside a function.
+
+# Avoid returning handles to object internals.
+```c++
+class Point {
+  public:
+    Point(int x, int y);
+    void setX(int newVal);
+    void setY(int newVal);
+};
+struct RectData {
+  Point ulhc;
+  Point lrhc;
+};
+class Rectangle {
+  public:
+    // according to perfer pass-by-reference-to-const to pass-by-value, return reference is more efficient.
+    Point& upperLeft() const {return pData->ulhc;}
+    Point& lowerRight() const {return pData->lrhc;}
+  private:
+    std::shared_ptr<RectData> pData;
+};
+Point coord1(0,0);
+Point coord2(100,100);
+const Rectangle rec(coord1, coord2);
+rec.uperLeft().setX(50);  // pass
+```
+In the example above, rec is declared as const, but we can modify its internal Point data member. This is what we won't.
+
+Returning pointers or iterators will cause the same problem.
+
+References, pointers and iterators are all handles, and returning a handle to an object's interals always runs the risk of compromising an object's encapsulation.
+
+We could applying const to their return types to avoid modifying.
+```c++
+class Rectangle {
+  public:
+    const Point& upperLeft() const {return pData->ulhc;}
+    const Point& lowerRight() const {return pData->lrhc;}
+};
+```
+
+But it can be problematic in other ways. It can lead to dangling handles.
+
+Avoid returning handles (references, pointers, or iterators) to object internals. Not returning handles increases encapsulation, helps const member functions act const , and minimizes the creation of dangling handles.
+
+# Strive for exception-safe code
+
