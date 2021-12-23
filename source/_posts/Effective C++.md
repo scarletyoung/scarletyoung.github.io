@@ -901,4 +901,201 @@ But it can be problematic in other ways. It can lead to dangling handles.
 Avoid returning handles (references, pointers, or iterators) to object internals. Not returning handles increases encapsulation, helps const member functions act const , and minimizes the creation of dangling handles.
 
 # Strive for exception-safe code
+When an exception is thrown, there are two requirements for exception safety.
+* Leak no resource.
+* Don't allow data structures to become corrupted.
 
+Exception-safe functions must offer one of three guarantees
+* The base guarantee promise. If an exception is thrown, everything in the program remains in a valid state. No objects or data structures become corrupted, and all objects are in internally consistent state. But the exact state of program may not be predictable.
+* The strong guarantee promise. If an exception is thrown, the state of the program is unchanged.
+* The nothrow guarantee promise. Never to throw exception. All operations on build-in types are nothrow.
+
+We can not distinguish the guarantee from the declaration of a function. All those guarantee are determined by the function's implmentation, not its declaration. 
+
+There is a general design strategy that typically leads to the strong guarantee. The strategy is known as copy and swap.
+Make a copy of the object you want to modify, then make all needed changes to the copy. After all the changes have been successfully completed, swap the modified object with the original in a non-throwing operation.
+
+The copy-and-swap strategy has some disadvantage
+* it doesn't guarantee that the overall function is strongly exception-safe. Consider a function throw a exception after a database modify function call. The database state will change and can not undo.
+* copying object may be expensive.
+
+A function can usually offer a guarante no stronger that the weakest guarantee of the functions it calls.
+
+# Understand the ins and outs of inlining
+The idea behind an inline function is to replace each call of that function with its code body. In general, overzealous inlining may increase program size. But if an inline function body is very short, the code generated for the function body may be smaller than the code generated for a function call.
+
+Inline is a request to compiler, not a command. So the compiler will decide if inlining the function will lead to any benefits.
+The requset can be given implicitly or explicitly.
+* implicitly: define a function inside a class definition.
+* explicitly: use inline keyword.
+
+Inline function must typically be in header files, because most build environments do inlining during compilation.
+
+Limit most inlining to small, frequently called functions.
+
+# Minimize compilation dependencies between files
+```c++
+class Person {
+  public:
+    Person(const std::string& name, const Date& birthday, const Address& addr);
+    std::string name() const;
+    std::string birthDate() const;
+    std::string address() const;
+  private:
+    std::string theName;
+    Date theBirthDate;
+    Address theAddress;
+};
+```
+Look at the code above. If any header file used in Person class changed, the Person class must be recompiled, as must any files that use Person.
+
+The compiler must know the Person size to allocate enough space. The only way to calculate the size it to consult the class definition.
+
+A solution is shown as below
+```c++
+#include <string>
+#include <memory>
+class PersonImpl;
+class Date;
+class Address;
+class Person {
+  public:
+    Person(const std::string& name, const Date& birthday, const Address& addr);
+    std::string name() const;
+    std::string birthDate() const;
+    std::string address() const;
+  private:
+    std::shared_ptr<PersonImpl> pImpl;
+};
+```
+The clients of Person are divorced from the details of dates, addresses and persons. In the code above, the client uses Person clas instead of PersonImpl class, only Person class uses PersonImpl class.
+
+The key is replacement of dependencie on definitions with dependencies on declarations. Make your header files self-sufficient whenever it's practical and when it's not depend on declarations in other files, not definitions.
+* Avoid using objects when object references and pointers will do.
+* Depend on class declarations instead of class definitions whenever you can.
+* Provide separate header files for declarations and definitions.
+
+I didn't fully understand this item.
+
+# Make sure public inheritance models "is-a"
+Public inheritance means "is-a". Everything that applies to base classes must also apply to derived classes.
+
+# Avoid hiding inherited names.
+When a class inherits a base class, the deried class inherits the things declared in the base class. Actually, the scope of the derived class is nested inside its base class's scope. 
+
+The names in the inner scopes hide names in outer scopes. C++'s name-hiding rules do just that: hind names. Whether the names correspond to the same or different types is immaterial.
+
+For example
+```c++
+class Base {
+  private:
+    int x;
+  public:
+    virtual void mf1() = 0;
+    virtual void mf1(int);
+    virtual void mf2();
+    void mf3();
+    void mf3(double);
+};
+class Derived: public Base {
+  public:
+    virtual void mf1();
+    void mf3();
+    void mf4();
+};
+Derived d;
+int x;
+d.mf1();  // call Derived::mf1
+d.mf1(x); // error Derived::mf1 hides Base::mf2
+d.mf2();  // call Based::mf2
+d.mf3();  // call Derived::mf3
+d.mf3(x); // error 
+```
+
+name-hiding rule will applies regardless of whether the functions are virtual or non-virtual or the functions take different parameter types.
+
+The solution is to do it with using declarations
+```c++
+class Base {
+  private:
+    int x;
+  public:
+    virtual void mf1() = 0;
+    virtual void mf1(int);
+    virtual void mf2();
+    void mf3();
+    void mf3(double);
+};
+class Derived: public Base {
+  public:
+    using Base::mf1;  // make mf1 and mf3 in Base class visible in Derived's scope
+    using Base::mf3;
+    virtual void mf1();
+    void mf3();
+    void mf4();
+};
+Derived d;
+int x;
+d.mf1(x); // call Base::mf1 
+d.mf3(x); // call Base::mf3 
+```
+
+Something you won't want to inherit all the functions from base class. The correct way to do is shown as below
+```c++
+class Base {
+  public:
+    virtual void mf1() = 0;
+    virtual void mf1(int);
+};
+class Derived: public Base {
+  public:
+    virtual void mf1() {Base::mf1();}
+};
+Derived d;
+int x;
+d.mf1(); // call Base::mf1 
+d.mf1(x); // error 
+```
+When inheritance is combined with templates, it will incur another problem that will tell in other item.
+
+# Differentiate between inheritance of interface and inheritance of implementation
+
+The purpose of declaring a pure virtual function is to have derived classes inherit a function interface only.
+
+It is possible to provide a definition for a pure vitual function, but the only way to call it would e qualify the call with the class name.
+
+The purpose of declaring a simple virtual function is to have derived class inherit a function interface as well as a default implementation.
+
+The purpose of declaring a non-virtual function is to have derived classes inherit a function interface as well as a mandatory implementation.
+
+The differences in declarations for pure virtual, simple virtual, and non-virtual functions allow you to specify with precision what you want derived classes to inherit: interface only, interface and a default implementation, or interface and a mandatory implementation, respectively.
+
+# Consider alternatives to virtual functions.
+
+## non-virtual interface idiom
+A form of the Template Method design pattern that wraps public non-virtual member functions around less accessible virtual functions
+## Function Pointer
+```c++
+class GameCharacter {
+  public:
+    typedef int (*HealthCalcFunc)(const GameCharacter&);
+    explicit GameCharacter(HealthCalcFunc hcf = defaultHealthCalc) : healthFunc(hcf) {}
+    int healthValue() const {reurn healthFunc(*this);}
+  private:
+    HealthCalcFunc healthFunc;
+};
+```
+The strategy offers some flexibility
+* Different instances of the same character type can have different health calculation functions.
+* Health calculation functions for a particular character may be changed at runtime.
+
+## std::function
+Replace virtual function with std::function data member.
+
+## Strategyh pattern
+Replace virtual functions in one hierarchy with virtual functions in another hierarchy.
+
+
+A disadvantage of moving functionality from a member function to a function outside the class is that the non-member function lacks access to the class’s non-public members.
+
+# Never redefine an inherited non-virtual function
