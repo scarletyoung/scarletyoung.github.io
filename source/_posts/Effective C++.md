@@ -1074,6 +1074,7 @@ The differences in declarations for pure virtual, simple virtual, and non-virtua
 
 ## non-virtual interface idiom
 A form of the Template Method design pattern that wraps public non-virtual member functions around less accessible virtual functions
+
 ## Function Pointer
 ```c++
 class GameCharacter {
@@ -1099,3 +1100,409 @@ Replace virtual functions in one hierarchy with virtual functions in another hie
 A disadvantage of moving functionality from a member function to a function outside the class is that the non-member function lacks access to the class’s non-public members.
 
 # Never redefine an inherited non-virtual function
+```c++
+class B{
+  public:
+    void mf1();
+    virtual mf2();
+};
+class D: public B {
+  public:
+    void mf1();
+    virtual void mf2();
+};
+D x;
+B* pb = &x;
+D* pd = &x;
+pb->mf1();  // B::mf1
+pb->mf2();  // D::mf2
+pd->mf1();  // D::mf1
+pd->mf2();  // D::mf2
+```
+
+Non-virtual functions are statically bound. 
+Virtual functions are dynamically bound.
+
+# Never redefine a function's inherited default parameter value.
+Virtual functions are dynamically bound, but default parameter values are statically bound.
+```c++
+class Shape {
+  public:
+    enum ShapeColor{Red, Green, Blue};
+    virtual void draw(ShapeColor color=Red) const = 0;
+};
+class Rectangle: public Shape {
+  public:
+    virtual void draw(ShapeColor color=Green) const = 0;
+};
+Shape *pr = new Rectangle;
+pr->draw();  // call Rectangle::draw(ShapeColor::Red) instead of Rectangle::draw(ShapeColor::Green)
+```
+The reason of using this strategy is for runtime efficiency. If default parameter values were dynamically bound, compilers would have to come up with a way to determine the appropriate default value for parameters of virtual functions at runtime, which would be slower and more compicated.
+
+But if you follow this rule and also offer default parameter values to users of both base and derived classes, code duplication occurs. If the default parameter value changed in base class, all derived classes that repeat it must also be changed.
+
+In this case, it's wise to consider alternative designs to virtual functions talking above.
+
+# Model "has-a" or "is-implemented-in-terms-of" through composition
+Composition has meanings completely different from that of public inheritance.
+
+In the application domain, composition means has-a. In the implementation domain, it means is-implemented-in-terms-of.
+
+# Use private inheritance judiciously
+private inheritance has two behavior.
+* Compiler will generally not convert a derived class object into bass class object if the inheritance relationsip between the classes is private.
+* Members inherited froma private base class become private members of the derived class.
+```c++
+class Person {};
+class Student: private Person{};
+void eat(const Person& p);
+void study(const Student& s);
+Person p;
+Student s;
+eat(p); // succeed
+eat(s); // error
+```
+
+Pirvate inheritance means is-implemented-in-terms-of. If make a class D privately inherit from a class, because you are interested in taking advantage of some of the features available in class B.
+
+Private inheritance is purely an implementation technique.
+
+The choice strategy between private inheritance and composition is that use composition whenever you can, and use private inheritance whenever you must.
+
+One of the case perfer private inheritance over composition is that you're dealing with a class that has no data in it. Such classes have no non-static data member, no virtual functions, and not virtual base class.
+
+This class conceptually should use no space, but c++ decree that frestanding objects must have non-zero size.
+```c++
+class Empty {};
+class HoldsAnInt {
+  private:
+    int x;
+    Empyt e;
+};
+sizeof(HoldsAnInt) > sizeof(int)  // true
+```
+For most compilers, sizeof(Empty) is 1. But alignment requirements may cause compilers to add padding to class like HoldsAnInt.
+
+This constriant doesn't apply to base class parts of derived class objects. so
+```c++
+class HoldsAnInt: private Empyt{
+  private:
+    int x;
+};
+sizeof(HoldsAnInt) == sizeof(int) //true
+```
+This is known as the empty base optimization(EBO). But the EBO is generally biable only under single inheritance.
+
+Using private inheritance judiciously means empolying it when having considered all the alternatives, it's the best way to express the relationship between two classes in your software.
+
+# Use multiple inheritance judiciously
+One of the problem when using multiple inheritance is that it becomes possible to inherit the same name, which will lead to new opportunities for ambiguity.
+```c++
+class BorrowableItem {
+  public:
+    void checkOut();
+};
+class ElectronicGadget {
+  private:
+    bool checkOut();
+};
+class MP3Player :public BorrowableItem, public ElectronicGadget {};
+MP3Player mp;
+mp.checkOut();  // ambiguous
+```
+This ambiguous exist even though only one of the two functions is accessible. Because C++ first indentifies the function that's the best-match function before seeing whether a function is accessible.
+
+To resolve the ambiguity, must specify which base class's function to call.
+
+Multiple inheritance can lead to deadly MI diamound.
+
+Classes using virtual inheritance are generally larger than they would be without using virtual inheritance. Access to data members in virtual base classes is also slower than to those in non-virtual base classes.
+
+The rules governing the initialization of virtual base classes are more complicated and less intuitive than are those for non-virtual bases.
+* classes derived from virtual bases that require initialization must be aware of their virtual bases, no matter how far distant the bases are
+* when a new derived class is added to the hierarchy, it must assume initialization responsibilities for its virtual bases.
+
+Advice on virtual base classes
+* don't use virtual bases unless you need to.
+* try to avoid putting data in virtual base classes.
+
+Multiple inheritance is more complex than single inheritance. It can lead to new ambiguity issues and to the need for virtual inheritance.
+
+Virtual inheritance imposes costs in size, speed, and complexity of initialization and assignment. It’s most practical when virtual base classes have no data.
+
+Multiple inheritance does have legitimate uses. One scenario involves combining public inheritance from an Interface class with private inheritance from a class that helps with implementation.
+
+# Understand implicit interfaces and compilet-time polymorphism.
+The object-oriented programming revolves around explicit interfaces and runtime polymorphism.
+
+The template and generic programming revolves around implicit interface and compile-time polymorphism.
+1. Implicit interface is the set of expressions that must be valid in order for the template to compile.
+2. Instantiating templates occurs during compilation.
+
+Both classes and templates support interfaces and polymorphism. For classes, interfaces are explicit and centered on function signatures. Polymorphism occurs at the runtime throught virtual functions. For template parameters, interfaces are implicit and based on valid expressions. Polymorphism occurs during compilation throught template instantiation and function overloading resolution.
+
+# Understand the two meanings of typename
+When declaring template parameters, class and typename are inter-changeable.
+
+```c++
+//this is not valid C++ code
+template<typename C>
+void print2nd(const C& container) {
+  if (container.size() >= 2) {
+    C::const_iterator iter(container.begin());
+    ++iter;
+    int value = *iter;
+    std::cout << value;
+  }
+}
+```
+Names in a template that are dependent on a template parameter are called dependent names. When a dependent name is nested inside a class, it is a nested dependent name. (What is non-nested dependent name look like?)
+In the code above, C::const_iterator is a nested dependent name. More accuratly, it is a type.
+
+Nested dependent names can lead to ambiguity. In the above code, until C is known, there is no way to know whether C::const_iterator is a type or isn't. So C++ consider a nested dependent name is not a type unless you tell it otherwise.
+
+The correct version of the code above is shown as follow
+```c++
+template<typename C>
+void print2nd(const C& container) {
+  if (container.size() >= 2) {
+    typename C::const_iterator iter(container.begin());
+    ++iter;
+    int value = *iter;
+    std::cout << value;
+  }
+}
+```
+
+typename should be used to identify only nested dependent type names.
+
+The exception to this rule is that typename must not precede nested dependent type names in a list of base classes or as a base class indentifier in a member initialization list.
+
+# Know how to access names in templatized base classes
+```c++
+template<typename Company>
+class MsgSender {
+  public:
+    void sendClear(const MsgInfo& info) {}
+    void sendSecret(const MsgInfo& info) {}
+};
+template<typename Company>
+class LoggingMsgSender: public MsgSender<Company> {
+  public:
+    void sendClearMsg(const MsgInfo& info) {}
+};
+template<>
+class MsgSender<CompanyZ> {
+  public:
+    void sendSecret(const MsgInfo& info);
+}
+```
+The code above won't compile. The reason is that when compilers encounter the definition for the class template LoggingMsgSender, they don't know what class it inherits from. Company is a template parameter, one that won't be know until later.
+
+Base class templates may be specialized and that such specializations may not offer the same interface as the general template. Thus, compile generally refuses to look in templatized base classes for inherited names.
+
+To solve this problem, we have to somehow disable C++'s "don't look in templatized base classes" behavior. There are three way to do that
+1. preface calls to base class function with "this->".
+2. employ a using declaration.
+3. explicitly specify that the function being called in the base class.
+
+All of these approaches promise compilers that any subsequent specializations of the base class template will support the interface offered by the general template.
+
+# Factor parameter-independent code out of templates
+In template code repication is implicit: there's only one copy of the template sourc code, so you should sense the replication that may take place when a template is instantiated multiple times.
+
+Templates generate multiple classes and multiple functions, so any template code not dependent on a template parameter causes bloat.
+
+Bloat due to non-type template parameters can often be eliminated by replacing template parameters with function parameters or class data members.
+
+Bloat due to type parameters can be reduced by sharing implementations for instantiation types with identical binary representations.
+
+# Use member function templates to accept "all compatible types"
+Real pointers supports impicit conversions. Derived class pointers implicitly convert into base class pointers, pointers to non-const objects convert into pointers to const object, etc.
+
+A user-defined smart pointer classes as follow
+```c++
+template<typename T>
+class SmartPtr {
+  public:
+    explicit SmartPtr(T *realPtr);
+};
+```
+In the code above, we can't convert Derived class pointer to base class pointer. For example
+```c++
+class Top {}
+class Bottom: public Top{}
+Top *tp = new Bottom; // pass
+SmartPtr<Top> stp = SmartPtr<Bottom>(new Bottom); // error
+```
+Because there is no inherent relationship among different instantiations of the same template.
+To achieve conversion that we want, we can write a constructor. However, if the hierarchy is extended in the future, we need to add a new constructor.
+
+Actually, we need a constructor template. Such templates are member function templates.
+```c++
+template<typename T>
+class SmartPtr {
+  public:
+    template<typename U>
+    SmartPtr(const SmartPtr<U>& other);
+};
+```
+A small problem in the code above is that a conversion from SmartPtr<Bottom> to SmartPtr<Top> is legal, which is what we want. To restrict the conversion, we can utilize the build-in type implicit conversion.
+```c++
+template<typename T>
+class SmartPtr {
+  public:
+    template<typename U>
+    SmartPtr(const SmartPtr<U>& other):heldPtr(other.get()) {}
+    T* get() const {return heldPtr;}
+  private:
+    T *heldPtr;
+};
+```
+This will compile only if there is an implicit conversion from a U* pointer to a T* pointer.
+
+It is not end. Compiler will generate copy constructor and copy opertor function if needed. A important thing is that Declaring a generalized copy constructor in a class doesn't keep compilers from generating their own copy constructor.
+
+So you must declare both a generalized copy constructo as well as the normal copy constructor.
+```c++
+template<typename T>
+class SmartPtr {
+  public:
+    SmartPtr(const SmartPtr const& r);
+    template<typename U>
+    SmartPtr(const SmartPtr<U>& other):heldPtr(other.get()) {}
+    T* get() const {return heldPtr;}
+  private:
+    T *heldPtr;
+};
+```
+
+# define non-member functions inside templates when type conversions are desired
+Implicit type conversion functions are never considered during template argument deduction. Such conversions are used during function calls.
+
+When writing a class template that offers functions related to the template that support implicit type conversions on all parameters, define those functions as friends inside the class template.
+
+# Use traits classes for information about types
+There are five categories of iterators, C++ has a tag struct for each of the five iterator categories.
+* Input interators, move only forward, move only one step at a time, only read and read only once.
+  ```c++
+  struct input_interator_tag{};
+  ```
+* Output interators, move only forward, move only one step at a time, only write and write only once.
+  ```c++
+  struct output_interator_tag{};
+  ```
+* forward interator, conbine input interators and output interator.
+  ```c++
+  struct forward_interator_tag : public input_interator_tag{};
+  ```
+* Bidirectional interators, add to forward interators the ability to move backward as well as forward.
+  ```c++
+  struct bidirectional_interator_tag : public forward_iterator_tag{};
+  ```
+* random access iterators, add to bidirectional iterators the ability to jump forward or backward an arbitrary distance in constant time.
+  ```c++
+  struct random_access_interator_tag : public bidirectional_interator_tag{};
+  ```
+
+Advance moves a specified iterator a specified distance. However, Given the different iterator capabilities, only random access interator can directly achieve iter += d and other interators must be to use a loop that interatively increments or decrements the iterator. The advance's implementation what we really want is likely like this
+```c++
+template<typename IterT, typename DistT>
+void advance(IterT& iter, DistT d) {
+  if (iter is a random access iterator) {
+    iter += d;
+  } else {
+    if (d >= 0) {
+      while (d--) {++iter;}
+    } else {
+      while(d++) --iter;
+    }
+  }
+}
+```
+This requires being able to determine whether iter is a random access iterator, which in turn requires knowing whether its type, IterT, is a random access iterator type.. The traits allow you to get information about a type during compilation.
+
+Traits is a technique and a convention followed by C++ programmers. One fo the demands is that it has to work as well for built-in types as it does for user-defined types. It means things like nesting information inside types won't do.
+
+The standard technique is to put it into a template and one or more specializations of taht template. For interators, the template in the standard library is named iterator_traits
+```c++
+template<typename IterT>
+struct iterator_traits;
+```
+The way iterator_traits works is that for each type IterT, a typedef named iterator_category is declared in the struct iterator_traits<IterT>. This typedef identifies the iterator category of IterT. interator_traits implements this in two parts.
+1. any user-defined iterator type must contain a nested typedef named iterator_category that identifies the appropriate tag struct.
+  ```c++
+  template<...>
+  class deque {
+    public:
+      class iterator {
+        public:
+          typedef random_access_iterator_tag iterator_category;
+      }
+  };
+  ```
+  iterator_traits just parrots back the iterator class's nested typedef
+  ```c++
+  template<typename IterT>
+  struct iterator_traits {
+    typedef typename IterT::iterator_category iterator_category;
+  };
+  ```
+2. To handle iterators that are pointers. iterato_traits offer a partial tempalte specialization for pointer types. Pointers act as random access iterators
+  ```c++
+  template<typename T>
+  struct iterator_traits<T*> {
+    typedef random_access_iterator_tag iterator_catagory;
+  }
+  ```
+In summary, To design and implement a traits class
+1. Identify some information about types you'd like to make available
+2. Choose a name to identify that information.
+3. Provide a template and set of specializations that contain the information for the types you want to support.
+
+Given iterator_traits, we can check the type at the runtime. However, IterT's type is known during compilation, so we can check at runtime using overload.
+```c++
+template<typename IterT, typename DistT>
+void doAdvance(IterT& iter, DistT d, std::random_access_iterator_tag) {
+  iter += d;
+}
+template<typename IterT, typename DistT>
+void doAdvance(IterT& iter, DistT d, std::bidirectional_iterator_tag) {
+  if (d >= 0) {while(d--) ++iter;}
+  else {while(d++) --iter;}
+}
+template<typename IterT, typename DistT>
+void doAdvance(IterT& iter, DistT d, std::input_iterator_tag) {
+  if (d < 0) {
+    throw std::out_of_range("Negative distance");
+  }
+  while (d--) ++iter;
+}
+```
+So advance can use overloading resolution to call proper implementation
+```c++
+template<typename IterT, typename DistT>
+void advance(IterT &iter, DistT d) {
+  doAdvance(iter, d, typename std::iterator_traits<IterT>::iterator_category());
+}
+```
+For using a traits class
+1. Create a set of overloaded worker functions or function templates that differ in a traits parameter. Implement each function in accord with the traits information passed.
+2. Create a master function or function template that calls the workers, pass information provided by traits class.
+
+# Be aware of template metaprogramming
+Template metaprogramming(TMP) is the process of writing tempalte-based C++ programs that execute during comilation. A template metaprogram is a program written in C++ that executes inside the C++ compiler.
+
+TMP has two great strengths
+1. It makes some things easy that would otherwise be hard or impossible.
+2. Can shift work from runtime to compile-time.
+
+TMP can accomplish
+* Ensuring dimensional unit correctness.
+* Optimizing matrix operations.
+* Generating custom design pattern implementations.
+
+The disadvantage of TMP
+1. Syntax is unintuitive.
+2. Tool support is weak.
