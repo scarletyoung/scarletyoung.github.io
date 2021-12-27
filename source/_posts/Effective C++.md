@@ -1506,3 +1506,117 @@ TMP can accomplish
 The disadvantage of TMP
 1. Syntax is unintuitive.
 2. Tool support is weak.
+
+# Understand the behavior of the new-handler
+Befere operator new throws an exception in response to an unsatisfiable request for memory, it calls a client-specifiable error-handling function called a new-handler. Clients use set_new_handler function specify the out-of-memory-handling function.
+```c++
+namespace std{
+  typedef void (*new_handler)();
+  new_handler set_new_handler(new_handler p) throw();
+}
+```
+throw() means that this function won't throw any exceptions. set_new_handler function takes a new_handler function pointer and return old function pointer.
+
+A new-handler function must do one of the following
+* Make more memory available. One way to implement this strategy is to allocate a large block of memory at program start-up, then release it for use in the program the first time the new-handler is invoked.
+* Install a different new-handler.
+* Deinstall the new-handler. If no new-handler installed, operator new will throw an exception when memeory allocation fails.
+* Throw an exception. Throw bad_alloc exception or some exception derived from bad_alloc.
+* Not return. typically by calling abort or exit.
+
+Sometimes you'd like to handle memory allocation failures depending on the class of the oject being allocated. The implementation will look like the following
+```c++
+class Widget {
+  public:
+    static std::new_handler set_new_handler(std::new_handler p) throw();
+    static void* operator new(std::size_t size) throw(std::bad_alloc);
+  private:
+    static std::new_handler currentHandler;
+};
+```
+The set_new_handler function implementation is like the standard version of set_new_handler
+```c++
+std::new_Handler Widget::set_new_handler(std::new_handler p) throw() {
+  std::new_handler oldHandler = currentHandler;
+  currentHandler = p;
+  return oldHandler;
+}
+```
+
+The operator new will do the following:
+1. Call the standard set_new_handler with Widget's error-handling function.
+2. Call the global operator new to perform the actual memory allocation. If failed, Widget's new-handler will be called. Whether exception thrown or not, original new-handler is always reinstated. Thus, treat the global new-handler as a resource and use resource-managing objects to prevent resource leaks.
+  ```c++
+  class NewHandlerHolder {
+    public:
+      explicit NewHandlerHolder(std::new_handler nh) : handler(nh) {}
+      ~NewHandlerHolder() {
+        std::set_new_handler(handler);
+      }
+    private:
+      std::new_handler handler;
+      NewHandlerHolder(const NewHandlerHolder&);
+      NewHandlerHolder& operator=(const NewHandlerHolder&);
+  }
+3. If allocation successed, return a pointer to the allocated memory. The destructor of resource-managing object will restore the global new-handler.
+
+The operator new implementation like this
+```C++
+void * Widget::operator new(std::size_t size) throw(std::bad_alloc) {
+  NewHandlerHolder h(std::set_new_handler(currentHandler));
+  return ::operator new(size);
+}
+```
+
+The implementation is class-independent. A better way is to create a template base class. The reason of using template is that each interiting class has its own static data.
+```c++
+template<typename T>
+class NewHandlerSupport {
+  public:
+    static std::new_handler set_new_handler(std::new_handler p) throw();
+    static void* operator new(std::size_t size) throw(std::bad_alloc);
+  private:
+    static std::new_handler currentHandler;
+};
+class Widget: public NewHandlerSupport<Widget> {};
+```
+
+C++ required that operator new reutrn null in a early version when it was unable to allocate the requseted memory. Now, operator new will throw a bad_alloc exception. In order to returing null, we can use nothrow
+```c++
+Widget *pw2 = new (std::nothrow) Widget;
+```
+If allocation failed, nothrow from will just return null. But if allocation successed, the constructor is called, and if in constructor operator new is called and faild, excpetion will be throw and propagated as usual.
+
+# Understand when it make sence to replace new and delete.
+The reason for replacing the compiler-provided version of operator new or operator delete is that
+* To detect usage errors.
+* To collect usage statistics.
+* To increase the speed of allocation and deallocation. General-purpose allocators are often a lot slower than custom version. Be sure to profile your program to confim that these functions are turly a bottleneck before custom operator new and operator delete.
+* To reduce the space overhead of default memory management.
+* To compensate for suboptimal alignment in the default allocator. Some compilers don't guarantee eight-byte alignment for dynamic allocations of doubles.
+* To cluster related objects near one another. Some particular data structures are generally used together and cluster them can minimize the frequency of page faults.
+* To obtain unconventional behavior. Do something that compiler-provided version don't offer.
+
+# Adhere to convention when writing new and delete
+Implementing a conformant operator new requirement
+* Having the right return value. Return a pointer to allocation memory or throw an exception of type bad_alloc.
+* Calling the new-handling function when insufficient memory is available.
+* Being prepared to cope with the requests for no memory.
+* Avoid inadvertently hiding the "normal" form of new.
+
+There is no way to get at the new-handling function pointer directly, so you have to call set_new_handler to find out what it is.
+
+Writing a custom memory manager is to optimize allocation for objects of a specific class, not for a class or any of its derived classes. Given an operator new for a class X, the behavior of that function is typically tuned for objects of size sizeof(X). But the operator new in a base class will be called to allocate memory for an object of a derived class. So Base's class-specific operator new must design to cope with this
+```c++
+class Base {
+  public:
+    static void* operator new(std::size_t size) throw(std::bad_alloc) {
+      if (size != sizeof(Base)) {
+        return ::operator new(size);
+      }
+    }
+};
+```
+The operator new[] and the operator have same problem.
+
+# Write placement delete if you write placement new
