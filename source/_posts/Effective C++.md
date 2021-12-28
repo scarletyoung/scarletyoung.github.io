@@ -1620,3 +1620,66 @@ class Base {
 The operator new[] and the operator have same problem.
 
 # Write placement delete if you write placement new
+When write a new expression to create object
+```c++
+Widget* pw = new Widget;
+```
+Two functions are call: one to operator new to allocate memory, a second to Widget's default constructor.
+
+Suppose that first call succeeds, but the second call result in an exception being thrown, the memory allocation performed in step 1 must be undone. The responsibility for undoing step 1 must therefore fall on the C++ runtime system.
+
+When a operator new function takes extra parameters, that function is known as a placement version of new.
+
+The runtime system looks for a version of oeprator delete that takes the same number and types of extra arguments as operator new.
+
+If an operator new with extra parameters isn't matched by an operator delete with the same extra parameters, no operator delete will be call if a memory allocation by the new needs to be undone.
+
+Placement delete is called only if an exception arises from a constructor call that's coupled to a call to a placement. Applying delete to a pointer NEVER yields a call to a placement version of delete. 
+
+So, you must provide both the normal operator delete and a placement version that takes the same extra arguments as operator new does.
+
+But member function names hide functions with the same names in outer scopes. So you need to remember is that by default, C++ offers the following forms of operator new at global scope.
+```c++
+void* operator new(std::size_t) throw(std::bad_alloc);
+void* operator new(std::size_t, void*) throw();
+void* operator new(std::size_t, const std::nothrow_t&) throw;
+```
+
+If you declare any operator news in a class, you'll hide all these standard forms.
+An easy way to do this is to create a base class containing all the normal forms of new and delete
+```c++
+class StandardNewDeleteForms {
+  public:
+    static void* operator new(std::size_t size) throw(std::bad_alloc) {
+      return ::operator new(size);
+    }
+    static void operator delete(void *pMemory) throw() {
+      ::operator delete(pMemory);
+    }
+    ...
+};
+class Widget: public StandardNewDeleteForms {
+  public:
+    using StandardNewDeleteForms::operator new;
+    using StandardNewDeleteForms::operator delete;
+};
+```
+
+# Pay attention to compiler warnings
+Take compiler warnings seriously, and strive to compile warning-free at the maximum warning level supported by your compilers.
+
+Don't become dependent on compiler warnings, because different compilers warn about different things. Porting to a new compiler may eliminate warning messages you've come to rely on.
+
+# Familiarize yourself with the standard library, including TR1.
+Major parts of the standard C++ library specified by C++98
+* THe Standard Template Library(STL)
+* Iostreams
+* Support for internationalization
+* Support for numeric processing
+* An exception hierarchy
+* C89's standard library
+
+# Familiarize yourself with Boost
+Boost is a community and web site for the development of free, open source, peer-reviewed C++ libraries. Boost plays an influential role in C++ standardization.
+
+Boost offers implementations of many TR1 components, but it also offers many other libraries, too.
