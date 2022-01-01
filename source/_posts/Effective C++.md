@@ -3,37 +3,35 @@ title: Effective C++ Note
 date: 2021/12/09
 ---
 # View C++ as a federation of languages
-c++ contains four main sublanguages
+C++ contains four main sublanguages
 1. c, block, statement, preprocessor, build-in data type, arrays, pointers, etc.
 2. Object-Oriented C++, class, encapsulation, inheritance, polymorphism, virtual functions, etc.
 3. template c++,
 4. STL 
 
-c++ is a federation of languages, so when you switch from one sublanguage to another, programming strategy should be change too.
+C++ is a federation of languages, so when you switch from one sublanguage to another, programming strategy should be change too.
 
 # Prefer consts, enums, and inlines to #defines
-reason
-1. the symbolic name may never be seen by compilers and may not get entered into the symbolic table, So when an error occurs, the error message may not refer to the symbolic name and you'd have no idea where the constant came from.
+Reason
+1. The symbolic name may never be seen by compilers and may not get entered into the symbolic table, So when an error occurs, the error message may not refer to the symbolic name and you'd have no idea where the constant came from.
 2. #define could result in multiple copies, because of preprocessor's blind substitution of macro name with value.
 3. #define can't be used to provide any kind of encapsulation.
 4. macro function has so many drawbacks, for example
-  ```
+  ```c++
   #define CALL_WITH_MAX(a,b) f((a) > (b) ? (a) : (b))
   int a = 5, b = 0;
   CALL_WITH_MAX(++a, b);  \\ a is incremented twice
   CALL_WITH_MAX(++a, b+10);  \\ a is incremented once
   ```
 
-
-solution
-1. replace macro with a constant. but there are two special cases
-   1. defining constant pointers, should use two const. For example
+Solution
+1. Replace macro with a constant. but there are two special cases
+   1. Defining constant pointers, should use two const. For example
       
       ```c++
       const char* const name = 'abc';
       ```
-   2. class-specific constant, should may a constant as a static member. For example
-
+   2. Class-specific constant, should may a constant as a static member. For example
       ```c++
       class GamePlayer {
         private:
@@ -43,7 +41,7 @@ solution
       ```
       When type is integral(integers, chars, bools) type, you can declare and use them without definition. The defination will be put in an implementation file, not a header file.
       
-      Some older compiler may not accept the syntax above. In this case, should put the initial value at the point of definition. But when you need the value of the constant during compilation of the class, such as in the declaration above. The solution is known as "the enum hack" shown below
+      Some older compiler may not accept the syntax above. In this case, should put the initial value at the point of definition. But when you need the value of the constant during compilation of the class, such as in the declaration above. The solution is known as "the enum hack" shown as below
       ```c++
       class GamePlayer {
         private:
@@ -51,7 +49,7 @@ solution
           int scores[NumTurns];
       }
       ```
-2. replace macro function with inline function. 
+2. Replace macro function with inline function. 
 
 # Use const whenever possible
 ## Iterator with const
@@ -60,8 +58,8 @@ const std::vector<int>::iterator iter = vec.begin();  //iter acts like a T* cons
 std::vector<int>::const_iterator iter = vec.begin();  //inter acts like a const T*. It measn that iter can be changed but data(*iter) is const
 ```
 
-## constant returned values
-constant returned values sometimes can reduce the incidence of client errors. For example,
+## Constant returned values
+Constant returned values sometimes can reduce the incidence of client errors. For example,
 ```c++
 class Rational {...}
 const Rational operator*(const Rational& lhs, const Rational& rhs);
@@ -70,13 +68,13 @@ Rational a,b,c;
 if (a*b=c) ...  // a typo. but if returned value is not constant, then it will pass compilation.
 ```
 
-## const member functions
+## Const member functions
 The reason for using const member functions
-1. can know which functions may be invoked on const objects.
-1. can know which functions may modify an object and which may not.
-2. work with const object.
+1. Can know which functions may be invoked on const objects.
+1. Can know which functions may modify an object and which may not.
+2. Work with const object.
 
-const function and non-const function can be overloaded, for example
+Const function and non-const function can be overloaded, for example
 ```c++
 class TextBlock {
   public:
@@ -92,7 +90,7 @@ tb[0] = 'x';  // fine
 std::cout << ctb[0];  // fine
 ctb[0] = 'x';  // error
 ```
-Notice, the return type of the non-const operator[] is a reference. If the type is a simple char, it is illegal to modify the return value of a function that returns a build-in type.
+Notice, the return type of the non-const operator[] is a reference. But, if the type is a simple char, it is illegal to modify the return value of a function that returns a build-in type.
 
 There two type of const, bitwise constness and logical constness.
 C++ is designed for bitwise constness, but there is a exception. For example
@@ -231,7 +229,7 @@ In C++, when a derived class object is deleted through a pointer to a base class
 
 The solution is that give the base class a virtual destructor. Any class with virtual functions should almost certainly have a virtual destructor, Because if a class does not contain virtual functions, it is not meant to be used as a base class.
 
-When a class is not intended to be a base class, making the destructor virtual is ususally a bad idea. Assume we have a class below
+When a class is not intended to be a base class, making the destructor virtual is usually a bad idea. Assume we have a class below
 ```C++
 class Point {
   public:
@@ -287,7 +285,7 @@ There are two solutions
    }
    ```
 
-The two solutions above have a disadvantage. The program has not opportunity to react to the problems that my arise.
+The two solutions above have a disadvantage. The program has not opportunity to react to the problems that may arise.
 A better strategy is shown as below
 ```c++
 class DBConn {
@@ -374,7 +372,7 @@ class Widget {
 }
 ```
 
-The tradiional way to prevent this error is to check for assignment to self via an identity test at the top of operator=
+The traditional way to prevent this error is to check for assignment to self via an identity test at the top of operator=
 ```c++
 Widget& operator=(const Widget& rhs) {
   if (this == &rhs)
@@ -1093,7 +1091,7 @@ The strategy offers some flexibility
 ## std::function
 Replace virtual function with std::function data member.
 
-## Strategyh pattern
+## Strategy pattern
 Replace virtual functions in one hierarchy with virtual functions in another hierarchy.
 
 
@@ -1303,9 +1301,9 @@ The code above won't compile. The reason is that when compilers encounter the de
 Base class templates may be specialized and that such specializations may not offer the same interface as the general template. Thus, compile generally refuses to look in templatized base classes for inherited names.
 
 To solve this problem, we have to somehow disable C++'s "don't look in templatized base classes" behavior. There are three way to do that
-1. preface calls to base class function with "this->".
-2. employ a using declaration.
-3. explicitly specify that the function being called in the base class.
+1. Preface calls to base class function with "this->".
+2. Employ a using declaration.
+3. Explicitly specify that the function being called in the base class.
 
 All of these approaches promise compilers that any subsequent specializations of the base class template will support the interface offered by the general template.
 
@@ -1378,7 +1376,7 @@ class SmartPtr {
 };
 ```
 
-# define non-member functions inside templates when type conversions are desired
+# Define non-member functions inside templates when type conversions are desired
 Implicit type conversion functions are never considered during template argument deduction. Such conversions are used during function calls.
 
 When writing a class template that offers functions related to the template that support implicit type conversions on all parameters, define those functions as friends inside the class template.
