@@ -1308,7 +1308,7 @@ To solve this problem, we have to somehow disable C++'s "don't look in templatiz
 All of these approaches promise compilers that any subsequent specializations of the base class template will support the interface offered by the general template.
 
 # Factor parameter-independent code out of templates
-In template code repication is implicit: there's only one copy of the template sourc code, so you should sense the replication that may take place when a template is instantiated multiple times.
+In template code repication is implicit: there's only one copy of the template source code, so you should sense the replication that may take place when a template is instantiated multiple times.
 
 Templates generate multiple classes and multiple functions, so any template code not dependent on a template parameter causes bloat.
 
