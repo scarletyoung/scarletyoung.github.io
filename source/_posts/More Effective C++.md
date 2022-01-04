@@ -1,5 +1,5 @@
 ---
-title: Effective Modern C++ Note
+title: More Effective C++ Note
 date: 2022/01/04
 ---
 
