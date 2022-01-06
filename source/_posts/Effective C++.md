@@ -3,37 +3,35 @@ title: Effective C++ Note
 date: 2021/12/09
 ---
 # View C++ as a federation of languages
-c++ contains four main sublanguages
+C++ contains four main sublanguages
 1. c, block, statement, preprocessor, build-in data type, arrays, pointers, etc.
 2. Object-Oriented C++, class, encapsulation, inheritance, polymorphism, virtual functions, etc.
 3. template c++,
 4. STL 
 
-c++ is a federation of languages, so when you switch from one sublanguage to another, programming strategy should be change too.
+C++ is a federation of languages, so when you switch from one sublanguage to another, programming strategy should be change too.
 
 # Prefer consts, enums, and inlines to #defines
-reason
-1. the symbolic name may never be seen by compilers and may not get entered into the symbolic table, So when an error occurs, the error message may not refer to the symbolic name and you'd have no idea where the constant came from.
+Reason
+1. The symbolic name may never be seen by compilers and may not get entered into the symbolic table, So when an error occurs, the error message may not refer to the symbolic name and you'd have no idea where the constant came from.
 2. #define could result in multiple copies, because of preprocessor's blind substitution of macro name with value.
 3. #define can't be used to provide any kind of encapsulation.
 4. macro function has so many drawbacks, for example
-  ```
+  ```c++
   #define CALL_WITH_MAX(a,b) f((a) > (b) ? (a) : (b))
   int a = 5, b = 0;
   CALL_WITH_MAX(++a, b);  \\ a is incremented twice
   CALL_WITH_MAX(++a, b+10);  \\ a is incremented once
   ```
 
-
-solution
-1. replace macro with a constant. but there are two special cases
-   1. defining constant pointers, should use two const. For example
+Solution
+1. Replace macro with a constant. but there are two special cases
+   1. Defining constant pointers, should use two const. For example
       
       ```c++
       const char* const name = 'abc';
       ```
-   2. class-specific constant, should may a constant as a static member. For example
-
+   2. Class-specific constant, should may a constant as a static member. For example
       ```c++
       class GamePlayer {
         private:
@@ -43,7 +41,7 @@ solution
       ```
       When type is integral(integers, chars, bools) type, you can declare and use them without definition. The defination will be put in an implementation file, not a header file.
       
-      Some older compiler may not accept the syntax above. In this case, should put the initial value at the point of definition. But when you need the value of the constant during compilation of the class, such as in the declaration above. The solution is known as "the enum hack" shown below
+      Some older compiler may not accept the syntax above. In this case, should put the initial value at the point of definition. But when you need the value of the constant during compilation of the class, such as in the declaration above. The solution is known as "the enum hack" shown as below
       ```c++
       class GamePlayer {
         private:
@@ -51,7 +49,7 @@ solution
           int scores[NumTurns];
       }
       ```
-2. replace macro function with inline function. 
+2. Replace macro function with inline function. 
 
 # Use const whenever possible
 ## Iterator with const
@@ -60,8 +58,8 @@ const std::vector<int>::iterator iter = vec.begin();  //iter acts like a T* cons
 std::vector<int>::const_iterator iter = vec.begin();  //inter acts like a const T*. It measn that iter can be changed but data(*iter) is const
 ```
 
-## constant returned values
-constant returned values sometimes can reduce the incidence of client errors. For example,
+## Constant returned values
+Constant returned values sometimes can reduce the incidence of client errors. For example,
 ```c++
 class Rational {...}
 const Rational operator*(const Rational& lhs, const Rational& rhs);
@@ -70,13 +68,13 @@ Rational a,b,c;
 if (a*b=c) ...  // a typo. but if returned value is not constant, then it will pass compilation.
 ```
 
-## const member functions
+## Const member functions
 The reason for using const member functions
-1. can know which functions may be invoked on const objects.
-1. can know which functions may modify an object and which may not.
-2. work with const object.
+1. Can know which functions may be invoked on const objects.
+1. Can know which functions may modify an object and which may not.
+2. Work with const object.
 
-const function and non-const function can be overloaded, for example
+Const function and non-const function can be overloaded, for example
 ```c++
 class TextBlock {
   public:
@@ -92,7 +90,7 @@ tb[0] = 'x';  // fine
 std::cout << ctb[0];  // fine
 ctb[0] = 'x';  // error
 ```
-Notice, the return type of the non-const operator[] is a reference. If the type is a simple char, it is illegal to modify the return value of a function that returns a build-in type.
+Notice, the return type of the non-const operator[] is a reference. But, if the type is a simple char, it is illegal to modify the return value of a function that returns a build-in type.
 
 There two type of const, bitwise constness and logical constness.
 C++ is designed for bitwise constness, but there is a exception. For example
@@ -231,7 +229,7 @@ In C++, when a derived class object is deleted through a pointer to a base class
 
 The solution is that give the base class a virtual destructor. Any class with virtual functions should almost certainly have a virtual destructor, Because if a class does not contain virtual functions, it is not meant to be used as a base class.
 
-When a class is not intended to be a base class, making the destructor virtual is ususally a bad idea. Assume we have a class below
+When a class is not intended to be a base class, making the destructor virtual is usually a bad idea. Assume we have a class below
 ```C++
 class Point {
   public:
@@ -287,7 +285,7 @@ There are two solutions
    }
    ```
 
-The two solutions above have a disadvantage. The program has not opportunity to react to the problems that my arise.
+The two solutions above have a disadvantage. The program has not opportunity to react to the problems that may arise.
 A better strategy is shown as below
 ```c++
 class DBConn {
@@ -374,7 +372,7 @@ class Widget {
 }
 ```
 
-The tradiional way to prevent this error is to check for assignment to self via an identity test at the top of operator=
+The traditional way to prevent this error is to check for assignment to self via an identity test at the top of operator=
 ```c++
 Widget& operator=(const Widget& rhs) {
   if (this == &rhs)
@@ -796,3 +794,890 @@ The cost of these two approaches are as follow
 If an assignment costs less than a constructor-desctructor pair, Approach A is more efficient as n growing larger. Otherwise B is better.
 
 # Minimize casting
+C++ offers four new cast forms
+* const_cast<T>(), only way to remove the constness of objects.
+* dynamic_cast<T>(), used to perform safe downcasting. Only way that cannot be performed using the old-style syntax. Only way that may have a significant runtime cost.
+* reinterpret_cast<T>(), intended for low-level casts, such as casting a pointer to int.
+* static_cast<T>(), used to force implicit conversions.
+
+C++ also support C-style casts, such as (T) expression and T(expression). But new forms are preferable.
+1. mush easier to indentify in code.
+2. compiler can diagnose usage error.
+
+Type conversions often lead to code that is executed at runtime.
+```c++
+class Base{...};
+class Derived: public Base {...};
+Derived d;
+Base *bp = &d;
+```
+In the code above, the base class pointer and the derived class pointer will not be the same. An offset is applied at runtime to the derived pointer to get the correct base pointer value.
+
+The offset varies from compiler to compiler. So, you should generally avoid making assumptions about how things are laid out in C++, and you should certainly not perform casts based on such assumptions.
+
+Suppose we want the virtual member function in derived classes call their base class couterparts first. 
+```c++
+class Window {
+  public:
+    virtual void onResize(){...}
+};
+class SpecialWindow: public Window {
+  public:
+    virtual void onResize() {
+      static_cast<Window>(*this).onResize();
+      ...
+    }
+}
+```
+The implementation in the code is wrong, because cast will create a new, temporary copy of the base class part of *this, then invokes onResize on the copy.
+
+The correct way to implement what you expect is shown as below
+```c++
+class Window {
+  public:
+    virtual void onResize(){...}
+};
+class SpecialWindow: public Window {
+  public:
+    virtual void onResize() {
+      Window::onResize();
+      ...
+    }
+}
+```
+
+The dynamic_cast generally cast base class pointer or reference to what you believe to be a derived class object.
+
+A common implementation is based in part on string comparisons of class names. So the dyname_cast cost is expensive.
+
+Avoid casts whenever practical, especially dynamic_casts in performance-sensitive code. If requires casting, try to develop a cast-free alternative.
+
+When casting is necessary, try to hide it inside a function.
+
+# Avoid returning handles to object internals.
+```c++
+class Point {
+  public:
+    Point(int x, int y);
+    void setX(int newVal);
+    void setY(int newVal);
+};
+struct RectData {
+  Point ulhc;
+  Point lrhc;
+};
+class Rectangle {
+  public:
+    // according to perfer pass-by-reference-to-const to pass-by-value, return reference is more efficient.
+    Point& upperLeft() const {return pData->ulhc;}
+    Point& lowerRight() const {return pData->lrhc;}
+  private:
+    std::shared_ptr<RectData> pData;
+};
+Point coord1(0,0);
+Point coord2(100,100);
+const Rectangle rec(coord1, coord2);
+rec.uperLeft().setX(50);  // pass
+```
+In the example above, rec is declared as const, but we can modify its internal Point data member. This is what we won't.
+
+Returning pointers or iterators will cause the same problem.
+
+References, pointers and iterators are all handles, and returning a handle to an object's interals always runs the risk of compromising an object's encapsulation.
+
+We could applying const to their return types to avoid modifying.
+```c++
+class Rectangle {
+  public:
+    const Point& upperLeft() const {return pData->ulhc;}
+    const Point& lowerRight() const {return pData->lrhc;}
+};
+```
+
+But it can be problematic in other ways. It can lead to dangling handles.
+
+Avoid returning handles (references, pointers, or iterators) to object internals. Not returning handles increases encapsulation, helps const member functions act const , and minimizes the creation of dangling handles.
+
+# Strive for exception-safe code
+When an exception is thrown, there are two requirements for exception safety.
+* Leak no resource.
+* Don't allow data structures to become corrupted.
+
+Exception-safe functions must offer one of three guarantees
+* The base guarantee promise. If an exception is thrown, everything in the program remains in a valid state. No objects or data structures become corrupted, and all objects are in internally consistent state. But the exact state of program may not be predictable.
+* The strong guarantee promise. If an exception is thrown, the state of the program is unchanged.
+* The nothrow guarantee promise. Never to throw exception. All operations on build-in types are nothrow.
+
+We can not distinguish the guarantee from the declaration of a function. All those guarantee are determined by the function's implmentation, not its declaration. 
+
+There is a general design strategy that typically leads to the strong guarantee. The strategy is known as copy and swap.
+Make a copy of the object you want to modify, then make all needed changes to the copy. After all the changes have been successfully completed, swap the modified object with the original in a non-throwing operation.
+
+The copy-and-swap strategy has some disadvantage
+* it doesn't guarantee that the overall function is strongly exception-safe. Consider a function throw a exception after a database modify function call. The database state will change and can not undo.
+* copying object may be expensive.
+
+A function can usually offer a guarante no stronger that the weakest guarantee of the functions it calls.
+
+# Understand the ins and outs of inlining
+The idea behind an inline function is to replace each call of that function with its code body. In general, overzealous inlining may increase program size. But if an inline function body is very short, the code generated for the function body may be smaller than the code generated for a function call.
+
+Inline is a request to compiler, not a command. So the compiler will decide if inlining the function will lead to any benefits.
+The requset can be given implicitly or explicitly.
+* implicitly: define a function inside a class definition.
+* explicitly: use inline keyword.
+
+Inline function must typically be in header files, because most build environments do inlining during compilation.
+
+Limit most inlining to small, frequently called functions.
+
+# Minimize compilation dependencies between files
+```c++
+class Person {
+  public:
+    Person(const std::string& name, const Date& birthday, const Address& addr);
+    std::string name() const;
+    std::string birthDate() const;
+    std::string address() const;
+  private:
+    std::string theName;
+    Date theBirthDate;
+    Address theAddress;
+};
+```
+Look at the code above. If any header file used in Person class changed, the Person class must be recompiled, as must any files that use Person.
+
+The compiler must know the Person size to allocate enough space. The only way to calculate the size it to consult the class definition.
+
+A solution is shown as below
+```c++
+#include <string>
+#include <memory>
+class PersonImpl;
+class Date;
+class Address;
+class Person {
+  public:
+    Person(const std::string& name, const Date& birthday, const Address& addr);
+    std::string name() const;
+    std::string birthDate() const;
+    std::string address() const;
+  private:
+    std::shared_ptr<PersonImpl> pImpl;
+};
+```
+The clients of Person are divorced from the details of dates, addresses and persons. In the code above, the client uses Person clas instead of PersonImpl class, only Person class uses PersonImpl class.
+
+The key is replacement of dependencie on definitions with dependencies on declarations. Make your header files self-sufficient whenever it's practical and when it's not depend on declarations in other files, not definitions.
+* Avoid using objects when object references and pointers will do.
+* Depend on class declarations instead of class definitions whenever you can.
+* Provide separate header files for declarations and definitions.
+
+I didn't fully understand this item.
+
+# Make sure public inheritance models "is-a"
+Public inheritance means "is-a". Everything that applies to base classes must also apply to derived classes.
+
+# Avoid hiding inherited names.
+When a class inherits a base class, the deried class inherits the things declared in the base class. Actually, the scope of the derived class is nested inside its base class's scope. 
+
+The names in the inner scopes hide names in outer scopes. C++'s name-hiding rules do just that: hind names. Whether the names correspond to the same or different types is immaterial.
+
+For example
+```c++
+class Base {
+  private:
+    int x;
+  public:
+    virtual void mf1() = 0;
+    virtual void mf1(int);
+    virtual void mf2();
+    void mf3();
+    void mf3(double);
+};
+class Derived: public Base {
+  public:
+    virtual void mf1();
+    void mf3();
+    void mf4();
+};
+Derived d;
+int x;
+d.mf1();  // call Derived::mf1
+d.mf1(x); // error Derived::mf1 hides Base::mf2
+d.mf2();  // call Based::mf2
+d.mf3();  // call Derived::mf3
+d.mf3(x); // error 
+```
+
+name-hiding rule will applies regardless of whether the functions are virtual or non-virtual or the functions take different parameter types.
+
+The solution is to do it with using declarations
+```c++
+class Base {
+  private:
+    int x;
+  public:
+    virtual void mf1() = 0;
+    virtual void mf1(int);
+    virtual void mf2();
+    void mf3();
+    void mf3(double);
+};
+class Derived: public Base {
+  public:
+    using Base::mf1;  // make mf1 and mf3 in Base class visible in Derived's scope
+    using Base::mf3;
+    virtual void mf1();
+    void mf3();
+    void mf4();
+};
+Derived d;
+int x;
+d.mf1(x); // call Base::mf1 
+d.mf3(x); // call Base::mf3 
+```
+
+Something you won't want to inherit all the functions from base class. The correct way to do is shown as below
+```c++
+class Base {
+  public:
+    virtual void mf1() = 0;
+    virtual void mf1(int);
+};
+class Derived: public Base {
+  public:
+    virtual void mf1() {Base::mf1();}
+};
+Derived d;
+int x;
+d.mf1(); // call Base::mf1 
+d.mf1(x); // error 
+```
+When inheritance is combined with templates, it will incur another problem that will tell in other item.
+
+# Differentiate between inheritance of interface and inheritance of implementation
+
+The purpose of declaring a pure virtual function is to have derived classes inherit a function interface only.
+
+It is possible to provide a definition for a pure vitual function, but the only way to call it would e qualify the call with the class name.
+
+The purpose of declaring a simple virtual function is to have derived class inherit a function interface as well as a default implementation.
+
+The purpose of declaring a non-virtual function is to have derived classes inherit a function interface as well as a mandatory implementation.
+
+The differences in declarations for pure virtual, simple virtual, and non-virtual functions allow you to specify with precision what you want derived classes to inherit: interface only, interface and a default implementation, or interface and a mandatory implementation, respectively.
+
+# Consider alternatives to virtual functions.
+
+## non-virtual interface idiom
+A form of the Template Method design pattern that wraps public non-virtual member functions around less accessible virtual functions
+
+## Function Pointer
+```c++
+class GameCharacter {
+  public:
+    typedef int (*HealthCalcFunc)(const GameCharacter&);
+    explicit GameCharacter(HealthCalcFunc hcf = defaultHealthCalc) : healthFunc(hcf) {}
+    int healthValue() const {reurn healthFunc(*this);}
+  private:
+    HealthCalcFunc healthFunc;
+};
+```
+The strategy offers some flexibility
+* Different instances of the same character type can have different health calculation functions.
+* Health calculation functions for a particular character may be changed at runtime.
+
+## std::function
+Replace virtual function with std::function data member.
+
+## Strategy pattern
+Replace virtual functions in one hierarchy with virtual functions in another hierarchy.
+
+
+A disadvantage of moving functionality from a member function to a function outside the class is that the non-member function lacks access to the class’s non-public members.
+
+# Never redefine an inherited non-virtual function
+```c++
+class B{
+  public:
+    void mf1();
+    virtual mf2();
+};
+class D: public B {
+  public:
+    void mf1();
+    virtual void mf2();
+};
+D x;
+B* pb = &x;
+D* pd = &x;
+pb->mf1();  // B::mf1
+pb->mf2();  // D::mf2
+pd->mf1();  // D::mf1
+pd->mf2();  // D::mf2
+```
+
+Non-virtual functions are statically bound. 
+Virtual functions are dynamically bound.
+
+# Never redefine a function's inherited default parameter value.
+Virtual functions are dynamically bound, but default parameter values are statically bound.
+```c++
+class Shape {
+  public:
+    enum ShapeColor{Red, Green, Blue};
+    virtual void draw(ShapeColor color=Red) const = 0;
+};
+class Rectangle: public Shape {
+  public:
+    virtual void draw(ShapeColor color=Green) const = 0;
+};
+Shape *pr = new Rectangle;
+pr->draw();  // call Rectangle::draw(ShapeColor::Red) instead of Rectangle::draw(ShapeColor::Green)
+```
+The reason of using this strategy is for runtime efficiency. If default parameter values were dynamically bound, compilers would have to come up with a way to determine the appropriate default value for parameters of virtual functions at runtime, which would be slower and more compicated.
+
+But if you follow this rule and also offer default parameter values to users of both base and derived classes, code duplication occurs. If the default parameter value changed in base class, all derived classes that repeat it must also be changed.
+
+In this case, it's wise to consider alternative designs to virtual functions talking above.
+
+# Model "has-a" or "is-implemented-in-terms-of" through composition
+Composition has meanings completely different from that of public inheritance.
+
+In the application domain, composition means has-a. In the implementation domain, it means is-implemented-in-terms-of.
+
+# Use private inheritance judiciously
+private inheritance has two behavior.
+* Compiler will generally not convert a derived class object into bass class object if the inheritance relationsip between the classes is private.
+* Members inherited froma private base class become private members of the derived class.
+```c++
+class Person {};
+class Student: private Person{};
+void eat(const Person& p);
+void study(const Student& s);
+Person p;
+Student s;
+eat(p); // succeed
+eat(s); // error
+```
+
+Pirvate inheritance means is-implemented-in-terms-of. If make a class D privately inherit from a class, because you are interested in taking advantage of some of the features available in class B.
+
+Private inheritance is purely an implementation technique.
+
+The choice strategy between private inheritance and composition is that use composition whenever you can, and use private inheritance whenever you must.
+
+One of the case perfer private inheritance over composition is that you're dealing with a class that has no data in it. Such classes have no non-static data member, no virtual functions, and not virtual base class.
+
+This class conceptually should use no space, but c++ decree that frestanding objects must have non-zero size.
+```c++
+class Empty {};
+class HoldsAnInt {
+  private:
+    int x;
+    Empyt e;
+};
+sizeof(HoldsAnInt) > sizeof(int)  // true
+```
+For most compilers, sizeof(Empty) is 1. But alignment requirements may cause compilers to add padding to class like HoldsAnInt.
+
+This constriant doesn't apply to base class parts of derived class objects. so
+```c++
+class HoldsAnInt: private Empyt{
+  private:
+    int x;
+};
+sizeof(HoldsAnInt) == sizeof(int) //true
+```
+This is known as the empty base optimization(EBO). But the EBO is generally biable only under single inheritance.
+
+Using private inheritance judiciously means empolying it when having considered all the alternatives, it's the best way to express the relationship between two classes in your software.
+
+# Use multiple inheritance judiciously
+One of the problem when using multiple inheritance is that it becomes possible to inherit the same name, which will lead to new opportunities for ambiguity.
+```c++
+class BorrowableItem {
+  public:
+    void checkOut();
+};
+class ElectronicGadget {
+  private:
+    bool checkOut();
+};
+class MP3Player :public BorrowableItem, public ElectronicGadget {};
+MP3Player mp;
+mp.checkOut();  // ambiguous
+```
+This ambiguous exist even though only one of the two functions is accessible. Because C++ first indentifies the function that's the best-match function before seeing whether a function is accessible.
+
+To resolve the ambiguity, must specify which base class's function to call.
+
+Multiple inheritance can lead to deadly MI diamound.
+
+Classes using virtual inheritance are generally larger than they would be without using virtual inheritance. Access to data members in virtual base classes is also slower than to those in non-virtual base classes.
+
+The rules governing the initialization of virtual base classes are more complicated and less intuitive than are those for non-virtual bases.
+* classes derived from virtual bases that require initialization must be aware of their virtual bases, no matter how far distant the bases are
+* when a new derived class is added to the hierarchy, it must assume initialization responsibilities for its virtual bases.
+
+Advice on virtual base classes
+* don't use virtual bases unless you need to.
+* try to avoid putting data in virtual base classes.
+
+Multiple inheritance is more complex than single inheritance. It can lead to new ambiguity issues and to the need for virtual inheritance.
+
+Virtual inheritance imposes costs in size, speed, and complexity of initialization and assignment. It’s most practical when virtual base classes have no data.
+
+Multiple inheritance does have legitimate uses. One scenario involves combining public inheritance from an Interface class with private inheritance from a class that helps with implementation.
+
+# Understand implicit interfaces and compilet-time polymorphism.
+The object-oriented programming revolves around explicit interfaces and runtime polymorphism.
+
+The template and generic programming revolves around implicit interface and compile-time polymorphism.
+1. Implicit interface is the set of expressions that must be valid in order for the template to compile.
+2. Instantiating templates occurs during compilation.
+
+Both classes and templates support interfaces and polymorphism. For classes, interfaces are explicit and centered on function signatures. Polymorphism occurs at the runtime throught virtual functions. For template parameters, interfaces are implicit and based on valid expressions. Polymorphism occurs during compilation throught template instantiation and function overloading resolution.
+
+# Understand the two meanings of typename
+When declaring template parameters, class and typename are inter-changeable.
+
+```c++
+//this is not valid C++ code
+template<typename C>
+void print2nd(const C& container) {
+  if (container.size() >= 2) {
+    C::const_iterator iter(container.begin());
+    ++iter;
+    int value = *iter;
+    std::cout << value;
+  }
+}
+```
+Names in a template that are dependent on a template parameter are called dependent names. When a dependent name is nested inside a class, it is a nested dependent name. (What is non-nested dependent name look like?)
+In the code above, C::const_iterator is a nested dependent name. More accuratly, it is a type.
+
+Nested dependent names can lead to ambiguity. In the above code, until C is known, there is no way to know whether C::const_iterator is a type or isn't. So C++ consider a nested dependent name is not a type unless you tell it otherwise.
+
+The correct version of the code above is shown as follow
+```c++
+template<typename C>
+void print2nd(const C& container) {
+  if (container.size() >= 2) {
+    typename C::const_iterator iter(container.begin());
+    ++iter;
+    int value = *iter;
+    std::cout << value;
+  }
+}
+```
+
+typename should be used to identify only nested dependent type names.
+
+The exception to this rule is that typename must not precede nested dependent type names in a list of base classes or as a base class indentifier in a member initialization list.
+
+# Know how to access names in templatized base classes
+```c++
+template<typename Company>
+class MsgSender {
+  public:
+    void sendClear(const MsgInfo& info) {}
+    void sendSecret(const MsgInfo& info) {}
+};
+template<typename Company>
+class LoggingMsgSender: public MsgSender<Company> {
+  public:
+    void sendClearMsg(const MsgInfo& info) {}
+};
+template<>
+class MsgSender<CompanyZ> {
+  public:
+    void sendSecret(const MsgInfo& info);
+}
+```
+The code above won't compile. The reason is that when compilers encounter the definition for the class template LoggingMsgSender, they don't know what class it inherits from. Company is a template parameter, one that won't be know until later.
+
+Base class templates may be specialized and that such specializations may not offer the same interface as the general template. Thus, compile generally refuses to look in templatized base classes for inherited names.
+
+To solve this problem, we have to somehow disable C++'s "don't look in templatized base classes" behavior. There are three way to do that
+1. Preface calls to base class function with "this->".
+2. Employ a using declaration.
+3. Explicitly specify that the function being called in the base class.
+
+All of these approaches promise compilers that any subsequent specializations of the base class template will support the interface offered by the general template.
+
+# Factor parameter-independent code out of templates
+In template code repication is implicit: there's only one copy of the template source code, so you should sense the replication that may take place when a template is instantiated multiple times.
+
+Templates generate multiple classes and multiple functions, so any template code not dependent on a template parameter causes bloat.
+
+Bloat due to non-type template parameters can often be eliminated by replacing template parameters with function parameters or class data members.
+
+Bloat due to type parameters can be reduced by sharing implementations for instantiation types with identical binary representations.
+
+# Use member function templates to accept "all compatible types"
+Real pointers supports impicit conversions. Derived class pointers implicitly convert into base class pointers, pointers to non-const objects convert into pointers to const object, etc.
+
+A user-defined smart pointer classes as follow
+```c++
+template<typename T>
+class SmartPtr {
+  public:
+    explicit SmartPtr(T *realPtr);
+};
+```
+In the code above, we can't convert Derived class pointer to base class pointer. For example
+```c++
+class Top {}
+class Bottom: public Top{}
+Top *tp = new Bottom; // pass
+SmartPtr<Top> stp = SmartPtr<Bottom>(new Bottom); // error
+```
+Because there is no inherent relationship among different instantiations of the same template.
+To achieve conversion that we want, we can write a constructor. However, if the hierarchy is extended in the future, we need to add a new constructor.
+
+Actually, we need a constructor template. Such templates are member function templates.
+```c++
+template<typename T>
+class SmartPtr {
+  public:
+    template<typename U>
+    SmartPtr(const SmartPtr<U>& other);
+};
+```
+A small problem in the code above is that a conversion from SmartPtr<Bottom> to SmartPtr<Top> is legal, which is what we want. To restrict the conversion, we can utilize the build-in type implicit conversion.
+```c++
+template<typename T>
+class SmartPtr {
+  public:
+    template<typename U>
+    SmartPtr(const SmartPtr<U>& other):heldPtr(other.get()) {}
+    T* get() const {return heldPtr;}
+  private:
+    T *heldPtr;
+};
+```
+This will compile only if there is an implicit conversion from a U* pointer to a T* pointer.
+
+It is not end. Compiler will generate copy constructor and copy opertor function if needed. A important thing is that Declaring a generalized copy constructor in a class doesn't keep compilers from generating their own copy constructor.
+
+So you must declare both a generalized copy constructo as well as the normal copy constructor.
+```c++
+template<typename T>
+class SmartPtr {
+  public:
+    SmartPtr(const SmartPtr const& r);
+    template<typename U>
+    SmartPtr(const SmartPtr<U>& other):heldPtr(other.get()) {}
+    T* get() const {return heldPtr;}
+  private:
+    T *heldPtr;
+};
+```
+
+# Define non-member functions inside templates when type conversions are desired
+Implicit type conversion functions are never considered during template argument deduction. Such conversions are used during function calls.
+
+When writing a class template that offers functions related to the template that support implicit type conversions on all parameters, define those functions as friends inside the class template.
+
+# Use traits classes for information about types
+There are five categories of iterators, C++ has a tag struct for each of the five iterator categories.
+* Input interators, move only forward, move only one step at a time, only read and read only once.
+  ```c++
+  struct input_interator_tag{};
+  ```
+* Output interators, move only forward, move only one step at a time, only write and write only once.
+  ```c++
+  struct output_interator_tag{};
+  ```
+* forward interator, conbine input interators and output interator.
+  ```c++
+  struct forward_interator_tag : public input_interator_tag{};
+  ```
+* Bidirectional interators, add to forward interators the ability to move backward as well as forward.
+  ```c++
+  struct bidirectional_interator_tag : public forward_iterator_tag{};
+  ```
+* random access iterators, add to bidirectional iterators the ability to jump forward or backward an arbitrary distance in constant time.
+  ```c++
+  struct random_access_interator_tag : public bidirectional_interator_tag{};
+  ```
+
+Advance moves a specified iterator a specified distance. However, Given the different iterator capabilities, only random access interator can directly achieve iter += d and other interators must be to use a loop that interatively increments or decrements the iterator. The advance's implementation what we really want is likely like this
+```c++
+template<typename IterT, typename DistT>
+void advance(IterT& iter, DistT d) {
+  if (iter is a random access iterator) {
+    iter += d;
+  } else {
+    if (d >= 0) {
+      while (d--) {++iter;}
+    } else {
+      while(d++) --iter;
+    }
+  }
+}
+```
+This requires being able to determine whether iter is a random access iterator, which in turn requires knowing whether its type, IterT, is a random access iterator type.. The traits allow you to get information about a type during compilation.
+
+Traits is a technique and a convention followed by C++ programmers. One fo the demands is that it has to work as well for built-in types as it does for user-defined types. It means things like nesting information inside types won't do.
+
+The standard technique is to put it into a template and one or more specializations of taht template. For interators, the template in the standard library is named iterator_traits
+```c++
+template<typename IterT>
+struct iterator_traits;
+```
+The way iterator_traits works is that for each type IterT, a typedef named iterator_category is declared in the struct iterator_traits<IterT>. This typedef identifies the iterator category of IterT. interator_traits implements this in two parts.
+1. any user-defined iterator type must contain a nested typedef named iterator_category that identifies the appropriate tag struct.
+  ```c++
+  template<...>
+  class deque {
+    public:
+      class iterator {
+        public:
+          typedef random_access_iterator_tag iterator_category;
+      }
+  };
+  ```
+  iterator_traits just parrots back the iterator class's nested typedef
+  ```c++
+  template<typename IterT>
+  struct iterator_traits {
+    typedef typename IterT::iterator_category iterator_category;
+  };
+  ```
+2. To handle iterators that are pointers. iterato_traits offer a partial tempalte specialization for pointer types. Pointers act as random access iterators
+  ```c++
+  template<typename T>
+  struct iterator_traits<T*> {
+    typedef random_access_iterator_tag iterator_catagory;
+  }
+  ```
+In summary, To design and implement a traits class
+1. Identify some information about types you'd like to make available
+2. Choose a name to identify that information.
+3. Provide a template and set of specializations that contain the information for the types you want to support.
+
+Given iterator_traits, we can check the type at the runtime. However, IterT's type is known during compilation, so we can check at runtime using overload.
+```c++
+template<typename IterT, typename DistT>
+void doAdvance(IterT& iter, DistT d, std::random_access_iterator_tag) {
+  iter += d;
+}
+template<typename IterT, typename DistT>
+void doAdvance(IterT& iter, DistT d, std::bidirectional_iterator_tag) {
+  if (d >= 0) {while(d--) ++iter;}
+  else {while(d++) --iter;}
+}
+template<typename IterT, typename DistT>
+void doAdvance(IterT& iter, DistT d, std::input_iterator_tag) {
+  if (d < 0) {
+    throw std::out_of_range("Negative distance");
+  }
+  while (d--) ++iter;
+}
+```
+So advance can use overloading resolution to call proper implementation
+```c++
+template<typename IterT, typename DistT>
+void advance(IterT &iter, DistT d) {
+  doAdvance(iter, d, typename std::iterator_traits<IterT>::iterator_category());
+}
+```
+For using a traits class
+1. Create a set of overloaded worker functions or function templates that differ in a traits parameter. Implement each function in accord with the traits information passed.
+2. Create a master function or function template that calls the workers, pass information provided by traits class.
+
+# Be aware of template metaprogramming
+Template metaprogramming(TMP) is the process of writing tempalte-based C++ programs that execute during comilation. A template metaprogram is a program written in C++ that executes inside the C++ compiler.
+
+TMP has two great strengths
+1. It makes some things easy that would otherwise be hard or impossible.
+2. Can shift work from runtime to compile-time.
+
+TMP can accomplish
+* Ensuring dimensional unit correctness.
+* Optimizing matrix operations.
+* Generating custom design pattern implementations.
+
+The disadvantage of TMP
+1. Syntax is unintuitive.
+2. Tool support is weak.
+
+# Understand the behavior of the new-handler
+Befere operator new throws an exception in response to an unsatisfiable request for memory, it calls a client-specifiable error-handling function called a new-handler. Clients use set_new_handler function specify the out-of-memory-handling function.
+```c++
+namespace std{
+  typedef void (*new_handler)();
+  new_handler set_new_handler(new_handler p) throw();
+}
+```
+throw() means that this function won't throw any exceptions. set_new_handler function takes a new_handler function pointer and return old function pointer.
+
+A new-handler function must do one of the following
+* Make more memory available. One way to implement this strategy is to allocate a large block of memory at program start-up, then release it for use in the program the first time the new-handler is invoked.
+* Install a different new-handler.
+* Deinstall the new-handler. If no new-handler installed, operator new will throw an exception when memeory allocation fails.
+* Throw an exception. Throw bad_alloc exception or some exception derived from bad_alloc.
+* Not return. typically by calling abort or exit.
+
+Sometimes you'd like to handle memory allocation failures depending on the class of the oject being allocated. The implementation will look like the following
+```c++
+class Widget {
+  public:
+    static std::new_handler set_new_handler(std::new_handler p) throw();
+    static void* operator new(std::size_t size) throw(std::bad_alloc);
+  private:
+    static std::new_handler currentHandler;
+};
+```
+The set_new_handler function implementation is like the standard version of set_new_handler
+```c++
+std::new_Handler Widget::set_new_handler(std::new_handler p) throw() {
+  std::new_handler oldHandler = currentHandler;
+  currentHandler = p;
+  return oldHandler;
+}
+```
+
+The operator new will do the following:
+1. Call the standard set_new_handler with Widget's error-handling function.
+2. Call the global operator new to perform the actual memory allocation. If failed, Widget's new-handler will be called. Whether exception thrown or not, original new-handler is always reinstated. Thus, treat the global new-handler as a resource and use resource-managing objects to prevent resource leaks.
+  ```c++
+  class NewHandlerHolder {
+    public:
+      explicit NewHandlerHolder(std::new_handler nh) : handler(nh) {}
+      ~NewHandlerHolder() {
+        std::set_new_handler(handler);
+      }
+    private:
+      std::new_handler handler;
+      NewHandlerHolder(const NewHandlerHolder&);
+      NewHandlerHolder& operator=(const NewHandlerHolder&);
+  }
+3. If allocation successed, return a pointer to the allocated memory. The destructor of resource-managing object will restore the global new-handler.
+
+The operator new implementation like this
+```C++
+void * Widget::operator new(std::size_t size) throw(std::bad_alloc) {
+  NewHandlerHolder h(std::set_new_handler(currentHandler));
+  return ::operator new(size);
+}
+```
+
+The implementation is class-independent. A better way is to create a template base class. The reason of using template is that each interiting class has its own static data.
+```c++
+template<typename T>
+class NewHandlerSupport {
+  public:
+    static std::new_handler set_new_handler(std::new_handler p) throw();
+    static void* operator new(std::size_t size) throw(std::bad_alloc);
+  private:
+    static std::new_handler currentHandler;
+};
+class Widget: public NewHandlerSupport<Widget> {};
+```
+
+C++ required that operator new reutrn null in a early version when it was unable to allocate the requseted memory. Now, operator new will throw a bad_alloc exception. In order to returing null, we can use nothrow
+```c++
+Widget *pw2 = new (std::nothrow) Widget;
+```
+If allocation failed, nothrow from will just return null. But if allocation successed, the constructor is called, and if in constructor operator new is called and faild, excpetion will be throw and propagated as usual.
+
+# Understand when it make sence to replace new and delete.
+The reason for replacing the compiler-provided version of operator new or operator delete is that
+* To detect usage errors.
+* To collect usage statistics.
+* To increase the speed of allocation and deallocation. General-purpose allocators are often a lot slower than custom version. Be sure to profile your program to confim that these functions are turly a bottleneck before custom operator new and operator delete.
+* To reduce the space overhead of default memory management.
+* To compensate for suboptimal alignment in the default allocator. Some compilers don't guarantee eight-byte alignment for dynamic allocations of doubles.
+* To cluster related objects near one another. Some particular data structures are generally used together and cluster them can minimize the frequency of page faults.
+* To obtain unconventional behavior. Do something that compiler-provided version don't offer.
+
+# Adhere to convention when writing new and delete
+Implementing a conformant operator new requirement
+* Having the right return value. Return a pointer to allocation memory or throw an exception of type bad_alloc.
+* Calling the new-handling function when insufficient memory is available.
+* Being prepared to cope with the requests for no memory.
+* Avoid inadvertently hiding the "normal" form of new.
+
+There is no way to get at the new-handling function pointer directly, so you have to call set_new_handler to find out what it is.
+
+Writing a custom memory manager is to optimize allocation for objects of a specific class, not for a class or any of its derived classes. Given an operator new for a class X, the behavior of that function is typically tuned for objects of size sizeof(X). But the operator new in a base class will be called to allocate memory for an object of a derived class. So Base's class-specific operator new must design to cope with this
+```c++
+class Base {
+  public:
+    static void* operator new(std::size_t size) throw(std::bad_alloc) {
+      if (size != sizeof(Base)) {
+        return ::operator new(size);
+      }
+    }
+};
+```
+The operator new[] and the operator have same problem.
+
+# Write placement delete if you write placement new
+When write a new expression to create object
+```c++
+Widget* pw = new Widget;
+```
+Two functions are call: one to operator new to allocate memory, a second to Widget's default constructor.
+
+Suppose that first call succeeds, but the second call result in an exception being thrown, the memory allocation performed in step 1 must be undone. The responsibility for undoing step 1 must therefore fall on the C++ runtime system.
+
+When a operator new function takes extra parameters, that function is known as a placement version of new.
+
+The runtime system looks for a version of oeprator delete that takes the same number and types of extra arguments as operator new.
+
+If an operator new with extra parameters isn't matched by an operator delete with the same extra parameters, no operator delete will be call if a memory allocation by the new needs to be undone.
+
+Placement delete is called only if an exception arises from a constructor call that's coupled to a call to a placement. Applying delete to a pointer NEVER yields a call to a placement version of delete. 
+
+So, you must provide both the normal operator delete and a placement version that takes the same extra arguments as operator new does.
+
+But member function names hide functions with the same names in outer scopes. So you need to remember is that by default, C++ offers the following forms of operator new at global scope.
+```c++
+void* operator new(std::size_t) throw(std::bad_alloc);
+void* operator new(std::size_t, void*) throw();
+void* operator new(std::size_t, const std::nothrow_t&) throw;
+```
+
+If you declare any operator news in a class, you'll hide all these standard forms.
+An easy way to do this is to create a base class containing all the normal forms of new and delete
+```c++
+class StandardNewDeleteForms {
+  public:
+    static void* operator new(std::size_t size) throw(std::bad_alloc) {
+      return ::operator new(size);
+    }
+    static void operator delete(void *pMemory) throw() {
+      ::operator delete(pMemory);
+    }
+    ...
+};
+class Widget: public StandardNewDeleteForms {
+  public:
+    using StandardNewDeleteForms::operator new;
+    using StandardNewDeleteForms::operator delete;
+};
+```
+
+# Pay attention to compiler warnings
+Take compiler warnings seriously, and strive to compile warning-free at the maximum warning level supported by your compilers.
+
+Don't become dependent on compiler warnings, because different compilers warn about different things. Porting to a new compiler may eliminate warning messages you've come to rely on.
+
+# Familiarize yourself with the standard library, including TR1.
+Major parts of the standard C++ library specified by C++98
+* THe Standard Template Library(STL)
+* Iostreams
+* Support for internationalization
+* Support for numeric processing
+* An exception hierarchy
+* C89's standard library
+
+# Familiarize yourself with Boost
+Boost is a community and web site for the development of free, open source, peer-reviewed C++ libraries. Boost plays an influential role in C++ standardization.
+
+Boost offers implementations of many TR1 components, but it also offers many other libraries, too.
