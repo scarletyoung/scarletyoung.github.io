@@ -16,19 +16,19 @@
   <meta name="description" content="">
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
-  <meta name="description" content="Fermi 实现了所有DirectX 11的硬件特征，包括曲面细分和DirectCompute（DirectCompute是微软的一个API接口，允许使用GPU进行通用计算）。 设计目标  卓越的游戏性能：翻新了几何管线，加倍了CUDA核，加倍了ROP，提高了填充率。 一流的图像质量：实现了新的32CSAA 电影级的几何真实感：全新的分布式几何处理架构，使用多个PolyMorph引擎实现。并行几">
+  <meta name="description" content="Distinguish between pointers and references How to decide to use pointers or references  There is no such thing as a null reference. But pointers can be null.    12char *pc &#x3D; 0;char&amp; rc &#x3D; *ps; Th">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://example.com/2021/12/10/20211122-Nvidia%20GPU%20Architecture/index.html">
+<meta property="og:title" content="More Effective C++ Note">
+<meta property="og:url" content="http://example.com/2022/01/04/More%20Effective%20C++/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="Fermi 实现了所有DirectX 11的硬件特征，包括曲面细分和DirectCompute（DirectCompute是微软的一个API接口，允许使用GPU进行通用计算）。 设计目标  卓越的游戏性能：翻新了几何管线，加倍了CUDA核，加倍了ROP，提高了填充率。 一流的图像质量：实现了新的32CSAA 电影级的几何真实感：全新的分布式几何处理架构，使用多个PolyMorph引擎实现。并行几">
+<meta property="og:description" content="Distinguish between pointers and references How to decide to use pointers or references  There is no such thing as a null reference. But pointers can be null.    12char *pc &#x3D; 0;char&amp; rc &#x3D; *ps; Th">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2021-12-10T10:45:29.006Z">
-<meta property="article:modified_time" content="2021-12-10T10:45:29.007Z">
+<meta property="article:published_time" content="2022-01-03T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-01-06T12:49:10.654Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary_large_image">
   
-  <title>Hexo</title>
+  <title>More Effective C++ Note - Hexo</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
 
@@ -174,7 +174,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="">
+            <span class="h2" id="subtitle" title="More Effective C++ Note">
               
             </span>
 
@@ -184,8 +184,8 @@
   
     <span class="post-meta">
       <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2021-12-10 18:45" pubdate>
-        2021年12月10日 晚上
+      <time datetime="2022-01-04 00:00" pubdate>
+        2022年1月4日 凌晨
       </time>
     </span>
   
@@ -195,7 +195,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      1.4k 字
+      1.8k 字
     </span>
   
 
@@ -204,7 +204,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      4 分钟
+      6 分钟
     </span>
   
 
@@ -233,36 +233,34 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none"></h1>
+            <h1 style="display: none">More Effective C++ Note</h1>
             
             <div class="markdown-body">
-              <h1 id="fermi"><a class="markdownIt-Anchor" href="#fermi"></a> Fermi</h1>
-<p>实现了所有DirectX 11的硬件特征，包括曲面细分和DirectCompute（DirectCompute是微软的一个API接口，允许使用GPU进行通用计算）。</p>
-<p>设计目标</p>
+              <h1 id="distinguish-between-pointers-and-references"><a class="markdownIt-Anchor" href="#distinguish-between-pointers-and-references"></a> Distinguish between pointers and references</h1>
+<p>How to decide to use pointers or references</p>
 <ol>
-<li>卓越的游戏性能：翻新了几何管线，加倍了CUDA核，加倍了ROP，提高了填充率。</li>
-<li>一流的图像质量：实现了新的32CSAA</li>
-<li>电影级的几何真实感：全新的分布式几何处理架构，使用多个PolyMorph引擎实现。并行几何处理能力</li>
-<li>革命性的游戏计算架构：图形和物理之间更快的上下文切换，并发计算内核执行和增强的缓存架构，增加原子操作性能。</li>
+<li>There is no such thing as a null reference. But pointers can be null.</li>
 </ol>
-<h2 id="架构"><a class="markdownIt-Anchor" href="#架构"></a> 架构</h2>
-<p>![image-20211123094226769](/Users/shellingford/Library/Application Support/typora-user-images/image-20211123094226769.png)</p>
-<p>Fermi架构包含了四个GPCs(Graphics Processing Clusters)，16个SMs(SMs)和六个内存控制器。</p>
-<p>GPU通过Host Interface读取cpu命令，GigaThread Engine从系统内存中获取指定的数据并拷贝的framebuffer中，然后创建并分发thread blocks到各个SM是中，每个SMs轮流调度warp到CUDA和和其他执行单元。当出现工作增加的时候，如曲面积分和光栅化之后，GigaThread Engine也会将工作重新分配个SM。</p>
-<p>Fermi共有512个CUDA核，每个SMs有32个核，共16个SMs，每个SMs是高度并行的，支持最大48个warp。L2缓存是统一的。</p>
-<p>Fermi有48个ROP单元，被分为6组，每组8个，每组有一个内存控制器，内存控制器、ROP和L2缓存是紧密耦合的。</p>
-<h3 id="gpc架构"><a class="markdownIt-Anchor" href="#gpc架构"></a> GPC架构</h3>
-<p>![image-20211123101027805](/Users/shellingford/Library/Application Support/typora-user-images/image-20211123101027805.png)</p>
-<p>GPC包含一个Raster Engine和最多四个SM。</p>
-<h1 id="kepler"><a class="markdownIt-Anchor" href="#kepler"></a> Kepler</h1>
-<p>28nm纳米工艺，最佳的性能/功耗比，提供最佳的细分性能，更高水平的几何复杂性、物理模拟、立体3D处理和高级的抗锯齿效果。</p>
-<p>Kepler设计的重点是提升性能功耗比，一个主要的改进是SMX（新的Streaming Multiprocessor）以图形时钟运行而不是以两倍的图形时钟运行。</p>
-<h2 id="架构-2"><a class="markdownIt-Anchor" href="#架构-2"></a> 架构</h2>
-<p>Kepler由GPCs、Streaming Multiprocessors和内存控制器组成。</p>
-<p>下图是GTX 680的架构，有四个GPCs，八个下一点SMX和四个内存控制器。</p>
-<p>![image-20211123082140331](/Users/shellingford/Library/Application Support/typora-user-images/image-20211123082140331.png)</p>
-<p>每个GPC有专用的光栅引擎和两个SMX单元，共有1546个CUDA核。</p>
-<p>完全修改了内存子系统，有更高的内存时钟（6008MHz），每个内存控制器有一个128BK的L2缓存和8个ROP（Render output unit）单元，每个ROP单元可以处理一个颜色样本</p>
+  <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">char</span> *pc = <span class="hljs-number">0</span>;<br><span class="hljs-keyword">char</span>&amp; rc = *ps;<br></code></pre></td></tr></table></figure>
+<p>The code behavior above is undefined.<br />
+2. References must be initialized. Pointers are subject to no such restriction.<br />
+3. Reference can be more efficient because there is no need to test the validity of a reference before using it.<br />
+4. Pointers may be reassigned to refer to different object. A reference always refers to the object with which it is initialized.</p>
+  <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function">string <span class="hljs-title">s1</span><span class="hljs-params">(<span class="hljs-string">&quot;Nancy&quot;</span>)</span></span>;<br><span class="hljs-function">string <span class="hljs-title">s2</span><span class="hljs-params">(<span class="hljs-string">&quot;Clancy&quot;</span>)</span></span>;<br>string&amp; rs = s1;<br>string *ps = &amp;s1;<br>rs = s2;  <span class="hljs-comment">// rs refers to s1, and s1&#x27;s value is change to &quot;Clancy&quot;</span><br>ps = &amp;s2; <span class="hljs-comment">// ps points to s2, s1 is unchanged.</span><br></code></pre></td></tr></table></figure>
+<p>Use a reference whenever there will always be an object to refer to, whenever never want to refer to anything else and implementing some operatores such as operator[] whose syntactic requirements make the use of pointers undesirable should use a reference return.</p>
+<p>In all other cases, stick with pointers.</p>
+<h1 id="prefer-cstyle-casts"><a class="markdownIt-Anchor" href="#prefer-cstyle-casts"></a> Prefer C+±style casts</h1>
+<p>Same as Effecitive C++ <a href="Effective%20C++.md#Minimize%20casting">Minimize casting</a></p>
+<h1 id="never-treat-arrays-polymorphically"><a class="markdownIt-Anchor" href="#never-treat-arrays-polymorphically"></a> Never treat arrays polymorphically</h1>
+<p>Suppose we have a class BST and a second class, BalancedBST, that inherits from BST</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">BST</span> &#123;</span>&#125;;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">BalancedBST</span>:</span> <span class="hljs-keyword">public</span> BST&#123;&#125;;<br></code></pre></td></tr></table></figure>
+<p>Consider a function to print out the content of each BST in an array of BSTs</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">printBSTArray</span><span class="hljs-params">(ostream&amp; s, <span class="hljs-keyword">const</span> BST array[], <span class="hljs-keyword">int</span> numElements)</span> </span>&#123;<br>  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; numElements; ++i) &#123;<br>    s &lt;&lt; array[i];<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>The function also can receive an array of BalancedBST objects</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++">BalanceBST bBSTArray[<span class="hljs-number">10</span>];<br><span class="hljs-built_in">printBSTArray</span>(count, bBSTArray, <span class="hljs-number">10</span>);  <span class="hljs-comment">// can pass and run</span><br></code></pre></td></tr></table></figure>
+<p>Because the parameter array is declared to be of type array-of-BST, so the distance between array and array+i is array + i * sizeof(BST).</p>
+<p>Derived class usually have more data members thar their base classes, so derived class objects usually larger that base class objects.</p>
+<p>So, if you passes an array of BalancedBST objects to printBSTArray, the pointer arithmetic will be wrong for arrays of BalancedBST objects, the function behavior is undefined.</p>
 
             </div>
             <hr>
@@ -278,6 +276,29 @@
                   
                 </p>
               
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/01/04/Effective%20Modern%20C++/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Effective Modern C++ Note</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/12/24/Blacklist/">
+                        <span class="hidden-mobile">BlackList</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
               
             </div>
 
@@ -296,7 +317,7 @@
         var options = Object.assign(
           {"clientID":"c9e92fe53c4f7c10bae4","clientSecret":"a096f7a1a72bea29b07f9fba28fe0b05856f1b8c","repo":"git","owner":"493488419@qq.com","admin":[],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
           {
-            id: 'aaee907dcdde0bc380d8e31d2d69f4e2'
+            id: '2497ebf337fe5138a0ebd3b40dbb7cba'
           }
         )
         var gitalk = new Gitalk(options);

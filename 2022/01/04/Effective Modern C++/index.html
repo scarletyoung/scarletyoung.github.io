@@ -1,0 +1,547 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="John Doe">
+  <meta name="keywords" content="">
+  <meta name="description" content="Understand template type deduction 123template&lt;typename T&gt;void f(ParamType param);f(expr); During compilation, compilers use expr to deduce two types: one for T and one for ParamType. The two t">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Effective Modern C++ Note">
+<meta property="og:url" content="http://example.com/2022/01/04/Effective%20Modern%20C++/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Understand template type deduction 123template&lt;typename T&gt;void f(ParamType param);f(expr); During compilation, compilers use expr to deduce two types: one for T and one for ParamType. The two t">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-01-03T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-01-06T12:49:10.653Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary_large_image">
+  
+  <title>Effective Modern C++ Note - Hexo</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":"UA-177876633-1","gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>成长之路</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Effective Modern C++ Note">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2022-01-04 00:00" pubdate>
+        2022年1月4日 凌晨
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      7k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      22 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Effective Modern C++ Note</h1>
+            
+            <div class="markdown-body">
+              <h1 id="understand-template-type-deduction"><a class="markdownIt-Anchor" href="#understand-template-type-deduction"></a> Understand template type deduction</h1>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f</span><span class="hljs-params">(ParamType param)</span></span>;<br><span class="hljs-built_in">f</span>(expr);<br></code></pre></td></tr></table></figure>
+<p>During compilation, compilers use expr to deduce two types: one for T and one for <em>ParamType</em>.<br />
+The two types are usually different, because <em>ParamType</em> often contains adornment, such as const or reference qualifiers.</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f</span><span class="hljs-params">(<span class="hljs-keyword">const</span> T&amp; param)</span></span>;<br><span class="hljs-keyword">int</span> x = <span class="hljs-number">0</span>;<br><span class="hljs-built_in">f</span>(x);   <span class="hljs-comment">// T is int, but ParamType is const int &amp;</span><br></code></pre></td></tr></table></figure>
+<p>It is natural to expect that the type deduced for T is the type of <em>expr</em>. But, the type deduced for T is dependent not just on the type of <em>expr</em>, but also on the form of <em>ParamType</em>.<br />
+There are three cases</p>
+<ol>
+<li><em>ParamType</em> is a pointer or reference type, but not a [universal reference](#Distinguish universal references from rvalue references)</li>
+<li><em>ParamType</em> is a universal reference.</li>
+<li><em>ParamType</em> is neither a pointer nor a reference.</li>
+</ol>
+<h2 id="case-1-paramtype-is-a-pointer-or-reference-type-but-not-a-universal-referencedistinguish-universal-references-from-rvalue-references"><a class="markdownIt-Anchor" href="#case-1-paramtype-is-a-pointer-or-reference-type-but-not-a-universal-referencedistinguish-universal-references-from-rvalue-references"></a> Case 1: <em>ParamType</em> is a pointer or reference type, but not a [universal reference](#Distinguish universal references from rvalue references)</h2>
+<p>In this case, type deduction works like this</p>
+<ol>
+<li>I <em>expr</em>’s type is a reference(pointer), ignore the reference(pointer) part.</li>
+<li>Then pattern-match <em>expr</em>’s type against <em>ParamType</em> to determine T.</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">// example one</span><br><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f</span><span class="hljs-params">(T&amp; param)</span></span>;<br><span class="hljs-keyword">int</span> x = <span class="hljs-number">27</span>;<br><span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> cx = x;<br><span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span>&amp; rx = x;<br><span class="hljs-built_in">f</span>(x);   <span class="hljs-comment">//T is int, ParamType is int&amp;</span><br><span class="hljs-built_in">f</span>(cx);  <span class="hljs-comment">//T is const int, ParamType is const int&amp;</span><br><span class="hljs-built_in">f</span>(rx);  <span class="hljs-comment">//T is const int, ParamType is const int&amp;</span><br><br><span class="hljs-comment">// example two</span><br><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f</span><span class="hljs-params">(<span class="hljs-keyword">const</span> T&amp; param)</span></span>; <span class="hljs-comment">// param is const T&amp; now</span><br><span class="hljs-keyword">int</span> x = <span class="hljs-number">27</span>;<br><span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> cx = x;<br><span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span>&amp; rx = x;<br><span class="hljs-built_in">f</span>(x);   <span class="hljs-comment">//T is int, ParamType is const int&amp;</span><br><span class="hljs-built_in">f</span>(cx);  <span class="hljs-comment">//T is int, ParamType is const int&amp;</span><br><span class="hljs-built_in">f</span>(rx);  <span class="hljs-comment">//T is int, ParamType is const int&amp;</span><br></code></pre></td></tr></table></figure>
+<h2 id="case-2-paramtype-is-a-universal-reference"><a class="markdownIt-Anchor" href="#case-2-paramtype-is-a-universal-reference"></a> Case 2: <em>ParamType</em> is a Universal Reference</h2>
+<p>The deduced scheme is that</p>
+<ol>
+<li>If <em>expr</em> is an lvalue, both T and <em>ParamType</em> are deduced to be lvalue references</li>
+<li>If <em>expr</em> is an rvalue, the Case 1 rules apply.</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f</span><span class="hljs-params">(T&amp;&amp; param)</span></span>;<br><span class="hljs-keyword">int</span> x = <span class="hljs-number">27</span>;<br><span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> cx = x;<br><span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span>&amp; rx = x;<br><span class="hljs-built_in">f</span>(x);   <span class="hljs-comment">// x is lvalue, T is int&amp;, ParamType is int&amp;</span><br><span class="hljs-built_in">f</span>(cx);  <span class="hljs-comment">// x is lvalue, T is const int&amp;, ParamType is const int&amp;</span><br><span class="hljs-built_in">f</span>(rx);  <span class="hljs-comment">// x is lvalue, T is const int&amp;, ParamType is const int&amp;</span><br><span class="hljs-built_in">f</span>(<span class="hljs-number">27</span>);  <span class="hljs-comment">// 27 is rvalue, T is int, ParamType is int&amp;&amp;</span><br></code></pre></td></tr></table></figure>
+<h2 id="case-3-paramtype-is-neither-a-pointer-or-a-reference"><a class="markdownIt-Anchor" href="#case-3-paramtype-is-neither-a-pointer-or-a-reference"></a> Case 3: <em>ParamType</em> is neither a pointer or a reference</h2>
+<p>When <em>ParamType</em> is neither a pointer or a reference, that means the parameter is pass-by-value. The deduction rules is</p>
+<ol>
+<li>If <em>expr</em>’s type is reference, ignore the reference part.</li>
+<li>If <em>expr</em> is const or volatile, also ignore that.</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f</span><span class="hljs-params">(T&amp;&amp; param)</span></span>;<br><span class="hljs-keyword">int</span> x = <span class="hljs-number">27</span>;<br><span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span> cx = x;<br><span class="hljs-keyword">const</span> <span class="hljs-keyword">int</span>&amp; rx = x;<br><span class="hljs-built_in">f</span>(x);   <span class="hljs-comment">// T and ParamType are both int</span><br><span class="hljs-built_in">f</span>(cx);  <span class="hljs-comment">// T and ParamType are both int</span><br><span class="hljs-built_in">f</span>(rx);  <span class="hljs-comment">// T and ParamType are both int</span><br></code></pre></td></tr></table></figure>
+<p>The reason is simple. Due to pass-by-value, param is a copy of cx or rx.</p>
+<p>Consider the case where <em>expr</em> is a const pointer to a const object</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f</span><span class="hljs-params">(T param)</span></span>;<br><span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span>* <span class="hljs-keyword">const</span> ptr = <span class="hljs-string">&quot;Fun with pointer&quot;</span>;<br><span class="hljs-built_in">f</span>(ptr); <span class="hljs-comment">// ParamType is char * const;</span><br></code></pre></td></tr></table></figure>
+<p>Pointer can be change and what pointer point to is const.</p>
+<h2 id="array-arguments"><a class="markdownIt-Anchor" href="#array-arguments"></a> Array arguments</h2>
+<p>In many context, an array decays into a pointer to its first element.</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> name[] = <span class="hljs-string">&quot;J. P. Briggs&quot;</span>;<br><span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span>* ptrToName = name;<br></code></pre></td></tr></table></figure>
+<p>Array types are different form pointer types, even though they sometimes seem to be interchangeable.</p>
+<p>There is no such thing as a function parameter that’s an array. If a array is pass to a template taking a by-value parameter, the array parameter declaration is treated as a pointer parameters</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f</span><span class="hljs-params">(T param)</span></span>;<br><span class="hljs-built_in">f</span>(name);  <span class="hljs-comment">// T deduced as const char*</span><br></code></pre></td></tr></table></figure>
+<p>But functions can declare parameters that are references to arrays. If template f take its argument by reference. The type deduced for T is the actual type of the array. That type includes the size of array.</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f</span><span class="hljs-params">(T&amp; param)</span></span>;<br><span class="hljs-built_in">f</span>(name);  <span class="hljs-comment">// T deduced as const char[13]. ParamType is const char (&amp;)[13]</span><br></code></pre></td></tr></table></figure>
+<p>The ability to declare references to arrays enables creation of a template that deduces the number of elements that an array contains</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T, std::<span class="hljs-keyword">size_t</span> N&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">constexpr</span> std::<span class="hljs-keyword">size_t</span> <span class="hljs-title">arraySize</span><span class="hljs-params">(T (&amp;)[N])</span> <span class="hljs-keyword">noexcept</span> </span>&#123;<br>  <span class="hljs-keyword">return</span> N;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h2 id="function-arguments"><a class="markdownIt-Anchor" href="#function-arguments"></a> Function arguments</h2>
+<p>Function types can decay into function pointers, and the type deduction for array applies to type deduction for function.</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">someFunc</span><span class="hljs-params">(<span class="hljs-keyword">int</span>, <span class="hljs-keyword">double</span>)</span></span>;<br><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f1</span><span class="hljs-params">(T param)</span></span>;<br><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f2</span><span class="hljs-params">(T param)</span></span>;<br><span class="hljs-built_in">f1</span>(someFunc); <span class="hljs-comment">// type is void (*)(int, double)</span><br><span class="hljs-built_in">f2</span>(someFunc); <span class="hljs-comment">// type is void [&amp;](int, double)</span><br></code></pre></td></tr></table></figure>
+<h1 id="understand-auto-type-deduction"><a class="markdownIt-Anchor" href="#understand-auto-type-deduction"></a> Understand auto type deduction</h1>
+<p>Auto type deduction is template type deduction. auto plays the role of T in the template, and type specifier for the variable act as <em>ParamType</em>.</p>
+<p>There is one exception. When the initializer for a auto-declared variable is enclosed in braces, the deduced type is a std::initializer_list.<br />
+If you want to declare an int with an initial value of 27, C++98 gives you two syntactic choices</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">int</span> x1 = <span class="hljs-number">27</span>;<br><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">x2</span><span class="hljs-params">(<span class="hljs-number">27</span>)</span></span>;<br></code></pre></td></tr></table></figure>
+<p>C++ add two choices</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">int</span> x3 = &#123;<span class="hljs-number">27</span>&#125;;<br><span class="hljs-keyword">int</span> x4&#123;<span class="hljs-number">27</span>&#125;;<br></code></pre></td></tr></table></figure>
+<p>But if using auto instead of fixed types. The behavior may not what you want</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">// type is int</span><br><span class="hljs-keyword">auto</span> x1= <span class="hljs-number">27</span>;<br><span class="hljs-function"><span class="hljs-keyword">auto</span> <span class="hljs-title">x2</span><span class="hljs-params">(<span class="hljs-number">27</span>)</span></span>;<br><span class="hljs-comment">// type is std::initializer_list&lt;int&gt; containing a single element instead of int</span><br><span class="hljs-keyword">auto</span> x3 = &#123;<span class="hljs-number">27</span>&#125;;<br><span class="hljs-keyword">auto</span> x4&#123;<span class="hljs-number">27</span>&#125;;<br></code></pre></td></tr></table></figure>
+<p>If the template passed a braced initializer, type deduction fails, and code is rejected.</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">f</span><span class="hljs-params">(T param)</span></span>;<br><span class="hljs-built_in">f</span>(&#123;<span class="hljs-number">11</span>,<span class="hljs-number">23</span>,<span class="hljs-number">9</span>&#125;); <span class="hljs-comment">// error, deduction failed</span><br></code></pre></td></tr></table></figure>
+<p>The only real difference between auto and template type deduction is that auto assumes that a braced initializer represents a std::initializer_list, but template type deduction doesn’t.</p>
+<p>C<ins>14 permits auto to indicate that a function’s return type should be deduced, and C</ins>14 lambdas may use auto in parameter declarations. However these uses of auto employ template type deduction, not auto type deduction.</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">auto</span> <span class="hljs-title">createInitList</span><span class="hljs-params">()</span> </span>&#123;<br>  <span class="hljs-keyword">return</span> &#123;<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>&#125;; <span class="hljs-comment">// error</span><br>&#125;<br>std::vector&lt;<span class="hljs-keyword">int</span>&gt; v;<br><span class="hljs-keyword">auto</span> resetV = [&amp;v](<span class="hljs-keyword">const</span> <span class="hljs-keyword">auto</span>&amp; newValue) &#123;v = newValue&#125;;<br><span class="hljs-built_in">resetV</span>(&#123;<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>&#125;);  <span class="hljs-comment">// error</span><br></code></pre></td></tr></table></figure>
+<h1 id="understand-decltype"><a class="markdownIt-Anchor" href="#understand-decltype"></a> Understand decltype</h1>
+<p>In C++ 11, the primary use for decltype is declaring function templates where the function’s return type depends on its parameter types.</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">//version one</span><br><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> Container, <span class="hljs-keyword">typename</span> Index&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">auto</span> <span class="hljs-title">authAndAccess</span><span class="hljs-params">(Container &amp;c, Index i)</span> -&gt; <span class="hljs-title">decltype</span><span class="hljs-params">(c[i])</span> </span>&#123;<br>  <span class="hljs-built_in">authenticateUser</span>();<br>  <span class="hljs-keyword">return</span> c[i];<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>In C++ 14, auto can be used to function’s return type.</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">// version two</span><br><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> Container, <span class="hljs-keyword">typename</span> Index&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">auto</span> <span class="hljs-title">authAndAccess</span><span class="hljs-params">(Container &amp;c, Index i)</span> </span>&#123; <span class="hljs-comment">// In c++11, error occur during compilation. In C++14, compilation will pass</span><br>  <span class="hljs-built_in">authenticateUser</span>();<br>  <span class="hljs-keyword">return</span> c[i];<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>The two verions of code have small different. Because, most of containers will return a reference, T&amp;, when calling operator[], in this case the auto type deduction is template type deduction and its return type will be T.</p>
+<p>The correct declaration should use decltype(auto) instead of auto.</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">// version two</span><br><span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> Container, <span class="hljs-keyword">typename</span> Index&gt;</span><br><span class="hljs-function"><span class="hljs-keyword">decltype</span>(<span class="hljs-keyword">auto</span>) <span class="hljs-title">authAndAccess</span><span class="hljs-params">(Container &amp;c, Index i)</span> </span>&#123; <br>  <span class="hljs-built_in">authenticateUser</span>();<br>  <span class="hljs-keyword">return</span> c[i];<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>In the code above, auto specifies that the type is to be deduced, and decltype says that decltype rules should be used during the deduction.</p>
+<p>Applying decltype to a name yields the declared type for that name. For lvalue expressions, decltype ensures that the type reported is always an lvalue reference.</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">decltype</span>(<span class="hljs-keyword">auto</span>) <span class="hljs-title">f1</span><span class="hljs-params">()</span></span>&#123;<br>  <span class="hljs-keyword">int</span> x = <span class="hljs-number">0</span>;<br>  <span class="hljs-keyword">return</span> x; <span class="hljs-comment">// decltype(x) is int</span><br>&#125;<br><span class="hljs-function"><span class="hljs-keyword">decltype</span>(<span class="hljs-keyword">auto</span>) <span class="hljs-title">f1</span><span class="hljs-params">()</span></span>&#123;<br>  <span class="hljs-keyword">int</span> x = <span class="hljs-number">0</span>;<br>  <span class="hljs-keyword">return</span> (x); <span class="hljs-comment">// decltype((x)) is int&amp;</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<h1 id="know-how-to-view-deduced-types"><a class="markdownIt-Anchor" href="#know-how-to-view-deduced-types"></a> Know how to view deduced types</h1>
+<p>nothing important</p>
+<h1 id="prefer-auto-to-explicit-type-declarations"><a class="markdownIt-Anchor" href="#prefer-auto-to-explicit-type-declarations"></a> Prefer auto to explicit type declarations</h1>
+<p>advantage of auto</p>
+<ol>
+<li>auto variables must be initialized.</li>
+<li>auto can represent types know only to compilers.</li>
+<li>std::function approach is generally bigger and slower than the auto approach, and may yield out-of-memory exceptions.</li>
+</ol>
+<p>disadvantage of auto</p>
+<ol>
+<li>The type for each auto variable is deduced from its initializing expression, and some initializing expressions have types that are neither anticipated nor desired</li>
+</ol>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/01/04/More%20Effective%20C++/">
+                        <span class="hidden-mobile">More Effective C++ Note</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"c9e92fe53c4f7c10bae4","clientSecret":"a096f7a1a72bea29b07f9fba28fe0b05856f1b8c","repo":"git","owner":"493488419@qq.com","admin":[],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '50ef3d06483e55c925190893fce53b22'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     #<a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> #<i class="iconfont icon-love"></i> #<a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+  
+
+  
+    <!-- KaTeX -->
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0/dist/katex.min.css" />
+  
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

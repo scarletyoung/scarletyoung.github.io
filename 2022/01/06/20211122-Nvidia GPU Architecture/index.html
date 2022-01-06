@@ -1,0 +1,589 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="John Doe">
+  <meta name="keywords" content="">
+  <meta name="description" content="CUDA CUDA是一个硬件和软件架构，可以让NVIDIA的GPU来执行由C、C++、Fortran、OpenCL、DirectCompute和其他语言写的程序。 CUDA程序调用并行内核，内核在一组并行的线程中并行地执行。编译器组织以线程块和线程块网格的方式来组织线程，GPU在并行线程块的一个网格中初始化内核程序，线程块的每个线程执行一个内核程序的实例，并且有自己的线程ID。 线程块是一组并发">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nvidia GPU Architecture">
+<meta property="og:url" content="http://example.com/2022/01/06/20211122-Nvidia%20GPU%20Architecture/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="CUDA CUDA是一个硬件和软件架构，可以让NVIDIA的GPU来执行由C、C++、Fortran、OpenCL、DirectCompute和其他语言写的程序。 CUDA程序调用并行内核，内核在一组并行的线程中并行地执行。编译器组织以线程块和线程块网格的方式来组织线程，GPU在并行线程块的一个网格中初始化内核程序，线程块的每个线程执行一个内核程序的实例，并且有自己的线程ID。 线程块是一组并发">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-01-06T12:49:10.666Z">
+<meta property="article:modified_time" content="2022-01-06T12:49:10.666Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary_large_image">
+  
+  <title>Nvidia GPU Architecture - Hexo</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.12","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":"UA-177876633-1","gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>成长之路</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Nvidia GPU Architecture">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2022-01-06 20:49" pubdate>
+        2022年1月6日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      4.4k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      14 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Nvidia GPU Architecture</h1>
+            
+            <div class="markdown-body">
+              <h1 id="cuda"><a class="markdownIt-Anchor" href="#cuda"></a> CUDA</h1>
+<p>CUDA是一个硬件和软件架构，可以让NVIDIA的GPU来执行由C、C++、Fortran、OpenCL、DirectCompute和其他语言写的程序。</p>
+<p>CUDA程序调用并行内核，内核在一组并行的线程中并行地执行。编译器组织以线程块和线程块网格的方式来组织线程，GPU在并行线程块的一个网格中初始化内核程序，线程块的每个线程执行一个内核程序的实例，并且有自己的线程ID。</p>
+<p>线程块是一组并发执行的线程，这些线程可以通过屏障同步和共享内存相互协作，每个线程块有自己的ID。</p>
+<p>一个网格是线程块数组，它们执行相同的内核，从全局内存中读取输入并向全局内存中写入输出，在独立的内核调用之间进行同步。</p>
+<p>在CUDA编程模型中，每个线程有自己的私有内存空间。每个线程块有块共享内存，用于线程间通信、数据共享和结果共享。线程块网格在全局内存空间中共享结果。</p>
+<p>CUDA与GPU的映射关系是</p>
+<ul>
+<li>一个GPU执行一个或多个内核网格。</li>
+<li>一个流式多处理器（SM）执行一个或多个线程块</li>
+<li>SM中的CUDA核和其他执行单元执行线程。</li>
+</ul>
+<p>SM以32个线程为一组执行，称为一个warp。可以通过让wrap中的线程执行相同的代码路径并访问附近地址的内存来极大地提高性能。</p>
+<h1 id="fermi"><a class="markdownIt-Anchor" href="#fermi"></a> Fermi</h1>
+<p>Fermi主要关注以下方面的改进</p>
+<ul>
+<li>改进了说精度浮点的性能</li>
+<li>支持ECC</li>
+<li>缓存层级</li>
+<li>更多的共享内存</li>
+<li>更快的上下文切换</li>
+<li>更快的原子操作</li>
+</ul>
+<p>Fermi架构的主要亮点如下</p>
+<ul>
+<li>第三代流式多处理器（SM）
+<ul>
+<li>每个流式多处理器有32个CUDA，是GT200的四倍</li>
+<li>双精度浮点数的性能峰值时GT200的八倍</li>
+<li>Dual Wrap调度器同时调度，派发来自两个独立的warp中的指令</li>
+<li>配置共享内存和L1缓存的64MB RAM</li>
+</ul>
+</li>
+<li>第二代并行线程执行ISA
+<ul>
+<li>完整C++支持的统一地址空间</li>
+<li>为OpenCL和DirectCompute进行了优化</li>
+<li>完整的IEEE 754-2008 32位和64为精度</li>
+<li>带64位扩展的完整32位整型路径</li>
+<li>支持过渡到64位寻址的内存访问指令</li>
+<li>通过预测改进了性能</li>
+</ul>
+</li>
+<li>改进的内存子系统
+<ul>
+<li>带有可配置的L1缓存和统一L2缓存的NVIDIA并行数据缓存层级</li>
+<li>带有ECC内存支持（第一个）</li>
+<li>极大地改进了原子内存操作性能</li>
+</ul>
+</li>
+<li>NVIDIA GigaThread Engine
+<ul>
+<li>10倍的上下文切换速度</li>
+<li>并发内核执行</li>
+<li>乱序线程阻塞执行</li>
+<li>双重叠内存传输引擎</li>
+</ul>
+</li>
+</ul>
+<h2 id="架构总览"><a class="markdownIt-Anchor" href="#架构总览"></a> 架构总览</h2>
+<p>架构图如下所示</p>
+<ul>
+<li>最多有512个CUDA核，每32个核组织成一个SM，共有16个SM。</li>
+<li>6个64位显存分区，384位显存接口，支持高达6GB的GDDR5 DRAM显存。</li>
+<li>通过PCI-Express链接GPU和CPU。</li>
+<li>GigaThread全局调度器将线程块分发给SM线程调度器。</li>
+</ul>
+<h3 id="第三代流式多处理器"><a class="markdownIt-Anchor" href="#第三代流式多处理器"></a> 第三代流式多处理器</h3>
+<p>每个CUDA核有一个完全流水化的整型运算单元（ALU）和浮点运算单元（FPU）。架构实现了新的IEEE 754-2008浮点标准，为单精度和双精度算数提供了融合乘加（FMA）指令，FMA改进了MAD指令，通过使用单个最终舍入步骤执行乘法和加法而不会损失加法精度。</p>
+<p>整型ALU支持所有指令的全32位精度，可以有效支持64位和扩展精度运算。</p>
+<p>每个SM有16个load/store单元，允许每个时钟周期位16个线程计算源和目的地址。</p>
+<p>特殊功能单元（SFU）执行sin、cos、倒数和求根指令，每个SFU每个线程执行一条指令，A warp执行八个时钟周期。SFU管道与调度单元解耦，允许在SFU占用的情况下向其他执行单元发出指令。</p>
+<p>每个SM每个时钟周期可以最多执行16个双精度FMA操作。（这个不会是用两个CUDA来执行一个双精度FMA吧？）</p>
+<p>每个SM以32个并行线程为一组进行调度，称为warp。每个SM有两个warp调度器和两个指令派发单元，允许发射和并行执行两个warp。双warp调度器选择两个warp，从每个warp中发射一条指令到16个核、16个load/store单元或4个SFU。大部分指令可以双重发射，但是双精度指令不支持与任何其他操作进行双重调度。</p>
+<p>每个SM有64KB可配置的共享内存和L1缓存。共享内存是的线程块内的线程可以进行合作、促进了数据重用并且极大地减少了芯片外的数据流，从而提高了GPU的性能。<br />
+64KB的内存有两种配置</p>
+<ul>
+<li>48KB的共享内存和16KB的L1缓存</li>
+<li>16KB的共享内存和48KB的L1缓存</li>
+</ul>
+<h2 id="第二代并行线程执行isa"><a class="markdownIt-Anchor" href="#第二代并行线程执行isa"></a> 第二代并行线程执行ISA</h2>
+<p>Fermi架构支持新的并行线程执行（PTX）2.0指令集，PTX是低级虚拟机和ISA，用于支持并线线程处理器的操作。程序安装时，PTX指令被GPU驱动翻译为机器指令。</p>
+<p>PTX的主要目标是</p>
+<ul>
+<li>提供跨越多代GPU的稳定ISA</li>
+<li>在已编译的应用上，实现完整的GPU性能</li>
+<li>为其他编译目标提供机器独立的ISA</li>
+<li>为应用和中间件开发者提供代码分发ISA</li>
+<li>为优化代码生成器和翻译器提供通用的ISA，可以将PTX映射到特定的目标机器</li>
+<li>促进库和性能内核的手动编码</li>
+<li>提供可扩展的编程模型，涵盖从几个内核到多个并行内核的GPU大小。</li>
+</ul>
+<p>PTX 2.0增加了对IEEE 32为浮点精度的完整支持，对所有变量和指针统一的地址空间，64为地址以及为OpenCL和DirectCompute增加的新指令。</p>
+<p>PTX 2.0提供了对C++的完整支持。</p>
+<h3 id="统一地址空间从而能够完整地支持c"><a class="markdownIt-Anchor" href="#统一地址空间从而能够完整地支持c"></a> 统一地址空间从而能够完整地支持C++</h3>
+<p>PTX 2.0对线程私有的局部地址空间、线程块的共享地址空间和全局地址空间进行了统一编码，可以在编译时就知道load和store指令对哪个地址空间进行操作，从而可以支持C和C++的指针。</p>
+<h3 id="为opencl和directcompute进行优化"><a class="markdownIt-Anchor" href="#为opencl和directcompute进行优化"></a> 为OpenCL和DirectCompute进行优化</h3>
+<p>OpenCL和DirectCompute与CUDA编程模型非常相似，有类似的抽象，如线程、线程块、线程块网格、栅栏同步、线程的共享内存、全局内存和原子操作。</p>
+<p>Fermi提供了对表面指令格式转换的硬件支持。PTX 2.0 ISA还增加了对DirectCompute指令population计数、追加和位翻转的支持。</p>
+<h3 id="ieee-32位精度浮点数"><a class="markdownIt-Anchor" href="#ieee-32位精度浮点数"></a> IEEE 32位精度浮点数</h3>
+<p>单精度浮点指令在硬件中默认支持次正规数，并且还支持所有IEEE 754-2008的舍入模式。</p>
+<p>次正规数是位于0和最小正规数之间的数字，之前的GPU会将次正规数舍入为零，因此会损失精度。Fermi的浮点运算单元在硬件中处理次正规数，在可以处理正规数的时候不会影响性能。</p>
+<p>GPU中经常进行的操作序列是两个数相乘，结果在加上第三个数。之前的GPU使用MAD指令技术来加速这个功能。但是MAD指令会对相乘的结果进行截断，因此会损失精度。</p>
+<p>而Fermi架构中使用了新的FMA指令，在相乘的时候可以保留中间阶段的精度，使得最终结果的精度增加了。</p>
+<h3 id="通过预测来改进条件的性能"><a class="markdownIt-Anchor" href="#通过预测来改进条件的性能"></a> 通过预测来改进条件的性能</h3>
+<p>用于不同线程管理的硬件预测器现在支持指令集的预测，预测器可以使得短的条件代码段能够高效执行，不会产生分支指令的开销。</p>
+<h2 id="内存子系统改进"><a class="markdownIt-Anchor" href="#内存子系统改进"></a> 内存子系统改进</h2>
+<h3 id="有可配置的l1缓存和统一的l2缓存的并行数据缓存"><a class="markdownIt-Anchor" href="#有可配置的l1缓存和统一的l2缓存的并行数据缓存"></a> 有可配置的L1缓存和统一的L2缓存的并行数据缓存</h3>
+<p>由于不同应用程序对于缓存和共享内存需求的不同，因此，最好的内存层级应该允许程序进行选择。</p>
+<p>之前的GPU架构只支持对纹理操作的加载路径和为像素数据输出的只写的导出路径。这个方法是不适用于执行通用程序。</p>
+<p>Fermi架构为load和store指令实现单一统一内存请求，每个SM有一个L1缓存和为所有SM提供服务的L2缓存。其中L1缓存时可配置的，可以根据应用程序的需求配置为48KB的共享内存和16KB的L1缓存或者是16KB的共享内存和48KB的L1缓存。</p>
+<p>L1缓存还有助于缓存复杂程序的临时寄存器溢出，上一代会将移除存储的DRAM，增加了访问延迟。</p>
+<h3 id="第一个具有ecc内存支持的gpu"><a class="markdownIt-Anchor" href="#第一个具有ecc内存支持的gpu"></a> 第一个具有ECC内存支持的GPU</h3>
+<p>Fermi支持基于纠错码（ECC）来保护内存数据，可以增强数据的完整性行。</p>
+<p>Fermi实现的ECC可以检二纠一（SECDED），SECDED可以保证可以检测出两比特错误和多比特错误。</p>
+<p>Fermi架构的寄存器堆、共享内存、L1缓存、L2缓存以及DRAM都增加了ECC保护，增加了GPU的可靠性。</p>
+<h3 id="快速原子内存操作"><a class="markdownIt-Anchor" href="#快速原子内存操作"></a> 快速原子内存操作</h3>
+<h2 id="gigathread线程调度器"><a class="markdownIt-Anchor" href="#gigathread线程调度器"></a> GigaThread线程调度器</h2>
+<p>两级分布式线程调度器是fermi架构的重要改进之一。在芯片层面，全局工作分配引擎将线程块调度到各个SM；在SM层级，每个warp调度器将32个线程的warp分配到执行单元。</p>
+<p>新一代的线程调度器提供了更高的线程吞吐量、显著增加了上下文切换、并发内核执行以及改进了线程块调度</p>
+<ul>
+<li>在上下文切换方面，fermi流水线可以将线程切换的时间降低到25微妙以下。</li>
+<li>Fermi支持同一应用上下文的不同内核可以同时在GPU上并发执行，最大限度地利用GPU资源。</li>
+</ul>
+<h1 id="kepler"><a class="markdownIt-Anchor" href="#kepler"></a> Kepler</h1>
+<p>由于Fermi架构存在严重的发热问题，Kepler架构除了提供高性能外，一个设计的重点是提升性能功耗比。</p>
+<h2 id="架构"><a class="markdownIt-Anchor" href="#架构"></a> 架构</h2>
+<p>Kepler由不同配置图形处理集群（GPCs）、流式多处理器（SMs）和内存控制器组成。</p>
+<p>下图是GTX 680的架构，有四个GPCs，八个下一代SMX和四个内存控制器。</p>
+<p>![image-20211123082140331](/Users/shellingford/Library/Application Support/typora-user-images/image-20211123082140331.png)</p>
+<p>每个GPC有专用的光栅引擎和两个SMX单元，GTX 680实现有8个SMX单元，共有1546个CUDA核。</p>
+<p>完全修改了内存子系统，显著提高了内存时钟速度。每个内存控制器有一个128BK的L2缓存和8个ROP（Render output unit）单元，每个ROP单元可以处理一个颜色样本。GTX 680有4个内存控制器，共有512KB的L2缓存和32个ROP单元</p>
+<h2 id="下一代sm总览"><a class="markdownIt-Anchor" href="#下一代sm总览"></a> 下一代SM总览</h2>
+<p>Kepler架构有256个SFU单元，128个纹理单元，在芯片级，关键操作（FMA32，SFU操作和纹理操作）的吞吐量得到了显著提升，其他操作的吞吐量保持不变。</p>
+<p>由于面积效率的原因，Kepler将这些单元划分为8个SMX，与Fermi架构相比减少了。因此每个SMX有更多的计算单元，更大的吞吐量。</p>
+<h2 id="下一代smx架构详情"><a class="markdownIt-Anchor" href="#下一代smx架构详情"></a> 下一代SMX架构详情</h2>
+<p>![image-20211230224848728](/Users/shellingford/Library/Application Support/typora-user-images/image-20211230224848728.png)</p>
+<p>SMX包含了4个warp调度器，每个warp每个时钟周期可以调度两条指令。</p>
+<p>调度功能进行了重新设计，更加关注能耗。</p>
+<p>Kepler和Fermi调度器都包含了</p>
+<ol>
+<li>长延迟操作的寄存器记分板</li>
+<li>interwarp调度决策</li>
+<li>线程块级的调度。</li>
+</ol>
+<p>Fermi架构包含了复杂的硬件了防止数据冒险。但是，这些信息是确定的（不知道为什么？），因此，kepler中可以使用简单的硬件了取代了复杂的硬件，节省了能耗。</p>
+<p>处理器执行核心开发了一种新设计，专注于每瓦最佳性能。 最大限度地提高时钟门控效率，最大限度地减少布线和重新定时开销。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"c9e92fe53c4f7c10bae4","clientSecret":"a096f7a1a72bea29b07f9fba28fe0b05856f1b8c","repo":"git","owner":"493488419@qq.com","admin":[],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: 'b62c4a8f72a36dcfc375b8a531029697'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     #<a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> #<i class="iconfont icon-love"></i> #<a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+  
+
+  
+    <!-- KaTeX -->
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0/dist/katex.min.css" />
+  
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
