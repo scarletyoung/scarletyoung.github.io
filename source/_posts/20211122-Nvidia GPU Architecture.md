@@ -129,18 +129,40 @@ Fermi实现的了FMA指令，对MAD进行了改进，乘积的结果不会被截
 
 # Kepler
 
-28nm纳米工艺，最佳的性能/功耗比，提供最佳的细分性能，更高水平的几何复杂性、物理模拟、立体3D处理和高级的抗锯齿效果。
-
-Kepler设计的重点是提升性能功耗比，一个主要的改进是SMX（新的Streaming Multiprocessor）以图形时钟运行而不是以两倍的图形时钟运行。
+由于Fermi架构存在严重的发热问题，Kepler架构除了提供高性能外，一个设计的重点是提升性能功耗比。
 
 ## 架构
 
-Kepler由GPCs、Streaming Multiprocessors和内存控制器组成。
+Kepler由不同配置图形处理集群（GPCs）、流式多处理器（SMs）和内存控制器组成。
 
-下图是GTX 680的架构，有四个GPCs，八个下一点SMX和四个内存控制器。
+下图是GTX 680的架构，有四个GPCs，八个下一代SMX和四个内存控制器。
 
 ![image-20211123082140331](/Users/shellingford/Library/Application Support/typora-user-images/image-20211123082140331.png)
 
-每个GPC有专用的光栅引擎和两个SMX单元，共有1546个CUDA核。
+每个GPC有专用的光栅引擎和两个SMX单元，GTX 680实现有8个SMX单元，共有1546个CUDA核。
 
-完全修改了内存子系统，有更高的内存时钟（6008MHz），每个内存控制器有一个128BK的L2缓存和8个ROP（Render output unit）单元，每个ROP单元可以处理一个颜色样本
+完全修改了内存子系统，显著提高了内存时钟速度。每个内存控制器有一个128BK的L2缓存和8个ROP（Render output unit）单元，每个ROP单元可以处理一个颜色样本。GTX 680有4个内存控制器，共有512KB的L2缓存和32个ROP单元
+
+## 下一代SM总览
+
+Kepler架构有256个SFU单元，128个纹理单元，在芯片级，关键操作（FMA32，SFU操作和纹理操作）的吞吐量得到了显著提升，其他操作的吞吐量保持不变。
+
+由于面积效率的原因，Kepler将这些单元划分为8个SMX，与Fermi架构相比减少了。因此每个SMX有更多的计算单元，更大的吞吐量。
+
+## 下一代SMX架构详情
+
+![image-20211230224848728](/Users/shellingford/Library/Application Support/typora-user-images/image-20211230224848728.png)
+
+SMX包含了4个warp调度器，每个warp每个时钟周期可以调度两条指令。
+
+调度功能进行了重新设计，更加关注能耗。
+
+Kepler和Fermi调度器都包含了
+
+1. 长延迟操作的寄存器记分板
+2. interwarp调度决策
+3. 线程块级的调度。
+
+Fermi架构包含了复杂的硬件了防止数据冒险。但是，这些信息是确定的（不知道为什么？），因此，kepler中可以使用简单的硬件了取代了复杂的硬件，节省了能耗。
+
+处理器执行核心开发了一种新设计，专注于每瓦最佳性能。 最大限度地提高时钟门控效率，最大限度地减少布线和重新定时开销。
