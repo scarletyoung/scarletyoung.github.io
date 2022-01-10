@@ -373,3 +373,70 @@ The different between typedef and alias declarations is in template. Alias decla
 Alias templates avoid the "::type" suffix and, in templates, the "typename" prefix often required to refer to typedef.
 
 C++14 offers alias templates for all the C++11 type traits transformations.
+
+# Prefer scoped enums to unscoped enums
+The C++98-style enumerator names will leak into the scope containing their enum definition, called unscoped enums.
+```c++
+enum Color {black, white, red};
+auto white = false; // error
+```
+Their new C++11 counterparts, scoped enums, don't leak names in this way
+```c++
+enum class Color {black, white, red};
+auto white false; // fine
+Color c = whilte; // error
+Color c = Color::white; // fine
+```
+
+Another advantage of scoped enum is that their enumerators are much more strongly typed.
+
+uscoped enums implicitly convert to integral types. However, there are not implicit conversions from enumerators in a scoped enum to any other type. If you want to perform a conversion, you can use a cast
+```c++
+enum class Color {black, white, red};
+Color c = Color::white;
+double d = static_cast<double>(c);
+```
+
+The third advantage of scoped enums is that C++98 only supports only enum definitions.
+
+By default, the underlying type for scoped enums is int. If the default doesn't suit your, you can override it
+```c++
+enum class Status: std::unit32_t;
+```
+
+You can also specify the underlying type for an unscoped enum, and the result may be forward-declared.
+```c++
+enum Color: std::unit8_t;
+```
+
+# Prefer deleted functions to private underfined ones.
+Deleted functions may not be used in any wayt, enve in member and friend function.
+
+An important advantage of deleted functions is that any function may be deleted, while only member functions may be private.
+```c++
+bool isLucky(int number);
+isLucky('a'); //fine
+isLucky(true);  //fine
+isLucky(3.5); // fine
+```
+If isLucky parameter must be integers, and we'd like to prevent calls such as these from compiling. We cans use deleted functions.
+```c++
+bool isLucky(int number);
+bool isLucky(char) = delete;
+bool isLucky(bool) = delete;
+bool isLucky(double) = delete;  // reject both double and float
+```
+Although deleted functions can't be used, they are part of program. Thus, they are taken into account during overload resolution.
+
+Another trick that deleted functions can perform is to prevent use of template instantiations that should be disabled.
+```c++
+template<typename T>
+void processPointer(T* ptr);
+template<>
+void processPointer<void>(void*) = delete;
+template<>
+void processPointer<char>(char*) = delete;
+```
+This can not be achieved by declaring them private. Because it's not possible to give member function template specialization a different access level from that of the main template.
+
+# Declare overriding functions override
