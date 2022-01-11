@@ -440,3 +440,27 @@ void processPointer<char>(char*) = delete;
 This can not be achieved by declaring them private. Because it's not possible to give member function template specialization a different access level from that of the main template.
 
 # Declare overriding functions override
+For overriding to occur, serveral requirements must be met
+* The base class function must be virtual.
+* The base class and derived function names must be identical.
+* The parameter types of the base and derived functions must be identical.
+* The constness of the base and derived functions must be identical.
+* The return types and exception specifications of the base and derived functions must be compatible.
+* The functions's reference qualifier must be identical.(New in C++11).
+
+Compiler may not provided warning about some of overriding problems.
+
+In C++11, you can using keyword override to make explicit that a derived class function is supposed to override a base class version.
+
+Using override keyword, compilers will kvetch about all the overriding-related problems.
+
+Member function reference qualifiers make it possible to treat lvalue and rvalue object diiferently.
+
+# Prefer const_iterators to iterators
+The standard practice of using const whenever possible dictates that you should use const_iterators any time you need an iterator.
+
+In C++11, it failed to add cbegin, cend, rbegin, rend, crbegin and crend. These functions are added in C++14;
+
+Non-member begin returns for a const array is a pointer-to-const, and a pointer-to-const is a const_iterator for an array.
+
+In maximally generic code, prefer non-member versions of begin, end, rbegin, etc., over their member function counterparts.
