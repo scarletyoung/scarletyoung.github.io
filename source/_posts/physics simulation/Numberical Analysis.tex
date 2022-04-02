@@ -1,0 +1,138 @@
+\documentclass[a4paper]{article}
+\title{数值分析笔记}
+\author{scarlet young}
+\date{\today}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage[dutch]{babel}
+\usepackage{amsmath, amssymb}
+\usepackage{ctex}
+
+
+% figure support
+\usepackage{import}
+\usepackage{xifthen}
+\pdfminorversion=7
+\usepackage{pdfpages}
+\usepackage{transparent}
+\newcommand{\incfig}[1]{%
+	\def\svgwidth{\columnwidth}
+	\import{./figures/}{#1.pdf_tex}
+}
+
+\pdfsuppresswarningpagegroup=1
+
+\begin{document}
+\section{插值法}
+\subsection{引言}
+\newtheorem{definition}{定义}
+\begin{definition}
+	设函数$f(x)$在$[a,b]$上有定义，且已知$a \le x_0 < x_1 \cdots <x_{n} \le b $点上的值$y_0,y_1,\cdots, y_{n} $，若存在以简单函数$\phi(x)$，使得
+	\[
+		\phi(x_{i}) = y_{i} \ \ \ \ i=0,1,2,\cdots n \tag{2.1} \label{2.1}
+	.\] 
+	成立，则称$\phi(x)$ 为$f(x)$ 的插值函数。式$\ref{2.1}$称为插值条件， $f(x)$ 称为被插值函数，$[a,b]$ 称为插值区间，$x_0,x_1,\cdots,x_{n}$ 称为插值节点，求$\phi(x)$ 的方法就是插值法。
+\end{definition}
+研究问题
+\begin{enumerate}
+	\item $\phi(x)$ 是否存在，是否唯一
+	\item 若存在，如何构造$\phi(x)$	
+	\item 如何估计$\phi(x)$的误差
+\end{enumerate}
+\subsection{Lagrange插值多项式}
+当$n=1$ 时，要构造通过两点$(x_0,y_0)$ 和$(x_1,y_1)$ 的不超过一次的多项式$L_1(x)$，使得
+\[
+	\begin{cases}
+		L_1(x_0) = y_0 \\
+		L_1(x_1) = y_1
+	\end{cases}
+.\]
+$L_1(x)$ 的表达式为
+\[
+L_1(x) = \frac{x_1-x}{x_1-x_0} y_0 + \frac{x - x_0}{x_1 - x_0}y_1
+.\] 
+$L_1(x)$ 表达式可以看作是函数值$y_0$ 和$y_1$ 的线性组合，组合的系数记为$l_0(x)$ 和$l_1(x)$，即
+\[
+\begin{cases}
+	l_0 = \frac{x - x_1}{x_0 - x_1} \\
+	l_1 = \frac{x - x_0}{x_1 - x_0}
+\end{cases}
+.\] 
+系数$l_0(x)$和$l_1(x)$不是常数，而是一次多项式，因此，组合后的结果也是一次多项式。$l_0(x)$和$l_1(x)$称为节点$x_0,x_1$ 上的线性插值基函数。线性插值基函数还需要满足插值条件（见表\ref{tab:label})。
+\begin{table}[htbp]
+	\centering
+	\caption{interpolate condition}
+	\label{tab:label}
+	\begin{tabular}{|c|c|c|}
+		\hline
+		& $x_0$ & $x_1$ \\
+		\hline
+		$l_0(x)$ & 0 & 1 \\
+		\hline
+		$l_1(x)$ & 1 & 0 \\
+		\hline
+	\end{tabular}
+\end{table}
+
+根据基函数的表达式可以得知，基函数的构造与函数值无关。
+
+将上述公式推广到一般情形。
+通过$n+1$ 个节点的n次插值多项式$L_n(x)$，设$L_n(n) = y_0l_0(x) + y_1l_1(x) + \cdots + y_{n}l_{x}(n)$满足插值条件$L_n(x_j) = y_j, \ \ j = 0,1,\cdots,n$。
+\newtheorem{definition}{定义}
+\begin{definition}
+若$n$ 次多项式$l_k(x)(k=0,1,\cdots,n$在各节点$x_0 < x_1 < \cdots < x_n$ 上满足条件，
+\[
+	l_k(x_{i}) = \delta_{ki} = \begin{cases}
+		1 & k = i \\
+		0 & k \neq i
+	\end{cases} \ \ i,k = 0,1,\cdots,n \tag{2.2} \label{2.2}
+.\] 
+就称这$n+1$ 个$n$ 次多项式$l_0(x), l_1(x), \cdots, l_n(x)$ 为节点$x_0, x_1, \cdots, x_{n}$ 上的n次插值基函数。
+\end{definition}
+用类推的方式可以得到$n$ 次插值基函数为
+\[
+	l_k(x) = \prod_{k=1, k \neq j}^{n} \frac{x - x_{j}}{x_{k} - x_{j}} 
+.\] 
+于是，插值多项式函数可以表示为
+\[
+	L_n(x) = \sum_{k=0}^{n} y_k l_k(x) \tag{2.3} \label{2.3}
+.\] 
+形如式$\ref{2.3}$的插值多项式$L_n(x)$ 称为Lagrange插值多项式。
+引入记号
+\[
+	\omega_{n+1}(x) = (x - x_0)(x - x_1)\cdots(x - x_{n})
+.\] 
+可知
+\[
+	\omega_{n+1}'(x) = (x_k - x_0) \cdots (x_k - x_{k-1})(x_k - x_{k+1}) \cdots (x_k - x_{n})
+.\] 
+于是式$\ref{2.3}$ 可以改写为
+\[
+	L_n(x) = \sum_{k=0}^{n} y_k \frac{\omega_{n+1}(x)}{(x-x_k)\omega_{n+1}'(x_k)}
+.\]
+
+若在$[a,b]$ 上用$L_n(x)$ 近似$f(x)$ ，则其截断误差为$R_n(x) = f(x) - L_n(x)$，$R_n(x)$ 也称为插值多项式的余项或插值余项。
+\newtheorem{theorem}{定理}
+\begin{theorem}
+	设$f^{(n)}(x)$ 在$[a,b]$ 上连续，$f^{(n+1)}(x)$ 在$(a,b)$ 内存在，节点$a \le x_0 < x_1 < \cdots < x_n \le b $，$L_n(x)$是满足插值条件的插值多项式，则对于任何$x \in [a,b]$，插值余项为
+	 \[
+		 R_n(x) = f(x) - L_n(x) = \frac{f^{(n+1)}(\xi)}{(n+1)!}\omega_{n+1}(x) \tag{2.4} \label{2.4}
+	.\] 
+	其中，$\xi \in (a,b)$且依赖与$x$ 。
+\end{theorem}
+
+\subsection{逐次线性插值法}
+
+\subsection{Newton插值多项式}
+
+\subsection{Hermite插值多项式}
+
+\subsection{分段低次插值}
+
+\subsection{三次样条插值}
+	
+
+\end{document}
+

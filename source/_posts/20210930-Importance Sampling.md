@@ -24,7 +24,11 @@ $$L_o(p, w_o) = L_e(p, w_o) + \int_{\Omega^+} L_i(p, w_i)fr(p, w_o, w_i) (n \cdo
 
 对$Q$求期望，可得
 
-$$\mathbb{E}(Q) &= \mathbb{E}(\frac 1 n \sum_{i=1}^n \frac {f(x_i)} {p(x_i)}) \\& = \frac 1 n \sum_{i=1}^N \mathbb{E}(\frac {f(x_i)} {p(x_i)}) \\ &= \int_a^b \frac {f(x)} {p(x)} p(x) \mathbf{d} x$$
+$$
+\begin{equation}
+\mathbb{E}(Q) &= \mathbb{E}(\frac 1 n \sum_{i=1}^n \frac {f(x_i)} {p(x_i)}) \\& = \frac 1 n \sum_{i=1}^N \mathbb{E}(\frac {f(x_i)} {p(x_i)}) \\ &= \int_a^b \frac {f(x)} {p(x)} p(x) \mathbf{d} x
+\end{equation}
+$$
 
 从上式可知，蒙特考虑积分$Q$的对积分$I$的无偏估计。
 

@@ -1,0 +1,79 @@
+\documentclass[a4paper]{article}
+\title{动态规划}
+\author{scarlet young}
+\date{\today}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage[dutch]{babel}
+\usepackage{amsmath, amssymb}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{ctex}
+
+% figure support
+\usepackage{import}
+\usepackage{xifthen}
+\pdfminorversion=7
+\usepackage{pdfpages}
+\usepackage{transparent}
+\newcommand{\incfig}[1]{%
+	\def\svgwidth{\columnwidth}
+	\import{./figures/}{#1.pdf_tex}
+}
+
+\pdfsuppresswarningpagegroup=1
+\lstset{
+    basicstyle          =   \sffamily,
+    keywordstyle        =   \bfseries,
+    commentstyle        =   \rmfamily\itshape,
+    stringstyle         =   \ttfamily,
+    flexiblecolumns,               
+    numbers             =   left,
+    showspaces          =   false,
+    numberstyle         =   \zihao{-5}\ttfamily,
+    showstringspaces    =   false,
+    captionpos          =   t,
+    frame               =   lrtb,
+}
+\begin{document}
+\section{introduction}
+动态规划是一种编程范式，可以系统地、有效地探索问题的所有可能解决方案。动态规划问题通常具有以下特征
+\begin{enumerate}
+	\item 问题可以划分为可重叠的子问题，子问题的解可以被多次重用
+	\item 问题有最优子结构，即问题的最优解可以有子问题的最优解得出
+\end{enumerate}
+动态规划（dp）的一个简单例子是斐波那契数列。
+对于第$n^{th}$斐波那契数$F(n)$ ，可以分解为两个小的子问题$f(n-1)$ 和$f(n-2)$ 。
+问题具有最优子结构，即$f(n) = f(n-1) + f(n-2)$。
+子问题是重叠的，即对于$f(5)$ 和$f(6)$ 都需要计算$F(4)$。
+
+贪心问题与dp问题的区别在于，贪心问题有最优子结构，但没有重叠的子问题。
+分治算法与dp问题的区别在于，分支算法可以将问题分解为子问题，但子问题是不重叠的。
+
+实现dp算法有两种方式，自下而上和自上而下
+自下而上的实现从最基本的例子开始迭代实现。
+\begin{lstlisting}
+F = array of length n+1
+F[0] = 0
+F[1] = 1
+for i from 2 to n:
+	F[i] = F[i-1] + F[i-2]
+\end{lstlisting}
+
+自上而下使用递归实现，同时，为了避免重复计算，缓存了中间结果。
+\begin{lstlisting}
+memo = hashmap
+Function F(integer i):
+	if i is 0 or 1:
+		return i
+	if i doesn't exist in memo:
+		memo[i] = F(i-1) + F(i-2)
+	return memo[i]	
+\end{lstlisting}
+
+自下而上的方式通常更快，自上而下的实现更加容易编写，而且不需要考虑子问题的顺序。
+
+\end{document}
+
