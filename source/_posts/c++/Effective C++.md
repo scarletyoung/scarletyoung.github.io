@@ -3,79 +3,103 @@ title: Effective C++ Note
 date: 2021/12/09
 ---
 # View C++ as a federation of languages
-C++ contains four main sublanguages
-1. c, block, statement, preprocessor, build-in data type, arrays, pointers, etc.
-2. Object-Oriented C++, class, encapsulation, inheritance, polymorphism, virtual functions, etc.
-3. template c++,
-4. STL 
+C++是一个多范式的编程语言，它结合了过程编程、面向对象编程、函数编程、泛型编程和元编程。一方面这使得C++功能强大，但是也使得C++存在许多令人困惑的地方。一个简单的方法是不将C++看作是一个单一的语言，而是看作几个子语言的组合。在特定的子语言下，C++的规则是简单的，当切换子语言的时候，规则也应该随之切换。
 
-C++ is a federation of languages, so when you switch from one sublanguage to another, programming strategy should be change too.
+C++主要包含以下四个主要的子语言
+1. C语言，C++是基于C语言的。块、声明、预处理、内建数据类型、数组、指针等都来自于C语言。
+2. 面向对象的C++，即在C语言的基础上增加了类、封装、多态、继承、虚函数等特征。
+3. 模板C++，这是C++的元编程部分，增加了模板。实际上，模板使得我们可以使用模板元编程（TMP），这里不涉及。
+4. STL，STL是一个模板库，包含了容器、迭代器、算法和函数对象等。
 
 # Prefer consts, enums, and inlines to #defines
-Reason
-1. The symbolic name may never be seen by compilers and may not get entered into the symbolic table, So when an error occurs, the error message may not refer to the symbolic name and you'd have no idea where the constant came from.
-2. #define could result in multiple copies, because of preprocessor's blind substitution of macro name with value.
-3. #define can't be used to provide any kind of encapsulation.
-4. macro function has so many drawbacks, for example
-  ```c++
-  #define CALL_WITH_MAX(a,b) f((a) > (b) ? (a) : (b))
-  int a = 5, b = 0;
-  CALL_WITH_MAX(++a, b);  \\ a is incremented twice
-  CALL_WITH_MAX(++a, b+10);  \\ a is incremented once
+不推荐使用#define有以下几个原因
+1. 在下面的代码中，符号名称ASPECT_RATIO可能不会被编译器所看到，也可能不会进入到符号表中。因此，当编译错误的时候，错误信息中不会包含ASPECT_RATIO而会包含1.653。这种错误信息可能会让人困惑，并且花费大量时间去排查。
+  ```cpp
+  #define ASPECT_RATIO 1.653
   ```
+  这种情况可以使用常量定义，如下所示
+  ```cpp
+  const double AspectRatio = 1.653;
+  ```
+  这种替换有两个特殊情况需要考虑
+  1. 当定义常量指针时，因为常量通常定义在头文件中，因此，指针和指针指向的内容都需要声明为常量，即
+    ```cpp
+    const char* const authorName = "Scott Meyers";
+    ```
+  2. 当声明为类的常量时，需要声明为静态（只有一个副本）成员（限制作用域）常量，即
+    ```cpp
+    class GamePlayer{
+    private:
+      static const int NumTurns = 5;
+      int scores[NumTurns];
+    }
+    ```
+    上述的常量时一个声明，而不是定义，通常，在使用一个变量的时候必须先定义它。但是类内的、静态的、整数类型的变量是例外，只要不获取它们地址，不需要定义在声明后直接使用。
+    如果一些编译器不接受这种写法，可以使用"enum hack"替代，即
+    ```cpp
+    class GamePlayer{
+    private:
+      enum {NumTurns = 5};
+      int scores[NumTurns];
+    }
+    ```
+    如果不想让其他人获取地址，也可以使用这个方法。
+2. #define的内容可能会出多个副本，因为预处理器会盲目的将宏名称替换为宏的值。
+3. #define不能提供任何封装。
+4. 以下形式的宏函数有许多缺点。
+  ```cpp
+  #define CALL_WITH_MAX(a, b) f((a) > (b) ? (a) : (b))
+  ```
+  第一点是需要将函数参数使用括号括起来。第二点则是这种函数调用会发生奇怪看的行为，如下所示
+  ```cpp
+  int a = 5, b = 0;
+  CALL_WITH_MAX(++a, b);      // a会增加两次
+  CALL_WITH_MAX(++a, b + 10); // a只增加一次
+  ```
+  宏函数可以用内联函数替换。
 
-Solution
-1. Replace macro with a constant. but there are two special cases
-   1. Defining constant pointers, should use two const. For example
-      
-      ```c++
-      const char* const name = 'abc';
-      ```
-   2. Class-specific constant, should may a constant as a static member. For example
-      ```c++
-      class GamePlayer {
-        private:
-          static const int NumTurns = 5;
-          int scores[NumTurns];
-      };
-      ```
-      When type is integral(integers, chars, bools) type, you can declare and use them without definition. The defination will be put in an implementation file, not a header file.
-      
-      Some older compiler may not accept the syntax above. In this case, should put the initial value at the point of definition. But when you need the value of the constant during compilation of the class, such as in the declaration above. The solution is known as "the enum hack" shown as below
-      ```c++
-      class GamePlayer {
-        private:
-          enum {NumTurns = 5};
-          int scores[NumTurns];
-      }
-      ```
-2. Replace macro function with inline function. 
+宏函数如果能避免第二个问题的话，感觉还是可以用的。
+
+我记得之前写引擎的时候，日志用内联好像会报错，而用宏则没有问题，这个问题忘记有没有解决了，找时间看一下。
 
 # Use const whenever possible
-## Iterator with const
-```c++
-const std::vector<int>::iterator iter = vec.begin();  //iter acts like a T* const. it means that data can be changed but iter is const
-std::vector<int>::const_iterator iter = vec.begin();  //inter acts like a const T*. It measn that iter can be changed but data(*iter) is const
+声明变量为const表明对象不应该被修改。const可以用在各种地方。
+
+对于指针来说，可以声明指针本身是const或指针指向的数据是cosnt。即
+```cpp
+const char *p;        // 指针指向的数据是const
+char const *P;        // 同上
+char * const p;       // 指针是const
+const char * const p; // 指针和指针指向的数据都是const
 ```
 
-## Constant returned values
-Constant returned values sometimes can reduce the incidence of client errors. For example,
-```c++
-class Rational {...}
-const Rational operator*(const Rational& lhs, const Rational& rhs);
+对于迭代器而言，它的行为类似指针，因此也有两种申明方式，迭代器本身是const，即不允许指向其他内容，和迭代器指向的内容是const的
+```cpp
+std::vector<int> vec;
+const std::vector<int>::iterator iter = vec.begin();  // 类似于T* const，即迭代器不能改变，但指向的内容可以修改。
+std::vector<int>::const_iterator cIter = vec.begin(); // 类似于const T*，迭代器可以修改，但迭代器指向的内容不可以修改。
+```
+
+将函数的返回值声明为const可以减少一些错误，如
+```cpp
+class Rational {...};
+const Rational operator*(const Rational &lhs, const Rational &rhs);
+```
+当函数的返回值不是const的时候，以下代码可以通过编译
+```cpp
 Rational a,b,c;
 
-if (a*b=c) ...  // a typo. but if returned value is not constant, then it will pass compilation.
+if (a * b = c) 
 ```
+if表达式中，由于输入错误将比较写成了赋值，当返回值不是const的时候，会将c赋值给a*b的结果，最终通过if判断，导致程序错误。而当返回值是const的时候，赋值是不合法的，因此，在编译期间就会报错。
+这种问题只会出现在用户自定义的类型中，内置类型不会有问题。因为这种行为时非法的。
 
-## Const member functions
-The reason for using const member functions
-1. Can know which functions may be invoked on const objects.
-1. Can know which functions may modify an object and which may not.
-2. Work with const object.
+将成员函数声明为const有以下几个用途
+1. 表明哪个函数可以被const对象调用。
+2. 表明哪个函数可能修改对象，哪个函数不会修改对象。
 
-Const function and non-const function can be overloaded, for example
-```c++
+const函数和非const函数可以重载，如下所示。
+```cpp
 class TextBlock {
   public:
     const char& operator[](std::size_t position) const;  // for const object
@@ -90,11 +114,11 @@ tb[0] = 'x';  // fine
 std::cout << ctb[0];  // fine
 ctb[0] = 'x';  // error
 ```
-Notice, the return type of the non-const operator[] is a reference. But, if the type is a simple char, it is illegal to modify the return value of a function that returns a build-in type.
+需要注意的一点是，返回值是非常量的函数返回值是一个char的引用而不是char，因为当返回值是char的时候，无法对他进行赋值。如前面所说的，对内置类型的返回值赋值时非法的，即便这个行为时合法的，此时的返回值时一个副本，修改这个副本并不会修改源对象，无法达到预期的行为。
 
-There two type of const, bitwise constness and logical constness.
-C++ is designed for bitwise constness, but there is a exception. For example
-```c++
+实际上有两种类型的const，bitwise constness and logical constness。
+bitwise constness认为一个成员函数时const当且仅当它无法修改成员对象的任何比特。C++的设计目标是bitwise constness，但是实际上许多函数行为违反了这个特性。如下所示
+```cpp
 class CTextBlock {
   public:
     char& operator[](std::size_t position) const;  // inappropriate declaration
@@ -105,8 +129,30 @@ const CTextBlock cctb("World");
 char *pc = &cctb[0];
 *pc = 'J';  // can pass
 ```
-If any member value may be modified and it should be valid for const. You should add a mutable modifier. For example
-```c++
+
+这就导致了logical constness的概念，即const成员函数可以以客户端无法检测的方式修改对象的一些比特。
+
+例如，上面的CTextBlock类中想要缓存字符串的长度。
+```cpp
+class CTextBlock {
+  public:
+    std::size_t length() const;
+  private:
+    char *pText;
+    std::size_t textLength;
+    bool lenghtIsValid;
+};
+std::size_t CTextBlock::length() const {
+  if (lengthIsValid) {
+    textLength = std::strlen(pText);
+    lengthIsValid = true;
+  }
+  return textLength;
+}
+```
+上述写法是无法通过编译的，因为它范围了bitwise constness。
+解决方法是使用multable关键字，即
+```cpp
 class CTextBlock {
   public:
     std::size_t length() const;
@@ -117,10 +163,10 @@ class CTextBlock {
 };
 ```
 
-## Avoidng Duplicatio in const and Non-const Member Functions
-In TextBlock class, we overloaded operator[] function for const and non-const. If we performed bounds checking, it will yields code duplication.
-The solution is below
-```c++
+在CTextBlock中，我们重载了operator\[\]的常量版本和非常量版本。这两个函数简单的返回了字符引用。但是，当我们要在返回之间执行一些其他操作，如边界检查，日志记录等等，我们需要在两个重载版本中都添加相应的代码，这将会导致代码的重复。
+
+我们想要只实现一次，但可以在两个地方使用，即让一个版本的operator\[\]调用另一个版本的operator\[\]，为此需要进行转换。即
+```cpp
 class TextBlock {
   public:
     const char& operator[](std::size_t position) const;
@@ -134,9 +180,10 @@ class TextBlock {
 
 # Make sure that objects are initialized before they're used
 C++对象的初始化规则通常比较复杂，最好的方法就是在使用之前进行初始化。
+
 对于对象的成员，我们应该使用初始化列表进行初始化而不是在构造函数内赋值，初始化列表通常比较高效，初始化列表中的参数会作为成员构造器的参数进行对象创建，而在构造器内赋值时，会先调用成员对象的默认构造器（实际上时在进入构造体之前调用的）然后在进行赋值（构造器内实际上是赋值而不是初始化）。
 当初始化列表中没有参数的时候，会调用成员对象的默认构造器，如下所示
-```c++
+```cpp
 ABEntry::ABEntry(): theName(),theAddress(),thePhones() {}
 ```
 但是，当成员对象是引用或常量时，则必须在初始化列表中进行初始化，因为，他们不能进行赋值。
@@ -148,7 +195,7 @@ ABEntry::ABEntry(): theName(),theAddress(),thePhones() {}
 一个翻译单元是产生单个目标文件的源代码，通常是一个源文件加上include的所有文件。
 若在一个翻译单元中的非局部静态对象使用了另一个翻译单元的非局部静态对象，这个对象可能是未初始化的，因为在两个不同翻译单元的非局部静态变量的初始化顺序是未定义的。
 一个解决方式是将非局部静态对象移动到函数中定义，使其成为局部的静态变量，使用函数调用获取对象的该引用，类似于单例。示例如下
-```c++
+```cpp
 //file_system.cpp
 class FileSystem{...};
 FileSystem& tfs() {
@@ -169,9 +216,8 @@ Directory& tempDir() {
 ```
 
 # Know what functions c++ silently writes and calls
-For a class, if you don't declare them yourself, compilers will declare their own version of a copy constructor, a copy assignment operator, and a destructor(If they are needed). If you do not declare any constructor, compilers will also declare a default constructor.
-The following two declaration is essentially the same.
-```c++
+对于一个类，若没有声明复制构造函数、复制赋值操作符和析构函数，编译器会自动生成这三个函数。若没有声明构造函数，则编译器会自动声明默认构造函数。即，下面的两个声明是一致的。
+```cpp
 // declaration one
 class Empty{};
 // declaration two
@@ -184,18 +230,19 @@ class Empty{
     Empty& operator=(const Empty& rhs){}
 };
 ```
+除非类继承了一个基类且基类的析构函数是虚的，否则生成的析构函数是虚的。
 
-The generated destructor usually is non-vitual unless its base class declares a virtual destructor.
+编译器生成的复制构造函数和复制赋值操作符仅仅会简单的复制非静态的成员变量。
 
-The copy constructor and the copy assignment operator will simply copy each non-static data member. But if a class contains a reference member or a const member, compiler won't generate a default copy assignment operator. You must define the copy assignment operator yourself.
-
-If the copy assignment operator of the base class is private, compilers will not refuse to generator default copy assignment operator.
+有以下几种情况，编译器不会生成复制赋值运算符
+1. 编译器声明的复制赋值操作符的行为必须是合法的且有意义的，否则编译器会拒绝生成复制赋值运算符。如当成员变量包含引用成员或常量成员的时候。
+2. 若类继承了基类，且基类中的复制赋值运算符是私有的。
 
 # Explicitly dissallow the use of compiler-generated functions you do not want.
-If you do not want to support copying, you can't just simply not declaring copy constructor and copy assignment operator, beacuse compilers will generate them when needed.
+根据上面的条款，如果类不想支持复制，不能简单的不声明复制构造函数和复制赋值运算符，因为编译器会在需要的时候自动生成这两个函数。
 
-One scheme is declare the copy constructor and copy assignment operator private and do not define them. For example
-```c++
+其中一个方是将这两个函数声明为私有且不进行定义，如下所示。
+```cpp
 class HomeForSale {
   public:
 
@@ -204,10 +251,10 @@ class HomeForSale {
     HomeForSale& operator=(const HomeForSale&);
 }
 ```
-The solution above has a problem: it can pass compiler and cause link-time error.
+这个解决方案的一个问题是，复制操作可以通过编译，但会在链接时期报错。
 
-The another scheme that move the link-time error up to compile time is that declaring the copy contructor and copy assignment operator private in the base class instead of HomeForSale class. For example
-```c++
+另一个方案可以在编译器得到错误，即声明一个复制构造函数和复制赋值运算符为私有的基类，让类去继承这个基类。例如
+```cpp
 class Uncopyable {
   protected:
     Uncopyable(){}
@@ -220,17 +267,23 @@ class HomeForSale : private Uncopyable{
 
 };
 ```
-This work because compilers will try to generator copy constructor and copy assignment operator and these functions will try to call their base counterparts and fails.
-This solution include some subtleties
-1. Multiple inheritance.
+
+C++11中有更好的方法，即声明为delete。
+```cpp
+class HomeForSale {
+  public:
+    HomeForSale(const HomeForSale&) = delete;
+    HomeForSale& operator=(const HomeForSale&) = delete;
+}
+```
 
 # Declare destructor virtual in polymorphic base classes
-In C++, when a derived class object is deleted through a pointer to a base class with a non-virtual destructor, result are undefined. The derived part of the object may never be destroyed at the runtime, thus leading to a curious partially destroyed object.
+当基类的构造函数是非虚的时候，删除基类指针指向的派生类时，结果是未定义的。因为仅有基类的析构函数会被调用，而派生类的析构函数不会调用，因此，基类的部分被销毁了而派生类的部分不会被销毁。
 
-The solution is that give the base class a virtual destructor. Any class with virtual functions should almost certainly have a virtual destructor, Because if a class does not contain virtual functions, it is not meant to be used as a base class.
+因此，对于基类的析构函数要声明为虚拟的。
 
-When a class is not intended to be a base class, making the destructor virtual is usually a bad idea. Assume we have a class below
-```C++
+但是，当一个类不准备作为基类的时候，声明析构函数为虚拟的通常不是一个好主意。假设有以下类
+```Cpp
 class Point {
   public:
     Point(int xCoord, int yCoord);
@@ -239,17 +292,21 @@ class Point {
     int x, y;
 };
 ```
-If an int occupies 32 bits, then a Point object is 64 bits. Furthermore, such a Point object can be pass as a 64-bit quantity to functions written in other languages, such as C.
+如果一个int占32个字节，那么一个Point对象会占用64个字节，能正好放到寄存器中。此外，这个对象还可以作为一个64位的量传递给其他语言编写的函数。
 
-But if Point's desctructor is virtual, the object will contain a additional pointer called vptr(virtual table pointer). The Point objects will increase in size. As a result, it is no longer possible to pass Points to and from functions written in other languages.
+但是，若Point的析构函数是虚拟的，那么对象会包含一个额外的指针，虚表指针。这个指针使得Point的大小增加了，因此，Point对象不能传递给其他语言编写的函数。
 
-You must provide a definition for the pure virtual destrcutor. Compiler will generate a call to base class desctructor from its derived classes' destructors. If you don't, the linker will complain.
+对于纯虚析构函数，必须提供一个定义。因为在派生类析构的时候，编译器会都用基类的写够函数，此时会产生连接错误。
 
-This rule applies only to polymorphic base classes.
+在C++11之后，可以使用final关键字类禁止继承。如
+```cpp
+class Point final {
+
+};
+```
 
 # Prevent exceptions from leaving desctructors
-Emitting exceptions from destructors is not a good idea. 
-Consider below the class
+C++不鼓励在析构函数中抛出异常，考虑下面的代码。
 ```c++
 class Widget {
   public:
@@ -260,11 +317,11 @@ void doSomething() {
   ...
 }
 ```
-When the vector v is destroyed, it will destroying all the Widgets in it. Assume an exception is thrown during destruction of the first one. The other Widgets still have to be destroyed. So, if another destructor is called and throws an exception, there are two simultaneously active exceptions. In this situation, program execution either terminates or yields underfined behavior.
+当向量v被销毁的时候，会销毁容器内的所有对象。假设在销毁第一个对象的时候，析构函数抛出了一个异常。剩余的对象依然需要被销毁，因此，v会继续调一下对象的析构函数，当出现第二个异常的时候，就有两个同时激活的异常。根据准确性条件，此时程序会终止或产生不确定的行为。
 
-There are two solutions
-1. Terminate the program.
-   ```c++
+当析构函数出现异常的时候，有两种选择
+1. 终止程序，如
+   ```cpp
    DBConn::~DBConn() {
      try {
        db.close();
@@ -274,8 +331,8 @@ There are two solutions
      }
    }
    ```
-2. swallow the exception. When choosing this scheme, the program must be able to reliably continue execuftion even after an error has been encountered and ignored.
-   ```c++
+2. 吞下异常。在选择这种方案的时候，即使忽略错误之后，程序也能可靠的继续执行。
+   ```cpp
    DBConn::~DBConn() {
      try {
        db.close();
@@ -284,10 +341,10 @@ There are two solutions
      }
    }
    ```
+上述两种方案都有一个缺点，即程序没有机会对异常做出回应。
 
-The two solutions above have a disadvantage. The program has not opportunity to react to the problems that may arise.
-A better strategy is shown as below
-```c++
+一个更好的策略如下，类提供一个close函数给客户端，客户端可以同过这个函数来处理抛出的异常。如果客户端关闭连接失败，或客户端不关心，或忘记调用，析构函数会吞掉异常。
+```cpp
 class DBConn {
   public:
     void close() {
@@ -305,8 +362,9 @@ class DBConn {
 ```
 
 # Never call virtual functions during construction or desctuction
-Let's see the code below
-```c++
+不应该在构造函数或析构函数中调用虚函数，因为它的行为是不确定的。
+参见如下代码
+```cpp
 class Transaction {
   public:
     Transaction() {
@@ -323,42 +381,46 @@ class SellTransaction: public Transaction {
     virtual void logTransaction() const;
 }
 ```
-When you create a derived class object, the base class constructor will be call before the derived clss constructor. If you call virtual fucntions in the base class constructor, it will not call the derived class version, because derived class data members have not been initialized.
+当创建一个派生类对象时，基类构造器会在派生类构造器调用之前调用。如果在基类构造器中调用虚函数，此时不会调用派生类的函数版本，因为派生类数据成员还没有初始化。在析构函数中调用虚函数时也是同样的道理。
 
-Actually, during base class constructor of a derived class object, the type of the object is that of the base class.
+在派生类对象的基类构造函数执行期间，对象的类型时基类。
 
-The same reasoning applies during destruction.
-
-The solution is that to turn logTransaction into a non-virutal function, then require that derived class constructors pass the necessary log information to the Transaction constructor.
-   ```c++
-   class Transaction {
-     public:
-      explicit Transaction(const std::string& logInfo) {
-        logTransaction(logInfo);
-      }
-      void logTransaction(const std;:string& logInfo) const;
-   };
-   class BuyTransaction: public Transaction {
-     public:
-      BuyTransaction(parameters):Transaction(createLogString(parameters)) {...}
-     private:
-      static std::string createLogString(parameters);  // make the functions static in case of referring to uninitialized datamembers.
-   }
-   ``` 
+其中一个解决方案时将logTransaction函数转换为非虚函数，然后要求派生类的构造器传递必要的信息给构造器。如下所示
+```cpp
+class Transaction {
+  public:
+  explicit Transaction(const std::string& logInfo) {
+    logTransaction(logInfo);
+  }
+  void logTransaction(const std;:string& logInfo) const;
+};
+class BuyTransaction: public Transaction {
+  public:
+  BuyTransaction(parameters):Transaction(createLogString(parameters)) {...}
+  private:
+  static std::string createLogString(parameters);  // make the functions static in case of referring to uninitialized datamembers.
+}
+``` 
 
 # Have assignment operators return a reference to *this.
-C++ supports chain of assignments and the assignment is right-associative. 
+C++支持链式赋值且赋值时右联的，即
 ```c++
 int x, y, z;
 x = y = z = 15;  // equal to x = (y = (z = 15))
 ```
-The assignment returns a reference to its left-hand argument.
+赋值实际上返回左边参数的引用。
 
-When you implement assignment operators for your classes, you should follow the convention.
+因此当为类实现赋值运算符的时候，需要遵循这个约定，即
+```c++
+Widget& operator=(const Widget& rhs) {
+  ...
+  return *this;
+}
+```
 
 # Handle assignment to self in operator=
-When you implement a operator= in a class, it may occurs self-assignment and this will cause some problem. For example
-```c++
+当在类中实现赋值运算符的时候，可能会出现自己赋值给自己的情况，这种情况会出现一些问题，因此需要特别处理，问题如下所示。
+```cpp
 class Bitmap{};
 class Widget {
   public:
@@ -372,8 +434,8 @@ class Widget {
 }
 ```
 
-The traditional way to prevent this error is to check for assignment to self via an identity test at the top of operator=
-```c++
+传统的方法通过一致性测试来判断是否是自赋值，从而防止上述错误的发生。
+```cpp
 Widget& operator=(const Widget& rhs) {
   if (this == &rhs)
     return *this
@@ -382,10 +444,10 @@ Widget& operator=(const Widget& rhs) {
   return *this;
 }
 ```
-The scheme above can avoid self-assignment, but it was exception-unsafe. If the "new Bitmap" expression yields an exception, the Widget will hold a pointer to a deleted Bitmap.
+上述方法存在一个问题，它不是异常安全的，即当new Bitmap发生异常的时候，Widget对象可能会持有一个删除的指针。
 
-A exception-safe and assignment-safe solution is shown also below
-```c++
+异常安全的版本如下所示，在下述代码中，直到副本创建成功之后，才删除原来的指针。如果比较在意效率，可以在函数的最开始添加一致性测试，但是考虑到自赋值情况少见，添加一致性测试之后增加了代码分支，可能影响指令预取、缓存、流水线等效率。
+```cpp
 Widget& operator=(const Widget& rhs) {
   Bigmap *pOrig = pb;
   pb = new Bitmap(*rhs.pb);
@@ -393,8 +455,8 @@ Widget& operator=(const Widget& rhs) {
   return *this;
 }
 ```
-A alternative to solution is use the technique know as "copy and swap"
-```c++
+另外，也可以用copy and swap的技术来解决问题，即
+```cpp
 class Widget {
   public:
     void swap(Widget& rhs);  // exchange rhs's data and *this's data.
@@ -412,55 +474,88 @@ class Widget {
 ```
 
 # Copy all parts of an object
-Copying functions should be sure to copy all of an object's data members and all of its base class parts.
+复制函数指复制构造函数和复制赋值函数，复制函数需要复制对象的所有的成员对象以及所有基类部分。特别是当类增加了成员变量的时候，需要记得修改复制函数。
 
-Don't try to implement one of the copying functions in terms of the other. Instead, put common functionality in a third function that both call.
+另一个需要注意的地方是继承，子类的复制函数需要记得调用父类的复制函数，如下所示
+```c++
+class PriorityCustomer: public Customer {
+public:
+  PriorityCustomer(const PriorityCustomer& rhs);
+  PriorityCustomer& operator=(const PriorityCustomer& rhs);
+private:
+  int prioirty;
+};
+PriorityCustomer::PriorityCustomer(const PriorityCustomer& rhs) 
+  : Customer(rhs),  // need to be remembered
+    priority(rhs.priority){}
+PriorityCustomer& PriorityCustomer::operator=(const PriorityCustomer& rhs) {
+  Customer::operator=(rhs); // need to be remembered
+  priority = rhs.priority;
+  return *this;
+}
+```
+
+通常，因为两个复制函数之间存在相似性，存在重复代码。但是，我们无法通过复制函数之间的互相调用来消除重复性，因为互相调用时没有意义的。因此，为了消除重复代码，需要创建第三个函数，然后两个复制函数调用第三个函数。
 
 # Use objects to manage resources
-There are two critical aspects of using objects to manager resources
-- Resources are acquired and immediately turned over to resource-managing objects.
-- Resource-managing objects use their destructors to ensure that resources are released.
+考虑如下代码
+```cpp
+void f() {
+  Investment *pInv = createInvestment();
+  ...
+  delete pInv;
+}
+```
+在上述代码中，被省略的部分可能会有返回语句、抛出异常等情况导致资源无法删除。即使经过仔细的设计可以避免这些问题，但是，代码可能会发生变化，修改时可能完全没有代码，或者是，省略部分调用的函数被修改了，抛出了异常，而此函数没有进行处理。因此，依靠这种方式释放资源容易出错。
 
-This item suggests that if you're releasing resources manually, you're doing something wrong.
+为了确保资源被释放，可以将资源放在对象中，对象的析构函数来释放资源。标准库中的auto_ptr适用于这种情况。
+
+使用对象管理资源有两个重要的方面
+1. 资源在获取后就被转交到资源管理对象
+2. 资源管理对象使用析构函数来保证资源被释放
+
+为了保证不会有多个auto_ptr指向同一个对象，auto_ptr的复制会转移资源的所有权。
+
+auto_ptr的一个替代时引用计数的智能指针(RCSP)，一个RCSP会追踪有多少个对象指向资源并且在没有对象指向资源的时候自动释放资源。但是，RCSP无法解决循环引用。
 
 # Think carefully about copying behavior in resource-managing classes
-There are some copying behaviors as below
-1. Prohibit copying
-2. Reference-count the underlying resource
-3. Copy the underlying resource
-4. Transfer ownership of the underlying resouce
+RAII思想是资源管理的基础。但是，RAII对象的复制行为需要仔细考虑，总共有以下几种复制行为
+1. 禁止复制
+2. 引用计数
+3. 复制基本资源
+4. 转移基本资源的所有权
 
-So the copying function behavior should depend on what you want.
+所以复制函数的应该根据实际需要来实现。
 
 # Provide access to raw resources in resource-managing classes.
-When you use classes to manage resources, you should access the resources with resource-managing classes, never sullying your hands with direct access to raw resources. But many APIs refer to access to raw resources. So you should provide a way to convert object into the raw resource it contains in resource-managing classes.
+当使用资源管理类来管理资源时，应该通过资源管理类来访问资源，而不是直接访问原始资源。但是许多API需要访问原始资源，所以资源管理类应该提供对原始资源的访问。
 
-There two general ways to do it: explicit conversion and implicit conversion.
-1. explicit conversion means that you should offer a get member function to return the raw pointer. But everytime you want to use raw resource, you must requset the get function. That in turn, would increase the chances of leaking fronts.
-2. implicit conversion function is shown as below
+有以下两种方式执行这种转换
+1. 显示转换，即提供一个成员函数来返回原始资源的指针，每次需要原始指针式都需要调用函数。
+2. 隐式转换，如下所示
    ```c++
    class Font {
      public:
       operator FontHandle() const {reutrn f;}  //implicit conversion function
    }
    ```
-   The downside is that implicit conversions increase the chance of error. For example
+   隐式转换的缺点是出错的机会增加了。考虑以下代码
    ```c++
    Font f1(getFont());
-
    FontHandle f2 = f1;  // f2 can access f1's resource. When f1 is destroyed, f2 will dangle.
    ```
-   The decision about to offer explicit conversion or to offer implicit conversion is one that depends on the situation.
-   explicit conversion is safer, but implicit conversion is more convenient for client. It is a tradeoff.
+
+提供隐式转换还是显示转换主要依赖于实际情况。显示转换更加安全，但是隐式转换更加方便
+
 
 # Use the same form in corresponding uses of new and delete
-When employing a new expression, two things happen. 
-1. allocate memory
-2. call one or more constructors for that memory
+当使用new表达式时，有两件事情发生
+1. 分配内存
+2. 在分配的内存上调用一个或多个构造函数
 
-The same as empolying a delete express
-1. one or more destructors are called.
-2. the memory is deallocated.
+当使用delete表达式时，也有两件事情发生
+1. 调用一个或多个析构函数。
+2. 回收分配的内存
 
 If you use [] in a new expression, you must use [] in the corresponding delete expression. If you don’t use [] in a new expression, you mustn’t use [] in the corresponding delete expression.
 
@@ -629,7 +724,7 @@ result = oneHalf * 2;  // pass
 result = 2 * oneHalf;  // error
 ```
 The first one successes because the compiler call a non-expllicit constructor to create a temporary Rational object from 2.
-```
+```cpp
 const Rational temp(2);
 result oneHalf * temp;
 ```
@@ -1150,7 +1245,7 @@ In the application domain, composition means has-a. In the implementation domain
 # Use private inheritance judiciously
 private inheritance has two behavior.
 * Compiler will generally not convert a derived class object into bass class object if the inheritance relationsip between the classes is private.
-* Members inherited froma private base class become private members of the derived class.
+* Members inherited from a private base class become private members of the derived class.
 ```c++
 class Person {};
 class Student: private Person{};
@@ -1362,7 +1457,7 @@ This will compile only if there is an implicit conversion from a U* pointer to a
 
 It is not end. Compiler will generate copy constructor and copy opertor function if needed. A important thing is that Declaring a generalized copy constructor in a class doesn't keep compilers from generating their own copy constructor.
 
-So you must declare both a generalized copy constructo as well as the normal copy constructor.
+So you must declare both a generalized copy constructor as well as the normal copy constructor.
 ```c++
 template<typename T>
 class SmartPtr {

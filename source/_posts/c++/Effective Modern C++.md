@@ -26,7 +26,7 @@ There are three cases
 ## Case 1: *ParamType* is a pointer or reference type, but not a [universal reference](#Distinguish universal references from rvalue references)
 
 In this case, type deduction works like this
-1. I *expr*'s type is a reference(pointer), ignore the reference(pointer) part.
+1. If *expr*'s type is a reference(pointer), ignore the reference(pointer) part.
 2. Then pattern-match *expr*'s type against *ParamType* to determine T.
 
 ```c++
@@ -279,7 +279,7 @@ class Widget {
 ```
 
 Uncopyable objects may be initialized using braces or parentheses, but not using "=";
-```c++
+```cpp
 std::atomic<int> ai1{0};  // pass
 std::atomic<int> ai2(0);  // pass
 std::atomic<int> ai3 = 0; // error
@@ -384,7 +384,7 @@ Their new C++11 counterparts, scoped enums, don't leak names in this way
 ```c++
 enum class Color {black, white, red};
 auto white false; // fine
-Color c = whilte; // error
+Color c = white; // error
 Color c = Color::white; // fine
 ```
 
@@ -515,7 +515,7 @@ In this case, make const member functions thread safe unless you're certain they
 Use of std::atomic varialbes may offer better performance than a mutex, but they're suited for manipulation of only a single variable or memory location.
 
 # Understand special member function generation
-The special member functions are the ones that C++ is willing to generate on its onw. C++98 has four such functions: the default constructor, the destructor, the copy constructor and the copy assignment operator.
+The special member functions are the ones that C++ is willing to generate on its own. C++98 has four such functions: the default constructor, the destructor, the copy constructor and the copy assignment operator.
 
 Generated special member functions are implicitly public and inline. They’re nonvirtual unless the function is a destructor in a derived class inheriting from a base class with a virtual destructor.
 
